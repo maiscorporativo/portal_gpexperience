@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-main: #082242;
+  --color-gold: #f37126;
+  --color-accent: #f8f8f8;
+  --font-sans: 'Outfit', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-up: marquee-up 35s linear infinite;
+  --animate-marquee-down: marquee-down 35s linear infinite;
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marquee-up {
+    0% {
+      transform: translateY(0);
+    }
+
+    100% {
+      transform: translateY(calc(-50% - 0.5rem));
+    }
+  }
+
+  @keyframes marquee-down {
+    0% {
+      transform: translateY(calc(-50% - 0.5rem));
+    }
+
+    100% {
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-primary-main text-white antialiased font-sans;
+  }
+
+  /* Global Keyboard Accessibility Strategy */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-primary-main rounded-sm transition-shadow;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* 3D Hover Effect Utilities */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .hover-3d-effect {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .hover-3d-effect:hover {
+    transform: translateY(-8px) rotateX(4deg) rotateY(-4deg) scale3d(1.02, 1.02, 1.02);
+    box-shadow: 
+      20px 20px 30px rgba(0,0,0,0.15), 
+      -10px -10px 20px rgba(255,255,255,0.8),
+      inset 0 0 0 1px rgba(255,255,255,0.4);
+  }
+  
+  /* Adds a subtle glare/shine effect on hover */
+  .hover-3d-effect::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(105deg, 
+      transparent 20%, 
+      rgba(255,255,255,0.3) 25%, 
+      transparent 30%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.6s ease;
+    transform: translateX(-100%);
+    pointer-events: none;
+    z-index: 50;
+  }
+  
+  .hover-3d-effect:hover::after {
+    opacity: 1;
+    transform: translateX(100%);
+  }
+
+  /* Reveal on Scroll Animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: opacity, transform;
+  }
+  
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .reveal-delay-100 { transition-delay: 100ms; }
+  .reveal-delay-200 { transition-delay: 200ms; }
+  .reveal-delay-300 { transition-delay: 300ms; }
+  .reveal-delay-400 { transition-delay: 400ms; }
+  .reveal-delay-500 { transition-delay: 500ms; }
+
+  /* Hide scrollbar for elements but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}

@@ -1,0 +1,28 @@
+export default function PartnersMarquee() {
+  return (
+    <section className="py-20 border-b border-white/5 bg-[#041121] overflow-hidden flex flex-col items-center">
+      <p className="text-[11px] text-[#4a6f93] uppercase tracking-[0.2em] mb-10 font-bold z-10 px-6 text-center">
+        Provedor Oficial de Hospitalidade da
+      </p>
+
+      <div className="w-full relative flex overflow-hidden">
+        {/* Gradient masks for smooth fade in/out on edges */}
+        <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#041121] to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#041121] to-transparent z-10 pointer-events-none"></div>
+
+        <div className="flex w-max animate-marquee opacity-40 hover:opacity-100 transition-opacity duration-300">
+          {[1, 2, 3, 4].map((set) => (
+            <div key={set} className="flex items-center justify-around gap-16 md:gap-32 px-8 md:px-16 w-max" aria-hidden={set !== 1 ? "true" : "false"}>
+              <span className="font-bold text-xl md:text-3xl">NFL</span>
+              <span className="font-bold text-xl md:text-3xl">NCAA</span>
+              <span className="font-bold text-xl md:text-3xl">UFC</span>
+              <span className="font-bold text-xl md:text-3xl">FIFA</span>
+              <span className="font-bold text-xl md:text-3xl italic">olympics</span>
+              <span className="font-bold text-lg md:text-2xl">Wimbledon</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
