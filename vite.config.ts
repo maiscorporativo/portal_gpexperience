@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/e-mais/',   // URL de produção: mais.tu.br/e-mais
   plugins: [react(), tailwindcss()],
   server: {
     port: 3010,
