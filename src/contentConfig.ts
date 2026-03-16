@@ -33,7 +33,7 @@ export const DEFAULT_PACKAGES: TrendingPackage[] = [
     price: '9.500',
     img: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
     badge: 'superbowl',
-    description: 'Acompanhe a grande final do futebol americano em Nova Orleans com máximo conforto. Desfrute da lendária hospitalidade sulista conjugada com um nível de serviço padrão On Location.',
+    description: 'Acompanhe a grande final do futebol americano em Nova Orleans com máximo conforto. Desfrute da lendária hospitalidade sulista com um nível de serviço premium.',
     flightDetails: 'Voos de ida e volta (Classe Econômica) via Delta Airlines, saindo de São Paulo (GRU) para Nova Orleans (MSY). Upgrade disponível sob consulta.',
     hotelDetails: '4 noites de hospedagem no recém-renovado Four Seasons New Orleans. Quarto Standard King com café da manhã incluso.',
     ticketDetails: 'Loge Box com visão central. Inclui acesso VIP à festa pré-jogo On the Fifty com shows, open bar premium e buffet de alta gastronomia assinado por Chefs renomados.',
@@ -49,7 +49,7 @@ export const DEFAULT_PACKAGES: TrendingPackage[] = [
     description: 'Celebre o espírito olímpico no coração de Paris. Tenha um lugar privilegiado nos eventos esportivos globais com o selo Paris 2024 Hospitality.',
     flightDetails: 'Passagem aérea Air France (GRU-CDG) ida e volta. Não inclui transfers.',
     hotelDetails: 'Acomodação 4 Estrelas nas margens do Rio Sena. Escolha flexível do número de noites na região do Marais ou Saint-Germain.',
-    ticketDetails: 'Acesso VIP aos louges de hospitalidade On Location (Club House 24). Ingressos de Categoria A para a cerimônia de abertura e para 3 modalidades à sua escolha.',
+    ticketDetails: 'Acesso VIP aos lounges de hospitalidade exclusiva (Club House 24). Ingressos de Categoria A para a cerimônia de abertura e para 3 modalidades à sua escolha.',
   },
   {
     tag: 'PREMIUM',

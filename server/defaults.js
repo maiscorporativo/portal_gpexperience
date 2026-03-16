@@ -24,7 +24,7 @@ export const DEFAULT_PACKAGES = [
     description: 'Celebre o espírito olímpico no coração de Paris.',
     flightDetails: 'Passagem aérea Air France (GRU-CDG) ida e volta.',
     hotelDetails: 'Acomodação 4 Estrelas nas margens do Rio Sena.',
-    ticketDetails: 'Acesso VIP aos lounges de hospitalidade On Location.',
+    ticketDetails: 'Acesso VIP aos lounges de hospitalidade exclusiva.',
   },
   {
     tag: 'PREMIUM', title: 'WrestleMania 41', loc: 'Las Vegas, NV', date: '19 - 20 Abr, 2026', price: '2.500',
