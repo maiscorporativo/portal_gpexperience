@@ -27,7 +27,7 @@ function FloatInput({
         onBlur={() => setFocused(false)}
         style={{
           width: '100%', boxSizing: 'border-box',
-          background: 'rgba(255,255,255,0.04)',
+          background: '#0d2d4e',
           border: `1.5px solid ${focused ? '#f37126' : 'rgba(255,255,255,0.1)'}`,
           borderRadius: 12,
           color: '#fff',
@@ -216,7 +216,7 @@ function PackageSelect({ id, value, onChange }: { id: string; value: string; onC
           placeholder={open ? 'Buscar pacote...' : ' '}
           style={{
             width: '100%', boxSizing: 'border-box',
-            background: active ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
+            background: active ? '#0e3055' : '#0d2d4e',
             border: `1.5px solid ${active ? '#f37126' : 'rgba(255,255,255,0.1)'}`,
             borderRadius: open ? '12px 12px 0 0' : 12,
             color: '#fff', fontSize: 15,
@@ -372,7 +372,7 @@ export default function ContactForm() {
       const pkgObj = packages.find(p => p.title === pacote && !p.deletedAt);
       const pacoteEnvio = pkgObj
         ? [pkgObj.title, pkgObj.price ? `${pkgObj.currency || 'BRL'} ${pkgObj.price}` : '', pkgObj.loc || '']
-            .filter(Boolean).join(' | ')
+          .filter(Boolean).join(' | ')
         : pacote;
 
       const res = await fetch('/api/contact', {
@@ -382,7 +382,7 @@ export default function ContactForm() {
           nome,
           email,
           telefone,
-          pacote:      pacoteEnvio,
+          pacote: pacoteEnvio,
           origem_lead: window.location.hostname,
           data_lead,
         }),
@@ -572,7 +572,7 @@ export default function ContactForm() {
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
                 >
                   {status === 'sending' ? 'Enviando…' : (
-                    <>Enviar mensagem <ArrowRight size={16} strokeWidth={2.5} /></>
+                    <>Enviar formulário <ArrowRight size={16} strokeWidth={2.5} /></>
                   )}
                 </button>
 

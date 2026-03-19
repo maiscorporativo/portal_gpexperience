@@ -154,3 +154,23 @@ html {
     background: rgba(255,255,255,0.07);
   }
 }
+
+/* ── Autofill: elimina flash branco/amarelo do browser ──────────────── */
+@keyframes autofillFix {
+  from { background-color: #0d2d4e; }
+  to   { background-color: #0d2d4e; }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  animation-name: autofillFix;
+  animation-duration: 0.001s;
+  animation-fill-mode: both;
+  -webkit-box-shadow: 0 0 0 1000px #0d2d4e inset !important;
+  box-shadow: 0 0 0 1000px #0d2d4e inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  color-scheme: dark;
+}

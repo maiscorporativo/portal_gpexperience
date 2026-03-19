@@ -4,26 +4,33 @@ const router = express.Router();
 
 const CLINT_WEBHOOK = 'https://functions-api.clint.digital/endpoints/integration/webhook/6ae05bc2-054e-4edc-af58-18cccc0f81c6';
 
-/* POST /api/contact — envia os dados do formulário para a Clint via POST puro (FormData) */
+/* POST /api/contact — repassa para a Clint como application/x-www-form-urlencoded (igual ao exemplo que funciona) */
 router.post('/', async (req, res) => {
-  const { nome, email, telefone, pacote, origem_lead, data_lead } = req.body;
+  const { nome, email, telefone, pacote, origem_lead, data_lead } = req.body ?? {};
 
   if (!nome || !email || !telefone) {
     return res.status(400).json({ error: 'nome, email e telefone são obrigatórios.' });
   }
 
   try {
-    const form = new FormData();
-    form.append('nome',        nome);
-    form.append('email',       email);
-    form.append('telefone',    telefone);
-    form.append('pacote',      pacote      || '');
-    form.append('origem_lead', origem_lead || '');
-    form.append('data_lead',   data_lead   || '');
+    // URLSearchParams — mesmo formato do exemplo que funciona na Clint
+    const dadosClint = new URLSearchParams();
+    dadosClint.append('nome', nome);
+    dadosClint.append('email', email);
+    dadosClint.append('telefone', telefone);
+    dadosClint.append('pacote', pacote || '');
+    dadosClint.append('origem_lead', origem_lead || '');
+    dadosClint.append('data_lead', data_lead || '');
 
-    const upstream = await fetch(CLINT_WEBHOOK, { method: 'POST', body: form });
+    console.log('[CLINT] enviando →', dadosClint.toString());
+
+    const upstream = await fetch(CLINT_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: dadosClint.toString(),
+    });
+
     const text = await upstream.text();
-
     let data = {};
     try { data = JSON.parse(text); } catch { data = { raw: text }; }
 

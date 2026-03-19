@@ -19,7 +19,8 @@ const PORT = process.env.PORT || 3001;
 
 /* ── Middleware ─────────────────────────────────────────────── */
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '50mb' })); // 50 MB para suportar imagens base64
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true })); // parse form POST do ContactForm
 
 /* ── Servir uploads estáticos (imagens salvas no disco) ─────────── */
 const publicPath = join(__dirname, '..', 'public');
@@ -87,3 +88,4 @@ app.listen(PORT, async () => {
   console.log(`   Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`   Banco:    ${process.env.DB_NAME || 'emais_cms'} @ ${process.env.DB_HOST || 'localhost'}\n`);
 });
+
