@@ -1,8 +1,8 @@
 export default function PartnersMarquee() {
   return (
-    <section className="py-20 border-b border-white/5 bg-[#041121] overflow-hidden flex flex-col items-center">
+    <section className="py-20 border-b border-white/5 overflow-hidden flex flex-col items-center" style={{ background: 'linear-gradient(to bottom, transparent 0%, #041121 60%)' }}>
       <p className="text-[11px] text-[#4a6f93] uppercase tracking-[0.2em] mb-10 font-bold z-10 px-6 text-center">
-        Provedor Oficial de Hospitalidade da
+        Eventos mais iconicos e importantes do mundo
       </p>
 
       <div className="w-full relative flex overflow-hidden">

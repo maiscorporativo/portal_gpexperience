@@ -3,6 +3,7 @@
 @theme {
   --color-primary-main: #082242;
   --color-gold: #f37126;
+  --color-gold-secondary: #faa71d;
   --color-accent: #f8f8f8;
   --font-sans: 'Outfit', sans-serif;
   --font-heading: 'Outfit', sans-serif;
@@ -130,5 +131,26 @@ html {
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+  }
+
+  /* Contact form input */
+  .form-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 0.625rem;
+    color: #fff;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    font-family: inherit;
+  }
+  .form-input::placeholder {
+    color: rgba(255,255,255,0.25);
+  }
+  .form-input:focus {
+    border-color: var(--color-gold);
+    background: rgba(255,255,255,0.07);
   }
 }

@@ -1,13 +1,33 @@
 import { Check } from 'lucide-react';
-import { useToast } from './ui/ToastProvider';
 import Reveal from './Reveal';
+import { useImageConfig } from '../hooks/useImageConfig';
+import type { ImageKey } from '../imageConfig';
 
 export default function PlatinumAccess() {
-  const { toast } = useToast();
+  const { getImage } = useImageConfig();
 
-  const handleEmptyClick = () => {
-    toast('Ações de usuário estão desabilitadas neste Preview.', 'info');
+  const scrollToContact = () => {
+    const el = document.querySelector('footer');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const col1: { key: ImageKey; alt: string }[] = [
+    { key: 'platinum_col1_1', alt: 'Tênis' },
+    { key: 'platinum_col1_2', alt: 'Atletismo' },
+    { key: 'platinum_col1_3', alt: 'Natação' },
+    { key: 'platinum_col1_4', alt: 'Ciclismo' },
+    { key: 'platinum_col1_5', alt: 'Surfe' },
+    { key: 'platinum_col1_6', alt: 'Boxe' },
+  ];
+
+  const col2: { key: ImageKey; alt: string }[] = [
+    { key: 'platinum_col2_1', alt: 'Futebol' },
+    { key: 'platinum_col2_2', alt: 'Basquete' },
+    { key: 'platinum_col2_3', alt: 'Baseball' },
+    { key: 'platinum_col2_4', alt: 'Golfe' },
+    { key: 'platinum_col2_5', alt: 'Esqui' },
+    { key: 'platinum_col2_6', alt: 'Estádio' },
+  ];
 
   return (
     <section id="platinum" className="bg-gold text-black py-24 px-6 overflow-hidden">
@@ -26,10 +46,10 @@ export default function PlatinumAccess() {
               Curadoria. Personalização. <span className="font-semibold">Sem limites.</span>
             </h3>
             <p className="text-black/80 font-medium text-base md:text-lg leading-relaxed mb-10 max-w-xl">
-              Experimente o melhor do luxo em esportes e entretenimento. Nosso Acesso Platinum vai além do ingresso, oferecendo roteiros sob medida, festas VIP extraordinárias e anfitriões dedicados para um nível de serviço inigualável.
+              Antes, durante e depois — o Acesso Platinum transforma cada evento em uma experiência completa. Vivencie os bastidores com exclusividade e eleve seu pacote com upgrades sob medida, para qualquer esporte ou evento, em qualquer lugar do mundo.
             </p>
             
-            <button onClick={handleEmptyClick} className="text-sm font-bold uppercase tracking-[0.15em] text-white border-b-2 border-white pb-2 hover:text-black hover:border-black transition-colors mb-16">
+            <button onClick={scrollToContact} className="text-sm font-bold uppercase tracking-[0.15em] text-white border-b-2 border-white pb-2 hover:text-black hover:border-black transition-colors mb-16">
               Vamos Planejar a Viagem
             </button>
 
@@ -46,7 +66,7 @@ export default function PlatinumAccess() {
                 <div className="text-white mt-1 shrink-0 bg-black/10 p-2 rounded-full"><Check size={18} strokeWidth={3} /></div>
                 <div>
                   <h5 className="font-bold text-sm mb-1 uppercase tracking-[0.1em] text-white">Acesso Inigualável</h5>
-                  <p className="text-sm text-black/70 font-medium">No campo, vestiários, bastidores.</p>
+                  <p className="text-sm text-black/70 font-medium">Bastidores, áreas VIP e camarotes exclusivos.</p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
@@ -56,17 +76,75 @@ export default function PlatinumAccess() {
                   <p className="text-sm text-black/70 font-medium">Hotéis 5 estrelas e vilas privativas.</p>
                 </div>
               </div>
+              <div className="flex gap-4 items-start">
+                <div className="text-white mt-1 shrink-0 bg-black/10 p-2 rounded-full"><Check size={18} strokeWidth={3} /></div>
+                <div>
+                  <h5 className="font-bold text-sm mb-1 uppercase tracking-[0.1em] text-white">Experiência Pré-Evento</h5>
+                  <p className="text-sm text-black/70 font-medium">Acesso exclusivo aos bastidores, área VIP e meet & greet com atletas e artistas.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start sm:col-span-2">
+                <div className="text-white mt-1 shrink-0 bg-black/10 p-2 rounded-full"><Check size={18} strokeWidth={3} /></div>
+                <div>
+                  <h5 className="font-bold text-sm mb-1 uppercase tracking-[0.1em] text-white">Upgrades de Pacote</h5>
+                  <p className="text-sm text-black/70 font-medium">Eleve seu pacote a qualquer momento — camarotes, transfers privativos, open bar e muito mais.</p>
+                </div>
+              </div>
             </div>
           </Reveal>
 
-          {/* Right Images (Modern Collage) */}
-          <Reveal className="w-full lg:w-1/2 relative h-[500px] md:h-[600px] lg:h-[750px] rounded-[2rem] overflow-hidden group shadow-2xl shadow-black/30" delay={200}>
-             {/* Main background image */}
-             <img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Vista do estádio cheio durante o pôr do sol - Experiência Platinum" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-             
-             {/* Gradient Overlay for elegance */}
-             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
-             
+          {/* Right: Animated 2-column photo grid */}
+          <Reveal
+            className="w-full lg:w-1/2 relative h-[500px] md:h-[600px] lg:h-[680px] rounded-[2rem] overflow-hidden"
+            delay={200}
+          >
+            {/* Top & bottom fade masks */}
+            <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-gold to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-gold to-transparent z-10 pointer-events-none" />
+
+            <div className="relative flex gap-3 h-full w-full p-3">
+
+              {/* Column 1 — scrolls UP */}
+              <div className="flex-1 overflow-hidden">
+                <div className="flex flex-col gap-3 animate-marquee-up">
+                  {(col1.filter(item => getImage(item.key)).length > 0
+                    ? [...col1.map(i => ({...i, _dup: false})), ...col1.map(i => ({...i, _dup: true}))]
+                    : col1.map(i => ({...i, _dup: false}))
+                  ).map((item) => {
+                    const src = getImage(item.key);
+                    return (
+                      <div key={item._dup ? `${item.key}-dup` : item.key} className="rounded-xl overflow-hidden shrink-0 aspect-[4/3] w-full bg-black/20">
+                        {src
+                          ? <img src={src} alt={item.alt} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">sem imagem</div>
+                        }
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Column 2 — scrolls DOWN */}
+              <div className="flex-1 overflow-hidden">
+                <div className="flex flex-col gap-3 animate-marquee-down">
+                  {(col2.filter(item => getImage(item.key)).length > 0
+                    ? [...col2.map(i => ({...i, _dup: false})), ...col2.map(i => ({...i, _dup: true}))]
+                    : col2.map(i => ({...i, _dup: false}))
+                  ).map((item) => {
+                    const src = getImage(item.key);
+                    return (
+                      <div key={item._dup ? `${item.key}-dup` : item.key} className="rounded-xl overflow-hidden shrink-0 aspect-[4/3] w-full bg-black/20">
+                        {src
+                          ? <img src={src} alt={item.alt} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">sem imagem</div>
+                        }
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
           </Reveal>
 
         </div>

@@ -2,19 +2,19 @@
 // All default image URLs are defined here. Overrides are stored in localStorage.
 
 export const DEFAULT_IMAGES = {
-  // Hero Section Gallery — 11 images (3 columns auto-scroll)
-  hero_col1_1: 'https://images.unsplash.com/photo-1563299796-b729d0af54a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col1_2: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col1_3: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col1_4: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col2_1: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col2_2: 'https://images.unsplash.com/photo-1512719994953-eabf50895df7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col2_3: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col2_4: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col3_1: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col3_2: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col3_3: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  hero_col3_4: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+  // Hero Section Gallery — 12 images (3 columns auto-scroll) — vazio por padrão
+  hero_col1_1: '',
+  hero_col1_2: '',
+  hero_col1_3: '',
+  hero_col1_4: '',
+  hero_col2_1: '',
+  hero_col2_2: '',
+  hero_col2_3: '',
+  hero_col2_4: '',
+  hero_col3_1: '',
+  hero_col3_2: '',
+  hero_col3_3: '',
+  hero_col3_4: '',
 
   // Events Section
   event_0: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -27,11 +27,19 @@ export const DEFAULT_IMAGES = {
   package_2: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
   package_3: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
 
-  // Testimonials
-  testimonial_0: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-  testimonial_1: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-  testimonial_2: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-  testimonial_3: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+  // Platinum Access — Animated Grid (2 columns × 6 images each) — vazio por padrão
+  platinum_col1_1: '',
+  platinum_col1_2: '',
+  platinum_col1_3: '',
+  platinum_col1_4: '',
+  platinum_col1_5: '',
+  platinum_col1_6: '',
+  platinum_col2_1: '',
+  platinum_col2_2: '',
+  platinum_col2_3: '',
+  platinum_col2_4: '',
+  platinum_col2_5: '',
+  platinum_col2_6: '',
 };
 
 export type ImageKey = keyof typeof DEFAULT_IMAGES;

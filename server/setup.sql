@@ -16,3 +16,11 @@ CREATE TABLE IF NOT EXISTS site_content (
 -- Insert default empty row (will be populated on first admin save)
 INSERT IGNORE INTO site_content (id, events, packages, testimonials, hero_images)
 VALUES (1, '[]', '[]', '[]', '{}');
+
+-- Admin users table (passwords stored as bcrypt hashes)
+CREATE TABLE IF NOT EXISTS admin_users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'master') NOT NULL DEFAULT 'admin'
+);

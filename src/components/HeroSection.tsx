@@ -1,5 +1,57 @@
 import Reveal from './Reveal';
 import { useImageConfig } from '../hooks/useImageConfig';
+import type { ImageKey } from '../imageConfig';
+
+type ColItem = { key: ImageKey; alt: string; h: string };
+
+const COL1: ColItem[] = [
+  { key: 'hero_col1_1', alt: 'Esportes ação 1',  h: 'h-48' },
+  { key: 'hero_col1_2', alt: 'Festa e esportes', h: 'h-64' },
+  { key: 'hero_col1_3', alt: 'Estádio vista',    h: 'h-56' },
+  { key: 'hero_col1_4', alt: 'Momento do jogo',  h: 'h-40' },
+];
+const COL2: ColItem[] = [
+  { key: 'hero_col2_1', alt: 'Vitória esportes', h: 'h-56' },
+  { key: 'hero_col2_2', alt: 'Copa premium',     h: 'h-48' },
+  { key: 'hero_col2_3', alt: 'Piscina olimpica', h: 'h-64' },
+  { key: 'hero_col2_4', alt: 'Atleta corrida',   h: 'h-48' },
+];
+const COL3: ColItem[] = [
+  { key: 'hero_col3_1', alt: 'Bandeira evento',  h: 'h-64' },
+  { key: 'hero_col3_2', alt: 'Pista de luta',    h: 'h-48' },
+  { key: 'hero_col3_3', alt: 'Competição',       h: 'h-56' },
+  { key: 'hero_col3_4', alt: 'Torcida vibrando', h: 'h-40' },
+];
+
+function MarqueeCol({ items, direction, offset, getImage }: {
+  items: ColItem[];
+  direction: 'animate-marquee-up' | 'animate-marquee-down';
+  offset: string;
+  getImage: (k: ImageKey) => string;
+}) {
+  // Always render all slots so the marquee height stays consistent.
+  // Empty slots get a translucent placeholder so the animation doesn't break.
+  function renderSlot(item: ColItem, keyPrefix: string) {
+    const src = getImage(item.key);
+    if (src) {
+      return <img key={`${keyPrefix}-${item.key}`} src={src} alt={item.alt} className={`w-full ${item.h} object-cover rounded-xl shadow-xl shadow-black/80`} />;
+    }
+    return <div key={`${keyPrefix}-${item.key}`} className={`w-full ${item.h} rounded-xl bg-white/5 border border-white/5`} />;
+  }
+
+  return (
+    <div className="relative">
+      <div className={`flex flex-col gap-4 w-full absolute ${direction} hover:[animation-play-state:paused] ${offset}`}>
+        <div className="flex flex-col gap-4">
+          {items.map(item => renderSlot(item, 'a'))}
+        </div>
+        <div className="flex flex-col gap-4">
+          {items.map(item => renderSlot(item, 'b'))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HeroSection() {
   const { getImage } = useImageConfig();
@@ -17,6 +69,13 @@ export default function HeroSection() {
           <p className="text-neutral-400 text-lg mb-10 max-w-md leading-relaxed pr-4">
             Vivencie momentos inesquecíveis com Ingressos Oficiais, VIP e Hospitalidade para os melhores eventos esportivos do mundo, feitos sob medida para você e seus convidados.
           </p>
+          <a
+            href="#trending"
+            className="inline-flex items-center gap-3 bg-gold text-black font-bold text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300 shadow-lg shadow-gold/20 group"
+          >
+            Ver Pacotes
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
         </div>
       </Reveal>
 
@@ -24,59 +83,11 @@ export default function HeroSection() {
       <Reveal className="w-full lg:w-7/12 relative min-h-[400px] md:min-h-[500px]" delay={200}>
         <div className="absolute -inset-8 p-8 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_5%,black_95%,transparent)] pointer-events-none">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 h-full pointer-events-auto w-full">
-            {/* Column 1 - Marquee Up */}
-        <div className="relative hidden md:block">
-          <div className="flex flex-col gap-4 w-full absolute animate-marquee-up hover:[animation-play-state:paused] -top-12">
-            <div className="flex flex-col gap-4">
-              <img src={getImage('hero_col1_1')} alt="Esportes ação 1" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col1_2')} alt="Festa e esportes" className="w-full h-64 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col1_3')} alt="Estádio vista" className="w-full h-56 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col1_4')} alt="Momento do jogo" className="w-full h-40 object-cover rounded-xl shadow-xl shadow-black/80" />
+            <div className="hidden md:block">
+              <MarqueeCol items={COL1} direction="animate-marquee-up"   offset="-top-12" getImage={getImage} />
             </div>
-            <div className="flex flex-col gap-4">
-              <img src={getImage('hero_col1_1')} alt="Esportes ação 1 duplicado" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col1_2')} alt="Festa e esportes duplicado" className="w-full h-64 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col1_3')} alt="Estádio vista duplicado" className="w-full h-56 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col1_4')} alt="Momento do jogo duplicado" className="w-full h-40 object-cover rounded-xl shadow-xl shadow-black/80" />
-            </div>
-          </div>
-        </div>
-
-        {/* Column 2 - Marquee Down (Visible on mobile too) */}
-        <div className="relative">
-          <div className="flex flex-col gap-4 w-full absolute animate-marquee-down hover:[animation-play-state:paused] -top-4">
-            <div className="flex flex-col gap-4">
-              <img src={getImage('hero_col2_1')} alt="Vitória esportes" className="w-full h-56 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col2_2')} alt="Copa premium" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col2_3')} alt="Piscina olimpica" className="w-full h-64 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col2_4')} alt="Atleta corrida" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-            </div>
-            <div className="flex flex-col gap-4">
-              <img src={getImage('hero_col2_1')} alt="Vitória esportes duplicado" className="w-full h-56 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col2_2')} alt="Copa premium duplicado" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col2_3')} alt="Piscina olimpica duplicado" className="w-full h-64 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col2_4')} alt="Atleta corrida duplicado" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-            </div>
-          </div>
-        </div>
-
-        {/* Column 3 - Marquee Up (Visible on mobile too) */}
-        <div className="relative">
-          <div className="flex flex-col gap-4 w-full absolute animate-marquee-up hover:[animation-play-state:paused] -top-16">
-            <div className="flex flex-col gap-4">
-              <img src={getImage('hero_col3_1')} alt="Bandeira evento" className="w-full h-64 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col3_2')} alt="Pista de luta" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col3_3')} alt="Competição" className="w-full h-56 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col3_4')} alt="Torcida vibrando" className="w-full h-40 object-cover rounded-xl shadow-xl shadow-black/80" />
-            </div>
-            <div className="flex flex-col gap-4">
-              <img src={getImage('hero_col3_1')} alt="Bandeira evento duplicado" className="w-full h-64 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col3_2')} alt="Pista de luta duplicado" className="w-full h-48 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col3_3')} alt="Competição duplicado" className="w-full h-56 object-cover rounded-xl shadow-xl shadow-black/80" />
-              <img src={getImage('hero_col3_4')} alt="Torcida vibrando duplicado" className="w-full h-40 object-cover rounded-xl shadow-xl shadow-black/80" />
-            </div>
-          </div>
-            </div>
+            <MarqueeCol items={COL2} direction="animate-marquee-down" offset="-top-4"  getImage={getImage} />
+            <MarqueeCol items={COL3} direction="animate-marquee-up"   offset="-top-16" getImage={getImage} />
           </div>
         </div>
       </Reveal>

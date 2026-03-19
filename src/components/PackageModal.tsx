@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Plane, BedDouble, Ticket, X } from 'lucide-react';
 import type { TrendingPackage } from '../types';
-import { useToast } from './ui/ToastProvider';
+import { getCurrencySymbol, formatDisplayPrice } from '../utils/currency';
+import { useSelectedPackage } from '../hooks/useSelectedPackage';
 
 interface PackageModalProps {
   isOpen: boolean;
@@ -10,136 +12,240 @@ interface PackageModalProps {
 }
 
 export default function PackageModal({ isOpen, onClose, pkg }: PackageModalProps) {
-  const { toast } = useToast();
+  const { setSelectedTitle } = useSelectedPackage();
 
-  // Acesso via Teclado: Fecha via tecla Esc
+  const handleReservar = () => {
+    if (!pkg) return;
+    setSelectedTitle(pkg.title);
+    onClose();
+    setTimeout(() => {
+      const el = document.getElementById('contato-form');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  };
+  // Trava o scroll da página enquanto o modal está aberto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // Fecha via tecla Esc
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
+      if (e.key === 'Escape' && isOpen) onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleEmptyClick = () => {
-    toast('Ações de usuário estão desabilitadas neste Preview.', 'info');
-  };
-
   if (!isOpen || !pkg) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" aria-modal="true" role="dialog" aria-labelledby="modal-title">
+  const modal = (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        overflowY: 'auto',
+      }}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="modal-title"
+    >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+      <div
         onClick={onClose}
         aria-hidden="true"
-      ></div>
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.65)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+        }}
+      />
 
-      {/* Modal Content container */}
-      <div className="relative bg-white text-black w-full max-w-3xl max-h-[90vh] rounded-2xl overflow-y-auto shadow-2xl animate-in fade-in zoom-in duration-300">
-        
+      {/* Card — posicionado acima do backdrop, sem overflow hidden no pai */}
+      <div
+        style={{
+          position: 'relative',
+          background: '#fff',
+          color: '#111',
+          width: '100%',
+          maxWidth: 760,
+          borderRadius: 20,
+          boxShadow: '0 32px 80px rgba(0,0,0,0.55)',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          maxHeight: 'calc(100dvh - 32px)',
+          flexShrink: 0,
+          margin: 'auto',
+        }}
+      >
         {/* Header Image */}
-        <div className="relative h-48 md:h-64 rounded-t-2xl overflow-hidden">
-          <img src={pkg.img} alt={pkg.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          
-          <button 
+        <div style={{ position: 'relative', height: 240, flexShrink: 0, borderRadius: '20px 20px 0 0', overflow: 'hidden' }}>
+          <img
+            src={pkg.img}
+            alt={pkg.title}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
+          }} />
+
+          {/* Close button */}
+          <button
             onClick={onClose}
-            className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 backdrop-blur transition-colors"
-            aria-label="Fechar Modal de detalhes"
+            aria-label="Fechar"
+            style={{
+              position: 'absolute', top: 14, right: 14,
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
+              transition: 'background 0.15s',
+              color: '#fff',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
-          
-          <div className="absolute bottom-6 left-6 right-6">
-            <span className="inline-block bg-gold text-black text-[10px] font-bold px-2 py-1 rounded tracking-wider uppercase mb-2">
+
+          {/* Title area */}
+          <div style={{ position: 'absolute', bottom: 20, left: 24, right: 24 }}>
+            <span style={{
+              display: 'inline-block',
+              background: '#f37126', color: '#000',
+              fontSize: 10, fontWeight: 800,
+              padding: '3px 10px', borderRadius: 5,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              marginBottom: 8,
+            }}>
               {pkg.tag}
             </span>
-            <h2 id="modal-title" className="text-3xl md:text-4xl font-bold text-white mb-1 leading-tight">{pkg.title}</h2>
-            <p className="text-neutral-300 text-sm font-medium">{pkg.date} | {pkg.loc}</p>
+            <h2
+              id="modal-title"
+              style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, color: '#fff', margin: '0 0 4px', lineHeight: 1.15, overflowWrap: 'break-word', wordBreak: 'break-word' }}
+            >
+              {pkg.title}
+            </h2>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+              {pkg.date} | {pkg.loc}
+            </p>
           </div>
         </div>
 
-        {/* Info Content Section */}
-        <div className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row gap-8">
-                
-                {/* Left Side Details */}
-                <div className="w-full md:w-2/3 space-y-8">
-                    <div>
-                        <h3 className="text-lg font-semibold border-b border-neutral-200 pb-2 mb-4">Sobre a Experiência</h3>
-                        <p className="text-neutral-600 text-sm leading-relaxed">
-                            {pkg.description || "Descrição detalhada do pacote ainda não informada. Por favor, contate nossos especialistas para um roteiro personalizado."}
-                        </p>
-                    </div>
+        {/* Body */}
+        <div style={{ padding: '28px 28px 32px', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
 
-                    <div className="grid grid-cols-1 gap-6">
-                        {/* Flight */}
-                        {pkg.flightDetails && (
-                        <div className="flex gap-4">
-                            <div className="bg-neutral-100 p-3 rounded-xl h-fit text-neutral-700">
-                            <Plane size={24} />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-neutral-900 mb-1">Passagem Aérea</h4>
-                                <p className="text-sm text-neutral-600">{pkg.flightDetails}</p>
-                            </div>
-                        </div>
-                        )}
-
-                        {/* Hotel */}
-                        {pkg.hotelDetails && (
-                        <div className="flex gap-4">
-                            <div className="bg-neutral-100 p-3 rounded-xl h-fit text-neutral-700">
-                            <BedDouble size={24} />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-neutral-900 mb-1">Hospedagem Premium</h4>
-                                <p className="text-sm text-neutral-600">{pkg.hotelDetails}</p>
-                            </div>
-                        </div>
-                        )}
-
-                        {/* Ticket */}
-                        {pkg.ticketDetails && (
-                        <div className="flex gap-4">
-                            <div className="bg-neutral-100 p-3 rounded-xl h-fit text-neutral-700">
-                            <Ticket size={24} />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-neutral-900 mb-1">Ingressos Oficiais</h4>
-                                <p className="text-sm text-neutral-600">{pkg.ticketDetails}</p>
-                            </div>
-                        </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Right Side Pricing and CTA */}
-                <div className="w-full md:w-1/3">
-                    <div className="bg-neutral-50 p-6 rounded-2xl border border-neutral-200 sticky top-4">
-                        <p className="text-xs text-neutral-500 uppercase font-semibold tracking-wider mb-2">Valor Estimado</p>
-                        <div className="text-3xl font-bold text-neutral-900 mb-6">
-                            R$ {pkg.price}
-                            <span className="text-sm font-normal text-neutral-500 block mt-1">por pessoa</span>
-                        </div>
-
-                        <div className="space-y-4">
-                            <button onClick={handleEmptyClick} className="w-full bg-gold text-black font-bold flex items-center justify-center gap-2 py-3.5 rounded-xl hover:bg-[#d9621e] transition-colors shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-gold/50">
-                                Reservar Pacote
-                            </button>
-                            <button onClick={handleEmptyClick} className="w-full bg-white text-neutral-800 border-2 border-neutral-200 font-bold flex items-center justify-center gap-2 py-3 rounded-xl hover:bg-neutral-50 transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-neutral-400">
-                                Falar com um Consultor
-                            </button>
-                        </div>
-                    </div>
-                </div>
+          {/* Left — details */}
+          <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 10px', paddingBottom: 10, borderBottom: '1px solid #e5e7eb' }}>
+                Sobre a Experiência
+              </h3>
+              <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7, margin: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                {pkg.description || 'Descrição detalhada do pacote ainda não informada. Por favor, contate nossos especialistas para um roteiro personalizado.'}
+              </p>
             </div>
-        </div>
 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {pkg.flightDetails && (
+                <DetailRow icon={<Plane size={22} />} title="Passagem Aérea" text={pkg.flightDetails} />
+              )}
+              {pkg.hotelDetails && (
+                <DetailRow icon={<BedDouble size={22} />} title="Hospedagem Premium" text={pkg.hotelDetails} />
+              )}
+              {pkg.ticketDetails && (
+                <DetailRow icon={<Ticket size={22} />} title="Ingressos Oficiais" text={pkg.ticketDetails} />
+              )}
+            </div>
+          </div>
+
+          {/* Right — pricing */}
+          <div style={{ flex: '0 0 210px' }}>
+            <div style={{
+              background: '#f9fafb', border: '1px solid #e5e7eb',
+              borderRadius: 16, padding: '24px 20px',
+              position: 'sticky', top: 16,
+            }}>
+              <p style={{ fontSize: 11, color: '#9ca3af', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 6px' }}>
+                Valor Estimado
+              </p>
+              <div style={{ fontSize: 30, fontWeight: 800, color: '#111', margin: '0 0 4px', lineHeight: 1.1 }}>
+                {getCurrencySymbol(pkg.currency || 'BRL')} {formatDisplayPrice(pkg.price, pkg.currency || 'BRL')}
+              </div>
+              <span style={{ fontSize: 12, color: '#9ca3af' }}>por pessoa</span>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
+                <button
+                  onClick={handleReservar}
+                  style={{
+                    width: '100%', padding: '13px 0',
+                    background: '#f37126', color: '#000',
+                    fontWeight: 800, fontSize: 14,
+                    border: 'none', borderRadius: 12,
+                    cursor: 'pointer', transition: 'opacity 0.15s',
+                    fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                >
+                  Reservar Pacote
+                </button>
+                <button
+                  onClick={() => {}}
+                  style={{
+                    width: '100%', padding: '12px 0',
+                    background: '#fff', color: '#374151',
+                    fontWeight: 700, fontSize: 14,
+                    border: '2px solid #e5e7eb', borderRadius: 12,
+                    cursor: 'pointer', transition: 'border-color 0.15s',
+                    fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = '#f37126')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                >
+                  Falar com um Consultor
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+
+  return createPortal(modal, document.body);
+}
+
+function DetailRow({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+      <div style={{
+        background: '#f3f4f6', borderRadius: 10,
+        padding: 10, flexShrink: 0, color: '#374151',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {icon}
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111', margin: '0 0 4px', overflowWrap: 'break-word', wordBreak: 'break-word' }}>{title}</h4>
+        <p style={{ fontSize: 13, color: '#6b7280', margin: 0, lineHeight: 1.6, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{text}</p>
       </div>
     </div>
   );

@@ -1,9 +1,16 @@
 import express from 'express';
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = express.Router();
 
-/* ── Auth middleware (inline copy to avoid circular import) ── */
+/* ── Auth middleware ── */
 function requireAuth(req, res, next) {
   const token = req.headers['authorization']?.replace('Bearer ', '');
   if (token !== process.env.ADMIN_TOKEN) {
@@ -12,9 +19,24 @@ function requireAuth(req, res, next) {
   next();
 }
 
-/* ── Multer: armazena em memória (sem gravar em disco) ── */
+/* ── Garante que a pasta uploads/ existe ── */
+const uploadsDir = path.join(__dirname, '..', '..', 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+/* ── Multer: salva em disco com nome único ── */
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadsDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.jpg';
+    const unique = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+    cb(null, unique);
+  },
+});
+
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -32,11 +54,9 @@ router.post('/', requireAuth, upload.single('image'), (req, res) => {
     return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
   }
 
-  // Converte para base64 data URL
-  const base64 = req.file.buffer.toString('base64');
-  const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
-
-  res.json({ url: dataUrl });
+  // Retorna URL pública relativa (servida pelo Express em produção ou Vite proxy em dev)
+  const url = `/uploads/${req.file.filename}`;
+  res.json({ url });
 });
 
 /* ── Error handler para multer ── */

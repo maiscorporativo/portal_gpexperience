@@ -5,6 +5,7 @@ import {
   DEFAULT_PACKAGES,
   DEFAULT_TESTIMONIALS,
   DEFAULT_HERO_IMAGES,
+  DEFAULT_CATEGORIES,
 } from '../defaults.js';
 
 const router = express.Router();
@@ -43,15 +44,13 @@ router.get('/events', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('X-Accel-Buffering', 'no'); // disable nginx buffering if any
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
-  // Send a heartbeat immediately so the browser knows the connection is open
   res.write(': connected\n\n');
 
   sseClients.add(res);
 
-  // Heartbeat every 25 s to prevent proxy timeouts
   const heartbeat = setInterval(() => {
     try { res.write(': heartbeat\n\n'); }
     catch { clearInterval(heartbeat); sseClients.delete(res); }
@@ -69,19 +68,22 @@ router.get('/', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM site_content WHERE id = 1');
     if (!rows.length) {
       return res.json({
-        events: DEFAULT_EVENTS,
-        packages: DEFAULT_PACKAGES,
+        events:     DEFAULT_EVENTS,
+        packages:   DEFAULT_PACKAGES,
         testimonials: DEFAULT_TESTIMONIALS,
         heroImages: DEFAULT_HERO_IMAGES,
+        categories: DEFAULT_CATEGORIES,
       });
     }
     const row = rows[0];
     res.json({
-      updated_at:   row.updated_at,
-      events:       parseField(row.events,       DEFAULT_EVENTS),
-      packages:     parseField(row.packages,     DEFAULT_PACKAGES),
-      testimonials: parseField(row.testimonials, DEFAULT_TESTIMONIALS),
-      heroImages:   parseField(row.hero_images,  DEFAULT_HERO_IMAGES),
+      updated_at:     row.updated_at,
+      events:         parseField(row.events,          DEFAULT_EVENTS),
+      packages:       parseField(row.packages,        DEFAULT_PACKAGES),
+      testimonials:   parseField(row.testimonials,    DEFAULT_TESTIMONIALS),
+      heroImages:     parseField(row.hero_images,     DEFAULT_HERO_IMAGES),
+      categories:     parseField(row.categories,      DEFAULT_CATEGORIES),
+      categoryIcons:  parseField(row.category_icons,  {}),
     });
   } catch (err) {
     console.error('[GET /api/content]', err.message);
@@ -91,24 +93,27 @@ router.get('/', async (req, res) => {
 
 /* ── PUT /api/content ─────────────────────────────────────────── */
 router.put('/', requireAuth, async (req, res) => {
-  const { events, packages, testimonials, heroImages } = req.body;
+  const { events, packages, testimonials, heroImages, categories, categoryIcons } = req.body;
   try {
     await pool.query(
-      `INSERT INTO site_content (id, events, packages, testimonials, hero_images)
-       VALUES (1, ?, ?, ?, ?)
+      `INSERT INTO site_content (id, events, packages, testimonials, hero_images, categories, category_icons)
+       VALUES (1, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-         events       = VALUES(events),
-         packages     = VALUES(packages),
-         testimonials = VALUES(testimonials),
-         hero_images  = VALUES(hero_images)`,
+         events          = VALUES(events),
+         packages        = VALUES(packages),
+         testimonials    = VALUES(testimonials),
+         hero_images     = VALUES(hero_images),
+         categories      = VALUES(categories),
+         category_icons  = VALUES(category_icons)`,
       [
         JSON.stringify(events       ?? DEFAULT_EVENTS),
         JSON.stringify(packages     ?? DEFAULT_PACKAGES),
         JSON.stringify(testimonials ?? DEFAULT_TESTIMONIALS),
         JSON.stringify(heroImages   ?? DEFAULT_HERO_IMAGES),
+        JSON.stringify(categories   ?? DEFAULT_CATEGORIES),
+        JSON.stringify(categoryIcons ?? {}),
       ]
     );
-    // Notify all connected browsers that content changed
     broadcastUpdate();
     res.json({ ok: true });
   } catch (err) {

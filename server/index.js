@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import contentRouter from './routes/content.js';
 import uploadRouter from './routes/upload.js';
+import authRouter from './routes/auth.js';
+import contactRouter from './routes/contact.js';
+import pool from './db.js';
 
 dotenv.config();
 
@@ -16,11 +19,17 @@ const PORT = process.env.PORT || 3001;
 
 /* ── Middleware ─────────────────────────────────────────────── */
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' })); // 50 MB para suportar imagens base64
+
+/* ── Servir uploads estáticos (imagens salvas no disco) ─────────── */
+const publicPath = join(__dirname, '..', 'public');
+app.use(express.static(publicPath));
 
 /* ── API Routes ─────────────────────────────────────────────── */
 app.use('/api/content', contentRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/contact', contactRouter);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
@@ -37,7 +46,43 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 /* ── Start ──────────────────────────────────────────────────── */
-app.listen(PORT, () => {
+
+/* Auto-migração: garante colunas LONGTEXT e cria category_icons se não existir */
+async function autoMigrate() {
+  const cols = ['events', 'packages', 'testimonials', 'hero_images', 'categories'];
+  try {
+    // Criar category_icons se não existir
+    const [checkRows] = await pool.query(
+      `SELECT COUNT(*) as c FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'site_content' AND COLUMN_NAME = 'category_icons'`
+    );
+    if (checkRows[0].c === 0) {
+      await pool.query(`ALTER TABLE site_content ADD COLUMN category_icons LONGTEXT`);
+      console.log('✅ Coluna category_icons criada');
+    }
+
+    // Migrar colunas existentes para LONGTEXT
+    const [rows] = await pool.query(
+      `SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'site_content'
+       AND COLUMN_NAME IN (${cols.map(() => '?').join(',')})`,
+      cols
+    );
+    const needsMigration = rows.filter(r => r.DATA_TYPE !== 'longtext').map(r => r.COLUMN_NAME);
+    if (needsMigration.length > 0) {
+      console.log(`⚡ Migrando colunas para LONGTEXT: ${needsMigration.join(', ')}`);
+      for (const col of needsMigration) {
+        await pool.query(`ALTER TABLE site_content MODIFY COLUMN \`${col}\` LONGTEXT`);
+      }
+      console.log('✅ Colunas migradas para LONGTEXT');
+    }
+  } catch (e) {
+    console.warn('⚠️ Auto-migração falhou (não crítico):', e.message);
+  }
+}
+
+app.listen(PORT, async () => {
+  await autoMigrate();
   console.log(`\n🚀 E-Mais API rodando em http://localhost:${PORT}`);
   console.log(`   Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`   Banco:    ${process.env.DB_NAME || 'emais_cms'} @ ${process.env.DB_HOST || 'localhost'}\n`);
