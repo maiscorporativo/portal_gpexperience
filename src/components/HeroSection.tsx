@@ -57,14 +57,14 @@ export default function HeroSection() {
   const { getImage } = useImageConfig();
 
   return (
-    <section className="relative pt-6 pb-20 px-6 max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-12 items-stretch">
+    <section className="relative pt-6 pb-16 px-4 sm:px-6 max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
       {/* Left Content */}
       <Reveal className="w-full lg:w-5/12 z-10 flex flex-col justify-between py-2">
         <div>
-          <h1 className="text-[3.2rem] lg:text-[4.2rem] font-semibold leading-[1.05] mb-6 tracking-tight">
+          <h1 className="text-[2.2rem] sm:text-[3.2rem] lg:text-[4.2rem] font-semibold leading-[1.05] mb-6 tracking-tight">
             O seu passaporte<br />
             para o<br />
-            <span className="font-light italic text-gold text-[3.2rem] lg:text-[4.2rem]">Inesquecível</span>
+            <span className="font-light italic text-gold text-[2.2rem] sm:text-[3.2rem] lg:text-[4.2rem]">Inesquecível</span>
           </h1>
           <p className="text-neutral-400 text-lg mb-10 max-w-md leading-relaxed pr-4">
             Vivencie momentos inesquecíveis com Ingressos Oficiais, VIP e Hospitalidade para os melhores eventos esportivos do mundo, feitos sob medida para você e seus convidados.
@@ -80,7 +80,7 @@ export default function HeroSection() {
       </Reveal>
 
       {/* Right Content (Masonry Image Grid with Endless Scrolling) */}
-      <Reveal className="w-full lg:w-7/12 relative min-h-[400px] md:min-h-[500px]" delay={200}>
+      <Reveal className="w-full lg:w-7/12 relative min-h-[280px] sm:min-h-[400px] md:min-h-[500px]" delay={200}>
         <div className="absolute -inset-8 p-8 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_5%,black_95%,transparent)] pointer-events-none">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 h-full pointer-events-auto w-full">
             <div className="hidden md:block">

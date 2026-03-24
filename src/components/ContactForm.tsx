@@ -417,12 +417,15 @@ export default function ContactForm() {
       }} />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: 64,
-          alignItems: 'center',
-        }}>
+        <div
+          className="contact-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
+            gap: 64,
+            alignItems: 'center',
+          }}
+        >
 
           {/* ── Left column ── */}
           <div>
@@ -483,14 +486,17 @@ export default function ContactForm() {
           </div>
 
           {/* ── Right column: card ── */}
-          <div style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 24,
-            padding: '40px 36px',
-            backdropFilter: 'blur(12px)',
-            boxShadow: '0 32px 64px rgba(0,0,0,0.35)',
-          }}>
+          <div
+            className="form-card"
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 24,
+              padding: '40px 36px',
+              backdropFilter: 'blur(12px)',
+              boxShadow: '0 32px 64px rgba(0,0,0,0.35)',
+            }}
+          >
             {status === 'success' ? (
               /* ── success state ── */
               <div style={{ textAlign: 'center', padding: '32px 0' }}>

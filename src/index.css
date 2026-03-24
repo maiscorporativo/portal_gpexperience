@@ -58,6 +58,11 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 /* 3D Hover Effect Utilities */
@@ -173,4 +178,25 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff;
   color-scheme: dark;
+}
+
+/* ── Mobile responsive overrides ───────────────────────────────── */
+@media (max-width: 639px) {
+  /* ContactForm: single column and smaller gap on mobile */
+  #contato-form .contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* ContactForm: reduce card padding on mobile */
+  #contato-form .form-card {
+    padding: 24px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Footer CTA: reduce large heading on small screens */
+  .footer-cta-heading {
+    font-size: 2.6rem !important;
+    line-height: 1.1 !important;
+  }
 }

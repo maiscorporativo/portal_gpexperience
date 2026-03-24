@@ -20,7 +20,7 @@ export default function Footer() {
             <div className="relative border-b border-white/8 px-6 py-20 text-center">
                 <Reveal>
                     <p className="text-xs font-bold uppercase tracking-[0.3em] text-gold mb-5">Experimente o Premium</p>
-                    <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.05]">
+                    <h2 className="footer-cta-heading text-5xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.05]">
                         Descubra a sua<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-gold-secondary">melhor experiência.</span>
                     </h2>
