@@ -401,7 +401,6 @@ export default function ContactForm() {
         background: 'linear-gradient(180deg, #071d38 0%, #082242 100%)',
         padding: '96px 24px',
         position: 'relative',
-        overflow: 'hidden',
       }}
     >
       <style>{`
