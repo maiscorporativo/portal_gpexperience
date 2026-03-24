@@ -530,13 +530,13 @@ export default function ContactForm() {
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
                 {/* row: nome + email */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
+                <div className="form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: 14 }}>
                   <FloatInput id={`${uid}-nome`} label="Nome completo" autoComplete="name" value={nome} onChange={setNome} required />
                   <FloatInput id={`${uid}-email`} label="E-mail" type="email" autoComplete="email" value={email} onChange={setEmail} required />
                 </div>
 
                 {/* row: telefone + evento */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, alignItems: 'start' }}>
+                <div className="form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: 14, alignItems: 'start' }}>
                   <PhoneInput value={telefone} onChange={setTelefone} />
                   <PackageSelect id={`${uid}-pacote`} value={pacote} onChange={setPacote} />
                 </div>

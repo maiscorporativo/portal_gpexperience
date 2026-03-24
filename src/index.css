@@ -194,6 +194,11 @@ input:-webkit-autofill:active {
     border-radius: 16px !important;
   }
 
+  /* ContactForm: force form rows to single column on mobile */
+  #contato-form .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
   /* Footer CTA: reduce large heading on small screens */
   .footer-cta-heading {
     font-size: 2.6rem !important;
