@@ -5,7 +5,11 @@ type ImageOverrides = Partial<Record<ImageKey, string>>;
 
 const UPDATE_EVENT = 'emais_image_update';
 const CONTENT_UPDATE_EVENT = 'emais_content_update';
-const ADMIN_TOKEN = 'emais2025';
+const getSessionToken = () =>
+  localStorage.getItem('emais_admin_token') ||
+  localStorage.getItem('emais_master_token') ||
+  '';
+
 
 function loadOverrides(): ImageOverrides {
   try {
@@ -23,7 +27,7 @@ async function pushHeroToApi(overrides: ImageOverrides) {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+        'Authorization': `Bearer ${getSessionToken()}`,
       },
       body: JSON.stringify({ ...content, heroImages: overrides }),
     });

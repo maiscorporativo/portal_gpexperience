@@ -19,6 +19,7 @@ export default function TrendingPackages() {
   const handleOpenModal = (pkg: TrendingPackage) => {
     setSelectedPackage(pkg);
     setIsModalOpen(true);
+    // eslint-disable-next-line react-hooks/immutability
     document.body.style.overflow = 'hidden';
   };
 

@@ -352,6 +352,7 @@ export default function ContactForm() {
   const { selectedTitle, setSelectedTitle } = useSelectedPackage();
   useEffect(() => {
     if (selectedTitle) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPacote(selectedTitle);
       setSelectedTitle('');
     }

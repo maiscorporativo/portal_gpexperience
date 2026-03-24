@@ -30,13 +30,22 @@ function parseField(value, fallback) {
   return value;
 }
 
-/* ── Auth middleware ──────────────────────────────────────────── */
-function requireAuth(req, res, next) {
+/* ── Auth middleware — valida sessão no banco ─────────────────── */
+async function requireAuth(req, res, next) {
   const token = req.headers['authorization']?.replace('Bearer ', '');
-  if (token !== process.env.ADMIN_TOKEN) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (!token) return res.status(401).json({ error: 'Não autenticado' });
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM user_sessions WHERE token = ? AND expires_at > NOW() LIMIT 1",
+      [token]
+    );
+    if (!rows.length) return res.status(401).json({ error: 'Sessão inválida ou expirada. Faça login novamente.' });
+    req.authUser = rows[0];
+    next();
+  } catch (err) {
+    console.error('[requireAuth]', err.message);
+    res.status(500).json({ error: 'Erro interno' });
   }
-  next();
 }
 
 /* ── GET /api/content/events  (SSE stream) ────────────────────── */

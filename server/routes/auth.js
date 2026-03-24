@@ -1,8 +1,20 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import pool from '../db.js';
 
 const router = express.Router();
+
+/* ── Gera token de sessão e insere no banco ───────────────────── */
+async function createSession(user) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+  await pool.query(
+    'INSERT INTO user_sessions (token, user_id, username, role, expires_at) VALUES (?, ?, ?, ?, ?)',
+    [token, user.id, user.username, user.role, expiresAt]
+  );
+  return token;
+}
 
 /* ── POST /api/auth/login ─────────────────────────────────────── */
 router.post('/login', async (req, res) => {
@@ -21,32 +33,35 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: 'Usuário ou senha inválidos' });
 
-    res.json({ ok: true, username: user.username, role: user.role });
+    const token = await createSession(user);
+    res.json({ ok: true, token, username: user.username, role: user.role });
   } catch (err) {
     console.error('[POST /api/auth/login]', err.message);
     res.status(500).json({ error: 'Erro interno' });
   }
 });
 
-/* ── Middleware: apenas master pode gerenciar usuários ─────────── */
-async function requireMaster(req, res, next) {
-  const masterUser = req.headers['x-master-user'];
-  const masterPass = req.headers['x-master-pass'];
-
-  if (!masterUser || !masterPass) {
-    return res.status(403).json({ error: 'Acesso negado' });
+/* ── POST /api/auth/logout ────────────────────────────────────── */
+router.post('/logout', async (req, res) => {
+  const token = req.headers['authorization']?.replace('Bearer ', '');
+  if (token) {
+    try { await pool.query('DELETE FROM user_sessions WHERE token = ?', [token]); }
+    catch { /* silencioso */ }
   }
+  res.json({ ok: true });
+});
+
+/* ── Middleware: sessão válida de role master ──────────────────── */
+async function requireMaster(req, res, next) {
+  const token = req.headers['authorization']?.replace('Bearer ', '');
+  if (!token) return res.status(403).json({ error: 'Acesso negado' });
 
   try {
     const [rows] = await pool.query(
-      'SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?) AND role = ? LIMIT 1',
-      [masterUser, 'master']
+      "SELECT * FROM user_sessions WHERE token = ? AND role = 'master' AND expires_at > NOW() LIMIT 1",
+      [token]
     );
-    if (!rows.length) return res.status(403).json({ error: 'Acesso negado' });
-
-    const valid = await bcrypt.compare(masterPass, rows[0].password_hash);
-    if (!valid) return res.status(403).json({ error: 'Acesso negado' });
-
+    if (!rows.length) return res.status(403).json({ error: 'Sessão inválida ou sem permissão' });
     req.masterUser = rows[0];
     next();
   } catch (err) {
@@ -122,17 +137,17 @@ router.put('/users/:id', requireMaster, async (req, res) => {
 router.delete('/users/:id', requireMaster, async (req, res) => {
   const { id } = req.params;
 
-  // Impede deletar o último master
   try {
     const [masters] = await pool.query("SELECT id FROM admin_users WHERE role = 'master'");
     const targetIsMaster = masters.some(m => String(m.id) === String(id));
     if (targetIsMaster && masters.length <= 1) {
       return res.status(400).json({ error: 'Não é possível excluir o único usuário master.' });
     }
-    // Impede self-delete
-    if (String(req.masterUser?.id) === String(id)) {
+    if (String(req.masterUser?.user_id) === String(id)) {
       return res.status(400).json({ error: 'Você não pode excluir a si mesmo.' });
     }
+    // Invalida todas as sessões do usuário deletado
+    await pool.query('DELETE FROM user_sessions WHERE user_id = ?', [id]);
     await pool.query('DELETE FROM admin_users WHERE id = ?', [id]);
     res.json({ ok: true });
   } catch (err) {

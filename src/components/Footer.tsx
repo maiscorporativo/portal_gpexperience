@@ -25,7 +25,14 @@ export default function Footer() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-gold-secondary">melhor experiência.</span>
                     </h2>
                     <button
-                        onClick={handleEmptyClick}
+                        onClick={() => {
+                           const el = document.getElementById('contato');
+                           if (el) {
+                             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                           } else {
+                             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                           }
+                        }}
                         className="inline-flex items-center gap-3 bg-gold text-black font-bold text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300 group shadow-lg shadow-gold/20"
                     >
                         Fale com um Consultor

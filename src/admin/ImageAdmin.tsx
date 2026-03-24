@@ -4,7 +4,7 @@ import {
   ImageIcon, LayoutDashboard, LogOut, RotateCcw,
   Upload, Download, Eye, Shield, X, Plus, Trash2,
   ChevronUp, ChevronDown, CalendarDays, MapPin, Tag,
-  DollarSign, FileText, Plane, BedDouble, Ticket, User, MessageSquare, Save,
+  DollarSign, FileText, Plane, BedDouble, Ticket, Save,
   Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock,
 } from 'lucide-react';
 import { DEFAULT_IMAGES, type ImageKey } from '../imageConfig';
@@ -91,7 +91,7 @@ function ImageUploadField({ label, labelIcon, value, onChange }: {
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const ADMIN_TOKEN = import.meta.env.VITE_ADMIN_TOKEN ?? 'emais2025';
+  const getToken = () => localStorage.getItem('emais_admin_token') ?? '';
 
   const handleFile = async (file: File) => {
     const maxSize = 5 * 1024 * 1024;
@@ -106,7 +106,7 @@ function ImageUploadField({ label, labelIcon, value, onChange }: {
       form.append('image', file);
       const res = await fetch('/api/upload', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${ADMIN_TOKEN}` },
+        headers: { Authorization: `Bearer ${getToken()}` },
         body: form,
       });
       if (!res.ok) {
@@ -213,7 +213,7 @@ function HeroImageRow({ imgKey, label }: { imgKey: ImageKey; label: string }) {
   const [uploadError, setUploadError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const isCustom = !!overrides[imgKey];
-  const ADMIN_TOKEN = import.meta.env.VITE_ADMIN_TOKEN ?? 'emais2025';
+  const getToken = () => localStorage.getItem('emais_admin_token') ?? '';
 
   const save = () => { updateImage(imgKey, val); setSaved(true); setTimeout(() => setSaved(false), 2000); };
   const reset = () => { updateImage(imgKey, DEFAULT_IMAGES[imgKey]); setVal(DEFAULT_IMAGES[imgKey]); };
@@ -227,7 +227,7 @@ function HeroImageRow({ imgKey, label }: { imgKey: ImageKey; label: string }) {
       form.append('image', file);
       const res = await fetch('/api/upload', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${ADMIN_TOKEN}` },
+        headers: { Authorization: `Bearer ${getToken()}` },
         body: form,
       });
       if (!res.ok) {
@@ -1065,7 +1065,9 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         body: JSON.stringify({ username, password: pw, role: 'admin' }),
       });
       if (res.ok) {
-        localStorage.setItem(AUTH_KEY, username);
+        const data = await res.json();
+        localStorage.setItem(AUTH_KEY, data.username ?? username);
+        localStorage.setItem('emais_admin_token', data.token);
         onLogin();
       } else {
         const data = await res.json();
@@ -1144,6 +1146,7 @@ export default function ImageAdmin() {
   // Exibe toast quando o servidor falhar ao salvar
   useEffect(() => {
     if (saveError) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       showToast('Não foi possível salvar no servidor. As alterações foram mantidas localmente — reinicie o servidor e salve novamente.', 'error');
     }
   }, [saveError, showToast]);
@@ -1208,7 +1211,13 @@ export default function ImageAdmin() {
           <button onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 8, fontSize: 13, cursor: 'pointer', border: 'none', background: '#0d2540', color: '#7bc4e8' }}>
             <Eye size={14} /> Ver Site
           </button>
-          <button onClick={() => { localStorage.removeItem(AUTH_KEY); setAuthed(false); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 8, fontSize: 13, cursor: 'pointer', border: 'none', background: 'transparent', color: '#4a6f93', textAlign: 'left' }}>
+          <button onClick={async () => {
+            const token = localStorage.getItem('emais_admin_token');
+            if (token) await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
+            localStorage.removeItem(AUTH_KEY);
+            localStorage.removeItem('emais_admin_token');
+            setAuthed(false);
+          }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 8, fontSize: 13, cursor: 'pointer', border: 'none', background: 'transparent', color: '#4a6f93', textAlign: 'left' }}>
             <LogOut size={14} /> Sair
           </button>
         </div>
@@ -1299,6 +1308,3 @@ export default function ImageAdmin() {
   );
 }
 
-// Re-export unused icon references to avoid lint warnings
-const _unused = [CalendarDays, MapPin, Tag, DollarSign, FileText, User, MessageSquare];
-void _unused;

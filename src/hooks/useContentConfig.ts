@@ -5,7 +5,13 @@ import {
   DEFAULT_PACKAGES,
 } from '../contentConfig';
 
-const ADMIN_TOKEN = import.meta.env.VITE_ADMIN_TOKEN ?? 'emais2025';
+/* ---------- Session token helper ---------- */
+function getSessionToken(): string {
+  return localStorage.getItem('emais_admin_token')
+      || localStorage.getItem('emais_master_token')
+      || '';
+}
+
 const CACHE_KEY = 'emais_content_cache';
 const CACHE_VERSION = 'v3'; // Bump this to force-clear all browser caches
 const CACHE_VER_KEY = 'emais_cache_version';
@@ -91,7 +97,7 @@ async function putContent(data: ContentStore & { heroImages?: Record<string, str
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${ADMIN_TOKEN}`,
+      'Authorization': `Bearer ${getSessionToken()}`,
     },
     body: JSON.stringify(data),
   });

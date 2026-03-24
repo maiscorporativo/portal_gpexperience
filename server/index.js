@@ -52,6 +52,23 @@ if (process.env.NODE_ENV === 'production') {
 async function autoMigrate() {
   const cols = ['events', 'packages', 'testimonials', 'hero_images', 'categories'];
   try {
+    // Criar tabela user_sessions se não existir
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_sessions (
+        token      VARCHAR(64)              NOT NULL PRIMARY KEY,
+        user_id    INT                      NOT NULL,
+        username   VARCHAR(255)             NOT NULL,
+        role       ENUM('admin','master')   NOT NULL,
+        created_at DATETIME DEFAULT         CURRENT_TIMESTAMP,
+        expires_at DATETIME                 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_expires (expires_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+
+    // Limpar sessões expiradas
+    const [del] = await pool.query('DELETE FROM user_sessions WHERE expires_at < NOW()');
+    if (del.affectedRows > 0) console.log(`🗑️  ${del.affectedRows} sessão(ões) expirada(s) removida(s)`);
+
     // Criar category_icons se não existir
     const [checkRows] = await pool.query(
       `SELECT COUNT(*) as c FROM information_schema.COLUMNS

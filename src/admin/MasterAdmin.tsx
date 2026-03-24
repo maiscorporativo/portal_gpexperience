@@ -55,8 +55,9 @@ function MasterLogin({ onLogin }: { onLogin: () => void }) {
         body: JSON.stringify({ username, password: pw, role: 'master' }),
       });
       if (res.ok) {
-        localStorage.setItem(MASTER_AUTH_KEY, username);
-        localStorage.setItem('emais_master_pass', pw); // para reautenticar chamadas à API de usuários
+        const data = await res.json();
+        localStorage.setItem(MASTER_AUTH_KEY, data.username ?? username);
+        localStorage.setItem('emais_master_token', data.token);
         onLogin();
       } else {
         const data = await res.json();
@@ -175,7 +176,7 @@ function AuditTrail({ pkg }: { pkg: TrendingPackage }) {
 }
 
 /* ── Package Review Card ── */
-function PackageReviewCard({ pkg, index: _index, onApprove, onReject, onUpdate }: {
+function PackageReviewCard({ pkg, onApprove, onReject, onUpdate }: {
   pkg: TrendingPackage; index: number;
   onApprove: () => void; onReject: () => void;
   onUpdate: (d: Partial<TrendingPackage>) => void;
@@ -332,8 +333,7 @@ type AdminUser = { id: number; username: string; role: 'admin' | 'master' };
 
 const masterHeaders = () => ({
   'Content-Type': 'application/json',
-  'x-master-user': localStorage.getItem(MASTER_AUTH_KEY) ?? '',
-  'x-master-pass': localStorage.getItem('emais_master_pass') ?? '',
+  'Authorization': `Bearer ${localStorage.getItem('emais_master_token') ?? ''}`,
 });
 
 function UsersTab() {
@@ -559,9 +559,11 @@ export default function MasterAdmin() {
     }
   }, [saveError, toast]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const token = localStorage.getItem('emais_master_token');
+    if (token) await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
     localStorage.removeItem(MASTER_AUTH_KEY);
-    localStorage.removeItem('emais_master_pass');
+    localStorage.removeItem('emais_master_token');
     setAuthed(false);
   }, []);
 
@@ -648,7 +650,7 @@ export default function MasterAdmin() {
               <div style={{ marginBottom: 32 }}>
                 <h2 style={{ fontSize: 14, fontWeight: 700, color: '#4a7fa8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Plane size={13} /> Pacotes ({curPkgs.length})</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {curPkgs.map((pkg, _i) => {
+                  {curPkgs.map((pkg) => {
                     // Identifica o índice real pelo createdAt (campo imutável) ou por title+loc como fallback
                     const realIdx = packages.findIndex(p =>
                       pkg.createdAt ? p.createdAt === pkg.createdAt : (p.title === pkg.title && p.loc === pkg.loc)

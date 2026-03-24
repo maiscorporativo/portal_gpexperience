@@ -5,6 +5,25 @@ import type { TrendingPackage } from '../types';
 import { getCurrencySymbol, formatDisplayPrice } from '../utils/currency';
 import { useSelectedPackage } from '../hooks/useSelectedPackage';
 
+/* ── Helper: detail row ─────────────────────────────────────── */
+function DetailRow({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+      <div style={{
+        background: '#f3f4f6', borderRadius: 10,
+        padding: 10, flexShrink: 0, color: '#374151',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {icon}
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111', margin: '0 0 4px', overflowWrap: 'break-word', wordBreak: 'break-word' }}>{title}</h4>
+        <p style={{ fontSize: 13, color: '#6b7280', margin: 0, lineHeight: 1.6, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{text}</p>
+      </div>
+    </div>
+  );
+}
+
 interface PackageModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -231,22 +250,4 @@ export default function PackageModal({ isOpen, onClose, pkg }: PackageModalProps
   );
 
   return createPortal(modal, document.body);
-}
-
-function DetailRow({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
-  return (
-    <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-      <div style={{
-        background: '#f3f4f6', borderRadius: 10,
-        padding: 10, flexShrink: 0, color: '#374151',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        {icon}
-      </div>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111', margin: '0 0 4px', overflowWrap: 'break-word', wordBreak: 'break-word' }}>{title}</h4>
-        <p style={{ fontSize: 13, color: '#6b7280', margin: 0, lineHeight: 1.6, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{text}</p>
-      </div>
-    </div>
-  );
 }
