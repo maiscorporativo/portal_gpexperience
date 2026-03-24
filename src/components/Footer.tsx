@@ -77,7 +77,7 @@ export default function Footer() {
                     <p className="text-sm text-neutral-400 leading-relaxed mb-6">
                         Lançamentos exclusivos, pacotes e hospitalidade premium direto na sua caixa de entrada.
                     </p>
-                    <form className="flex w-full mb-3" onSubmit={e => { e.preventDefault(); handleEmptyClick(e as unknown as React.MouseEvent); }}>
+                    <form className="flex w-full mb-3 pr-14 sm:pr-0" onSubmit={e => { e.preventDefault(); handleEmptyClick(e as unknown as React.MouseEvent); }}>
                         <input
                             type="email"
                             placeholder="seu@email.com"

@@ -404,6 +404,13 @@ export default function ContactForm() {
         overflow: 'hidden',
       }}
     >
+      <style>{`
+        @media (max-width: 639px) {
+          .cf-outer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .cf-card { padding: 24px 16px !important; border-radius: 16px !important; }
+          .cf-row { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       {/* decorative glow orbs */}
       <div style={{
         position: 'absolute', top: -120, left: -120, width: 400, height: 400,
@@ -418,7 +425,7 @@ export default function ContactForm() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <div
-          className="contact-grid"
+          className="cf-outer-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
@@ -487,7 +494,7 @@ export default function ContactForm() {
 
           {/* ── Right column: card ── */}
           <div
-            className="form-card"
+            className="cf-card"
             style={{
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.08)',
@@ -530,13 +537,13 @@ export default function ContactForm() {
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
                 {/* row: nome + email */}
-                <div className="form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: 14 }}>
+                <div className="cf-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: 14 }}>
                   <FloatInput id={`${uid}-nome`} label="Nome completo" autoComplete="name" value={nome} onChange={setNome} required />
                   <FloatInput id={`${uid}-email`} label="E-mail" type="email" autoComplete="email" value={email} onChange={setEmail} required />
                 </div>
 
                 {/* row: telefone + evento */}
-                <div className="form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: 14, alignItems: 'start' }}>
+                <div className="cf-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: 14, alignItems: 'start' }}>
                   <PhoneInput value={telefone} onChange={setTelefone} />
                   <PackageSelect id={`${uid}-pacote`} value={pacote} onChange={setPacote} />
                 </div>
