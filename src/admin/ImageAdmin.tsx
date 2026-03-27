@@ -672,7 +672,8 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
             {/* Approval status warning */}
             {(!pkg.status || pkg.status === 'pending') && (
               <div style={{ background: '#3d2800', border: '1px solid #7a4f00', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#ffd57a', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span><Clock size={14} /> <strong>Enviado para aprovação,</strong> este pacote só aparecerá no site após aprovação.</span>
+                <Clock size={14} style={{ flexShrink: 0 }} />
+                <span><strong>Enviado para aprovação,</strong> este pacote só aparecerá no site após aprovação.</span>
               </div>
             )}
             {pkg.status === 'rejected' && (
