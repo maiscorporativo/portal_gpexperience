@@ -762,7 +762,7 @@ export default function MasterAdmin() {
                         onApprove={() => { approvePackage(realIdx); toast('Pacote aprovado! ✅', 'success'); }}
                         onReject={() => { rejectPackage(realIdx); toast('Pacote rejeitado.', 'warning'); }}
                         onUpdate={d => masterUpdatePackage(realIdx, d)}
-                        onRemove={() => removePackage(realIdx)}
+                        onRemove={() => removePackage(realIdx, localStorage.getItem('emais_master_auth') || 'master')}
                         trendingCount={packages.filter(p => p.isTrending && !p.deletedAt).length}
                       />
                     );

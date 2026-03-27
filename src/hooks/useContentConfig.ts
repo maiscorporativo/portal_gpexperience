@@ -276,9 +276,8 @@ export function useContentConfig() {
     return persist({ ...content, packages: [...content.packages, { tag: 'NOVO', title: 'Novo Pacote', loc: 'Local', date: 'Data', price: '0', img: '', badge: 'novo', description: '', flightDetails: '', hotelDetails: '', ticketDetails: '', createdBy: user, createdAt: now() }] });
   }, [content, persist]);
 
-  const removePackage = useCallback((i: number) => {
-    const masterVal = localStorage.getItem('emais_master_auth');
-    const user = (masterVal && masterVal !== '1') ? masterVal : getAdminUser();
+  const removePackage = useCallback((i: number, deletedBy?: string) => {
+    const user = deletedBy || getAdminUser();
     return persist({ ...content, packages: content.packages.map((p, idx) =>
       idx === i ? { ...p, deletedAt: now(), deletedBy: user } : p
     )});
