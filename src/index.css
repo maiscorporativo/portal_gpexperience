@@ -65,6 +65,30 @@ body {
   overflow-x: hidden;
 }
 
+/* Custom Orange Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #041121;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-secondary);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold) #041121;
+}
+
 /* 3D Hover Effect Utilities */
 @layer utilities {
   .perspective-1000 {
