@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, X, ChevronDown, ChevronUp, Shield, LogOut, Upload, Plus, Trash2, Pencil, Users, KeyRound, AlertTriangle, Clock, CheckCircle2, XCircle, Plane, BedDouble, Ticket, FileText, Globe2, Type, Award, Flame, Package, ArrowRight, Tag, MapPin, CalendarDays, DollarSign } from 'lucide-react';
+import { Check, X, ChevronDown, ChevronUp, Shield, LogOut, Upload, Plus, Trash2, Pencil, Users, KeyRound, AlertTriangle, Clock, CheckCircle2, XCircle, Plane, BedDouble, Ticket, FileText, Globe2, Type, Award, Flame, Package, ArrowRight, Tag, MapPin, CalendarDays, DollarSign, RotateCcw } from 'lucide-react';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
@@ -571,6 +571,24 @@ function UsersTab() {
   );
 }
 
+
+/* ── Trash Delete Button (needs useDialog hook) ── */
+function TrashDeleteButton({ realIdx, permanentRemovePackage, toast }: {
+  realIdx: number;
+  permanentRemovePackage: (i: number) => void;
+  toast: (msg: string, type: 'success' | 'warning' | 'error' | 'info') => void;
+}) {
+  const { showConfirm } = useDialog();
+  return (
+    <button
+      onClick={async () => { if (await showConfirm('Excluir permanentemente? Esta ação não pode ser desfeita.', { type: 'danger', confirmText: 'Excluir', title: 'Exclusão Permanente' })) { permanentRemovePackage(realIdx); toast('Pacote excluído permanentemente.', 'error'); } }}
+      style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#2a0a0a', color: '#ff6b6b', border: '1px solid #3a1a1a', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+    >
+      <Trash2 size={13} /> Deletar
+    </button>
+  );
+}
+
 /* ── Main Master Admin ── */
 export default function MasterAdmin() {
   const navigate = useNavigate();
@@ -579,8 +597,8 @@ export default function MasterAdmin() {
     if (v === '1') { localStorage.removeItem(MASTER_AUTH_KEY); return false; } // limpa sessão legada
     return !!v;
   });
-  const [section, setSection] = useState<'pending' | 'approved' | 'rejected' | 'users'>('pending');
-  const { packages, approvePackage, rejectPackage, masterUpdatePackage, removePackage, saveError } = useContentConfig();
+  const [section, setSection] = useState<'pending' | 'approved' | 'rejected' | 'users' | 'trash'>('pending');
+  const { packages, approvePackage, rejectPackage, masterUpdatePackage, removePackage, restorePackage, permanentRemovePackage, saveError } = useContentConfig();
   const { toast } = useToast();
 
   // Exibe toast de erro quando o servidor falhar ao salvar
@@ -600,9 +618,10 @@ export default function MasterAdmin() {
 
   if (!authed) return <MasterLogin onLogin={() => setAuthed(true)} />;
 
-  const pendingPkgs = packages.filter(p => !p.status || p.status === 'pending');
-  const approvedPkgs = packages.filter(p => p.status === 'approved');
-  const rejectedPkgs = packages.filter(p => p.status === 'rejected');
+  const pendingPkgs = packages.filter(p => (!p.status || p.status === 'pending') && !p.deletedAt);
+  const approvedPkgs = packages.filter(p => p.status === 'approved' && !p.deletedAt);
+  const rejectedPkgs = packages.filter(p => p.status === 'rejected' && !p.deletedAt);
+  const deletedPkgs = packages.map((p, i) => ({ p, i })).filter(({ p }) => !!p.deletedAt);
 
   const totalPending = pendingPkgs.length;
 
@@ -612,7 +631,7 @@ export default function MasterAdmin() {
     { id: 'rejected' as const, icon: <XCircle size={14} />,      label: 'Rejeitados', count: rejectedPkgs.length },
   ];
 
-  const curPkgs = section === 'pending' ? pendingPkgs : section === 'approved' ? approvedPkgs : rejectedPkgs;
+  const curPkgs = section === 'pending' ? pendingPkgs : section === 'approved' ? approvedPkgs : section === 'rejected' ? rejectedPkgs : [];
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#060F1C', color: '#e8edf2', fontFamily: 'Inter, system-ui, sans-serif', alignItems: 'flex-start' }}>
@@ -652,6 +671,17 @@ export default function MasterAdmin() {
           <Users size={14} /> Usuários
         </button>
 
+        {/* Trash section */}
+        <button onClick={() => setSection('trash')} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 13, fontWeight: 600,
+          background: section === 'trash' ? '#142030' : 'transparent',
+          color: section === 'trash' ? '#f37126' : '#4a7fa8',
+        }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}><Trash2 size={14} /> Lixeira</span>
+          {deletedPkgs.length > 0 && <span style={{ fontSize: 11, background: '#3a1a1a', color: '#f87171', padding: '1px 7px', borderRadius: 10, fontWeight: 700 }}>{deletedPkgs.length}</span>}
+        </button>
+
         <div style={{ flex: 1 }} />
         <button onClick={() => navigate('/admin')} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 8, border: '1px solid #142030', cursor: 'pointer', background: 'transparent', color: '#4a7fa8', fontSize: 12, marginBottom: 4 }}>
           <ArrowRight size={13} /> Admin Vendedores
@@ -667,6 +697,45 @@ export default function MasterAdmin() {
         {/* Users section */}
         {section === 'users' ? (
           <UsersTab />
+        ) : section === 'trash' ? (
+          /* Trash Tab */
+          <>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#f37126', marginBottom: 4 }}>Lixeira</h1>
+            <p style={{ fontSize: 13, color: '#4a7fa8', marginBottom: 24 }}>Pacotes excluídos. Restaure ou exclua permanentemente.</p>
+            {deletedPkgs.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ background: '#1a1400', border: '1px solid #7a4a00', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <AlertTriangle size={13} /> Pacotes na lixeira não aparecem no site. Restaure para reativá-los.
+                </div>
+                {deletedPkgs.map(({ p: pkg, i: realIdx }) => (
+                  <div key={realIdx} style={{ background: '#09182a', border: '1px solid #3a1a1a', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', opacity: 0.8 }}>
+                    {pkg.img ? <img src={pkg.img} alt={pkg.title} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} /> : <div style={{ width: 52, height: 52, background: '#0d1f35', borderRadius: 8, flexShrink: 0 }} />}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#e8edf2' }}>{pkg.title || 'Sem título'}</div>
+                      <div style={{ fontSize: 12, color: '#4a6f93', marginTop: 2 }}>
+                        Excluído por <strong style={{ color: '#7bc4e8' }}>{pkg.deletedBy ?? 'admin'}</strong>
+                        {pkg.deletedAt ? ` em ${new Date(pkg.deletedAt).toLocaleDateString('pt-BR')}` : ''}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        onClick={() => { restorePackage(realIdx); toast(`"${pkg.title}" restaurado!`, 'success'); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#0d3320', color: '#4ade80', border: '1px solid #1a5c38', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        <RotateCcw size={13} /> Restaurar
+                      </button>
+                      <TrashDeleteButton realIdx={realIdx} permanentRemovePackage={permanentRemovePackage} toast={toast} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px', color: '#4a7fa8' }}>
+                <Trash2 size={32} />
+                <span style={{ fontSize: 14 }}>Lixeira vazia. Pacotes excluídos aparecerão aqui.</span>
+              </div>
+            )}
+          </>
         ) : (
           <>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: '#f37126', marginBottom: 4 }}>
@@ -682,7 +751,6 @@ export default function MasterAdmin() {
                 <h2 style={{ fontSize: 14, fontWeight: 700, color: '#4a7fa8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Plane size={13} /> Pacotes ({curPkgs.length})</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {curPkgs.map((pkg) => {
-                    // Identifica o índice real pelo createdAt (campo imutável) ou por title+loc como fallback
                     const realIdx = packages.findIndex(p =>
                       pkg.createdAt ? p.createdAt === pkg.createdAt : (p.title === pkg.title && p.loc === pkg.loc)
                     );
