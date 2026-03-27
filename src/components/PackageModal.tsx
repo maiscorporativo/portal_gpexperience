@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { Plane, BedDouble, Ticket, X } from 'lucide-react';
 import type { TrendingPackage } from '../types';
 import { getCurrencySymbol, formatDisplayPrice } from '../utils/currency';
-import { useSelectedPackage } from '../hooks/useSelectedPackage';
 
 /* ── Helper: detail row ─────────────────────────────────────── */
 function DetailRow({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
@@ -31,17 +30,6 @@ interface PackageModalProps {
 }
 
 export default function PackageModal({ isOpen, onClose, pkg }: PackageModalProps) {
-  const { setSelectedTitle } = useSelectedPackage();
-
-  const handleReservar = () => {
-    if (!pkg) return;
-    setSelectedTitle(pkg.title);
-    onClose();
-    setTimeout(() => {
-      const el = document.getElementById('contato-form');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
-  };
   // Trava o scroll da página enquanto o modal está aberto
   useEffect(() => {
     if (isOpen) {
@@ -210,36 +198,42 @@ export default function PackageModal({ isOpen, onClose, pkg }: PackageModalProps
               <span style={{ fontSize: 12, color: '#9ca3af' }}>por pessoa</span>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
-                <button
-                  onClick={handleReservar}
+                <a
+                  href="https://api.whatsapp.com/send/?phone=5518997624457&text=Ol%C3%A1,%20tudo%20bem?%20Gostaria%20de%20falar%20com%20um%20consultor.&type=phone_number&app_absent=0"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     width: '100%', padding: '13px 0',
                     background: '#f37126', color: '#000',
                     fontWeight: 800, fontSize: 14,
                     border: 'none', borderRadius: 12,
                     cursor: 'pointer', transition: 'opacity 0.15s',
-                    fontFamily: 'inherit',
+                    fontFamily: 'inherit', textAlign: 'center',
+                    textDecoration: 'none', display: 'block', boxSizing: 'border-box',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
                   onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                 >
                   Reservar Pacote
-                </button>
-                <button
-                  onClick={() => {}}
+                </a>
+                <a
+                  href="https://api.whatsapp.com/send/?phone=5518997624457&text=Ol%C3%A1,%20tudo%20bem?%20Gostaria%20de%20falar%20com%20um%20consultor.&type=phone_number&app_absent=0"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     width: '100%', padding: '12px 0',
                     background: '#fff', color: '#374151',
                     fontWeight: 700, fontSize: 14,
                     border: '2px solid #e5e7eb', borderRadius: 12,
                     cursor: 'pointer', transition: 'border-color 0.15s',
-                    fontFamily: 'inherit',
+                    fontFamily: 'inherit', textAlign: 'center',
+                    textDecoration: 'none', display: 'block', boxSizing: 'border-box',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = '#f37126')}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
                 >
                   Falar com um Consultor
-                </button>
+                </a>
               </div>
             </div>
           </div>

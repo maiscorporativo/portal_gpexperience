@@ -70,6 +70,31 @@ router.post('/', requireAuth, upload.single('image'), (req, res) => {
   res.json({ url });
 });
 
+/* ── DELETE /api/upload?file=filename ── */
+router.delete('/', requireAuth, async (req, res) => {
+  const filename = req.query.file;
+  if (!filename || typeof filename !== 'string') {
+    return res.status(400).json({ error: 'Parâmetro "file" obrigatório.' });
+  }
+
+  // Prevenir path traversal
+  const safeName = path.basename(filename);
+  const filePath = path.join(uploadsDir, safeName);
+
+  // Verificar se o arquivo existe
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Arquivo não encontrado.' });
+  }
+
+  try {
+    fs.unlinkSync(filePath);
+    res.json({ ok: true, deleted: safeName });
+  } catch (err) {
+    console.error('[delete upload]', err.message);
+    res.status(500).json({ error: 'Erro ao deletar arquivo.' });
+  }
+});
+
 /* ── Error handler para multer ── */
 router.use((err, _req, res, _next) => {
   if (err.code === 'LIMIT_FILE_SIZE') {

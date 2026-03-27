@@ -88,6 +88,7 @@ function ImageUploadField({ label, labelIcon, value, onChange }: {
   label: string; labelIcon?: React.ReactNode; value: string; onChange: (url: string) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -123,6 +124,36 @@ function ImageUploadField({ label, labelIcon, value, onChange }: {
     }
   };
 
+  const handleDelete = async () => {
+    setError('');
+    const currentValue = value || '';
+
+    // Se é imagem hospedada no servidor, deletar do disco
+    if (currentValue.startsWith('/uploads/')) {
+      setDeleting(true);
+      try {
+        const filename = currentValue.split('/').pop();
+        const res = await fetch(`/api/upload?file=${encodeURIComponent(filename || '')}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `Erro ${res.status}`);
+        }
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Falha ao deletar.';
+        setError(msg);
+        setDeleting(false);
+        return;
+      }
+      setDeleting(false);
+    }
+
+    // Limpar o valor
+    onChange('');
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
@@ -131,6 +162,7 @@ function ImageUploadField({ label, labelIcon, value, onChange }: {
 
   const isUploaded = value?.startsWith('/uploads/');
   const isBase64   = value?.startsWith('data:'); // legado
+  const hasValue   = !!value && value.length > 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -146,35 +178,74 @@ function ImageUploadField({ label, labelIcon, value, onChange }: {
         </div>
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={uploading}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
-              background: uploading ? '#0a1e35' : '#0d2540',
-              color: uploading ? '#4a6f93' : '#7bc4e8',
-              border: '1px solid #1a3150', borderRadius: 7,
-              fontSize: 12, fontWeight: 600, cursor: uploading ? 'wait' : 'pointer',
-            }}
-          >
-            <Upload size={13} />
-            {uploading ? 'Enviando…' : 'Subir imagem'}
-          </button>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
+                background: uploading ? '#0a1e35' : '#0d2540',
+                color: uploading ? '#4a6f93' : '#7bc4e8',
+                border: '1px solid #1a3150', borderRadius: 7,
+                fontSize: 12, fontWeight: 600, cursor: uploading ? 'wait' : 'pointer',
+              }}
+            >
+              <Upload size={13} />
+              {uploading ? 'Enviando…' : 'Subir imagem'}
+            </button>
 
-          <input
-            type="url"
-            value={isBase64 ? '' : (value || '')}
-            placeholder={isBase64 ? '(imagem legada — re-envie)' : 'https://... (ou arraste/clique acima)'}
-            onChange={e => onChange(e.target.value)}
-            style={{
-              background: '#09182a', border: '1px solid #1a3150', borderRadius: 7,
-              color: '#e8edf2', fontSize: 11, fontFamily: 'monospace',
-              padding: '7px 10px', outline: 'none', width: '100%', boxSizing: 'border-box',
-            }}
-            onFocus={e => { e.target.style.borderColor = '#f37126'; }}
-            onBlur={e => { e.target.style.borderColor = '#1a3150'; }}
-          />
+            {hasValue && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                title="Remover imagem"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5, padding: '8px 12px',
+                  background: deleting ? '#1a0d0d' : '#2a0d0d',
+                  color: deleting ? '#7a4a4a' : '#f87171',
+                  border: '1px solid #3a1a1a', borderRadius: 7,
+                  fontSize: 12, fontWeight: 600, cursor: deleting ? 'wait' : 'pointer',
+                }}
+              >
+                <Trash2 size={13} />
+                {deleting ? 'Deletando…' : 'Deletar'}
+              </button>
+            )}
+          </div>
+
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="url"
+              value={isBase64 ? '' : (value || '')}
+              placeholder={isBase64 ? '(imagem legada — re-envie)' : 'https://... (ou arraste/clique acima)'}
+              onChange={e => onChange(e.target.value)}
+              style={{
+                background: '#09182a', border: '1px solid #1a3150', borderRadius: 7,
+                color: '#e8edf2', fontSize: 11, fontFamily: 'monospace',
+                padding: '7px 32px 7px 10px', outline: 'none', width: '100%', boxSizing: 'border-box',
+              }}
+              onFocus={e => { e.target.style.borderColor = '#f37126'; }}
+              onBlur={e => { e.target.style.borderColor = '#1a3150'; }}
+            />
+            {hasValue && !isBase64 && (
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                title="Limpar URL"
+                style={{
+                  position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#4a6f93', padding: 2, display: 'flex', alignItems: 'center',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#f87171'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#4a6f93'; }}
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
 
           <span style={{ fontSize: 10, color: isUploaded ? '#4ade80' : '#4a6f93' }}>
             {isUploaded ? '✅ Imagem enviada (servidor)' : isBase64 ? '⚠️ Base64 legado — re-envie o arquivo' : 'Arraste ou clique em "Subir imagem" · máx. 5 MB'}
