@@ -509,7 +509,6 @@ const CURRENCIES = [
   { code: 'SEK', symbol: 'kr', label: 'SEK — Coroa Sueca' },
   { code: 'DKK', symbol: 'kr', label: 'DKK — Coroa Dinamarquesa' },
   { code: 'PLN', symbol: 'zł', label: 'PLN — Złoty Polonês' },
-  { code: 'MXN', symbol: '$', label: 'MXN — Peso Mexicano' },
 ];
 
 function CurrencySelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {

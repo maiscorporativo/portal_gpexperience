@@ -177,16 +177,17 @@ export function useContentConfig() {
     const merged: ContentStore = {
       ...next,
       packages: next.packages.map(pkg => {
-        // Se o pacote desta instância não tem imagem, busca no cache local por createdAt
-        if (localCache && (!pkg.img || !pkg.badgeImg)) {
+        // Se o pacote desta instância não tem imagem (undefined/null, NÃO string vazia),
+        // busca no cache local por createdAt
+        if (localCache && (pkg.img == null || pkg.badgeImg == null)) {
           const cachedPkg = localCache.packages.find(p =>
             pkg.createdAt ? p.createdAt === pkg.createdAt : (p.title === pkg.title && p.loc === pkg.loc)
           );
           if (cachedPkg) {
             return {
               ...pkg,
-              img:      pkg.img      || cachedPkg.img      || '',
-              badgeImg: pkg.badgeImg || cachedPkg.badgeImg || '',
+              img:      pkg.img      ?? cachedPkg.img      ?? '',
+              badgeImg: pkg.badgeImg ?? cachedPkg.badgeImg ?? '',
             };
           }
         }
