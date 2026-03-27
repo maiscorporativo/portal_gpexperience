@@ -58,7 +58,7 @@ export default function Footer() {
                     <span className="text-neutral-500 font-medium">© {new Date().getFullYear()} E-MAIS.</span>
                     <a href="https://maiscorporativo.tur.br/politica-de-privacidade/" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Privacidade</a>
                     <a href="https://emais.tur.br/admin" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Administrador</a>
-                    <a href="https://emais.tur.br/master-admin" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Administrador Master</a>
+                    <a href="https://emais.tur.br/admin-master" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Administrador Master</a>
                 </div>
                 <p className="text-neutral-700">Produto Mais Corporativo</p>
             </div>

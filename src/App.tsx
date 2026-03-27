@@ -18,7 +18,7 @@ import { SelectedPackageProvider } from './hooks/useSelectedPackage';
 const PAGE_TITLES: Record<string, string> = {
   '/':            'E-Mais — Experiências Premium em Eventos Esportivos',
   '/admin':       'E-Mais Admin',
-  '/master-admin':'E-Mais Master Admin',
+  '/admin-master':'E-Mais Master Admin',
 };
 
 function usePageTitle() {
@@ -59,7 +59,7 @@ function App() {
     <Routes>
       <Route path="/"            element={<SitePage />} />
       <Route path="/admin"       element={<AdminPage />} />
-      <Route path="/master-admin"element={<MasterPage />} />
+      <Route path="/admin-master"element={<MasterPage />} />
       <Route path="*"            element={<NotFound />} />
     </Routes>
   );

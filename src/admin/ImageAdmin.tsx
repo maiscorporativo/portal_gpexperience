@@ -1016,9 +1016,7 @@ function CategoriesTab() {
 
 /* ── Trash Tab ────────────────────────────────── */
 function TrashTab() {
-  const { packages, restorePackage, permanentRemovePackage } = useContentConfig();
-  const { toast } = useToast();
-  const { showConfirm } = useDialog();
+  const { packages } = useContentConfig();
   const deleted = packages
     .map((p, realIdx) => ({ p, realIdx }))
     .filter(({ p }) => !!p.deletedAt);
@@ -1035,7 +1033,7 @@ function TrashTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ background: '#1a1400', border: '1px solid #7a4a00', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <AlertTriangle size={13} /> Pacotes na lixeira não aparecem no site. Restaure para reativá-los.
+        <AlertTriangle size={13} /> Pacotes na lixeira não aparecem no site. Somente o <strong>Admin Master</strong> pode restaurar ou deletar permanentemente.
       </div>
       {deleted.map(({ p: pkg, realIdx }) => (
         <div key={realIdx} style={{ background: '#09182a', border: '1px solid #3a1a1a', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', opacity: 0.8 }}>
@@ -1047,16 +1045,18 @@ function TrashTab() {
               {pkg.deletedAt ? ` em ${new Date(pkg.deletedAt).toLocaleDateString('pt-BR')}` : ''}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <button
-              onClick={() => { restorePackage(realIdx); toast(`"${pkg.title}" restaurado!`, 'success'); }}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#0d3320', color: '#4ade80', border: '1px solid #1a5c38', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+              disabled
+              title="Somente o Admin Master pode restaurar pacotes"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#0d3320', color: '#4ade80', border: '1px solid #1a5c38', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'not-allowed', opacity: 0.4 }}
             >
               <RotateCcw size={13} /> Restaurar
             </button>
             <button
-              onClick={async () => { if (await showConfirm('Excluir permanentemente? Esta ação não pode ser desfeita.', { type: 'danger', confirmText: 'Excluir', title: 'Exclusão Permanente' })) { permanentRemovePackage(realIdx); toast('Pacote excluído permanentemente.', 'error'); } }}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#2a0a0a', color: '#ff6b6b', border: '1px solid #3a1a1a', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+              disabled
+              title="Somente o Admin Master pode deletar permanentemente"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#2a0a0a', color: '#ff6b6b', border: '1px solid #3a1a1a', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'not-allowed', opacity: 0.4 }}
             >
               <Trash2 size={13} /> Deletar
             </button>
