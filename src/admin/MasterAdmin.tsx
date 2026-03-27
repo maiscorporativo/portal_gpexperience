@@ -176,10 +176,13 @@ function AuditTrail({ pkg }: { pkg: TrendingPackage }) {
 }
 
 /* ── Package Review Card ── */
-function PackageReviewCard({ pkg, onApprove, onReject, onUpdate }: {
+const MAX_TRENDING = 8;
+
+function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }: {
   pkg: TrendingPackage; index: number;
   onApprove: () => void; onReject: () => void;
   onUpdate: (d: Partial<TrendingPackage>) => void;
+  trendingCount: number;
 }) {
   const [open, setOpen] = useState(false);
   const [local, setLocal] = useState<TrendingPackage>(pkg);
@@ -286,11 +289,26 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate }: {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, paddingBottom: 2 }}>
               <label style={{ fontSize: 10, color: local.isTrending ? '#f37126' : '#4a7fa8', fontWeight: local.isTrending ? 700 : 600, textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}><Flame size={11} /> Em Alta</label>
-              <button type="button" onClick={() => set({ isTrending: !local.isTrending })}
-                style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background .2s', background: local.isTrending ? '#f37126' : '#142030' }}>
+              <button type="button" onClick={() => {
+                if (!local.isTrending && trendingCount >= MAX_TRENDING) {
+                  alert(`Limite atingido! Já existem ${MAX_TRENDING} pacotes em "Pacotes em Alta". Desative um antes de ativar este.`);
+                  return;
+                }
+                set({ isTrending: !local.isTrending });
+              }}
+                style={{
+                  width: 44, height: 24, borderRadius: 12, border: 'none',
+                  cursor: local.isTrending || trendingCount < MAX_TRENDING ? 'pointer' : 'not-allowed',
+                  position: 'relative', transition: 'background .2s',
+                  background: local.isTrending ? '#f37126' : '#142030',
+                  opacity: !local.isTrending && trendingCount >= MAX_TRENDING ? 0.5 : 1,
+                }}>
                 <span style={{ position: 'absolute', top: 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left .2s', left: local.isTrending ? 23 : 3 }} />
               </button>
               <span style={{ fontSize: 10, color: local.isTrending ? '#f37126' : '#4a7fa8' }}>{local.isTrending ? 'Sim' : 'Não'}</span>
+              {!local.isTrending && trendingCount >= MAX_TRENDING && (
+                <span style={{ fontSize: 9, color: '#f87171', textAlign: 'center', lineHeight: 1.3 }}>Lotado ({trendingCount}/{MAX_TRENDING})</span>
+              )}
             </div>
           </div>
 
@@ -663,6 +681,7 @@ export default function MasterAdmin() {
                         onApprove={() => { approvePackage(realIdx); toast('Pacote aprovado! ✅', 'success'); }}
                         onReject={() => { rejectPackage(realIdx); toast('Pacote rejeitado.', 'warning'); }}
                         onUpdate={d => masterUpdatePackage(realIdx, d)}
+                        trendingCount={packages.filter(p => p.isTrending && !p.deletedAt).length}
                       />
                     );
                   })}
