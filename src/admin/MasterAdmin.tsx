@@ -179,10 +179,11 @@ function AuditTrail({ pkg }: { pkg: TrendingPackage }) {
 /* ── Package Review Card ── */
 const MAX_TRENDING = 8;
 
-function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }: {
+function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trendingCount }: {
   pkg: TrendingPackage; index: number;
   onApprove: () => void; onReject: () => void;
   onUpdate: (d: Partial<TrendingPackage>) => void;
+  onRemove: () => void;
   trendingCount: number;
 }) {
   const [open, setOpen] = useState(false);
@@ -195,7 +196,7 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }
   const masterUser = localStorage.getItem(MASTER_AUTH_KEY) ?? 'master';
   const now = () => new Date().toISOString();
   const { toast } = useToast();
-  const { showAlert } = useDialog();
+  const { showAlert, showConfirm } = useDialog();
 
   const handleSaveApprove = () => { onUpdate({ ...local, status: 'approved', updatedBy: masterUser, updatedAt: now() }); toast('Edições salvas com sucesso!', 'success'); };
   const handleSaveOnly    = () => { onUpdate({ ...local, updatedBy: masterUser, updatedAt: now() }); toast('Salvo sem aprovar.', 'info'); };
@@ -228,7 +229,10 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }
               <X size={13} /> Rejeitar
             </button>
           )}
-          {open ? <ChevronUp size={16} color="#4a7fa8" /> : <ChevronDown size={16} color="#4a7fa8" />}
+          <button onClick={async e => { e.stopPropagation(); if (await showConfirm('Mover este pacote para a lixeira?', { type: 'danger', confirmText: 'Excluir', title: 'Excluir Pacote' })) { onRemove(); toast('Pacote movido para a lixeira.', 'warning'); } }} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', background: '#2a0a0a', color: '#f87171', border: '1px solid #3a1a1a', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+              <Trash2 size={13} />
+            </button>
+            {open ? <ChevronUp size={16} color="#4a7fa8" /> : <ChevronDown size={16} color="#4a7fa8" />}
         </div>
       </div>
 
@@ -340,6 +344,11 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }
             )}
             <button onClick={onReject} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', background: '#3a0d0d', color: '#f87171', border: '1px solid #7a1a1a', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
               <X size={14} /> Rejeitar
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-start', paddingTop: 8, borderTop: '1px solid #142030', marginTop: 4 }}>
+            <button onClick={async () => { if (await showConfirm('Mover este pacote para a lixeira?', { type: 'danger', confirmText: 'Excluir', title: 'Excluir Pacote' })) { onRemove(); toast('Pacote movido para a lixeira.', 'warning'); } }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', background: '#2a0a0a', color: '#f87171', border: '1px solid #3a1a1a', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              <Trash2 size={14} /> Excluir Pacote
             </button>
           </div>
         </div>
@@ -571,7 +580,7 @@ export default function MasterAdmin() {
     return !!v;
   });
   const [section, setSection] = useState<'pending' | 'approved' | 'rejected' | 'users'>('pending');
-  const { packages, approvePackage, rejectPackage, masterUpdatePackage, saveError } = useContentConfig();
+  const { packages, approvePackage, rejectPackage, masterUpdatePackage, removePackage, saveError } = useContentConfig();
   const { toast } = useToast();
 
   // Exibe toast de erro quando o servidor falhar ao salvar
@@ -685,6 +694,7 @@ export default function MasterAdmin() {
                         onApprove={() => { approvePackage(realIdx); toast('Pacote aprovado! ✅', 'success'); }}
                         onReject={() => { rejectPackage(realIdx); toast('Pacote rejeitado.', 'warning'); }}
                         onUpdate={d => masterUpdatePackage(realIdx, d)}
+                        onRemove={() => removePackage(realIdx)}
                         trendingCount={packages.filter(p => p.isTrending && !p.deletedAt).length}
                       />
                     );
