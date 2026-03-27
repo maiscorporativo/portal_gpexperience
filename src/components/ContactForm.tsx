@@ -72,14 +72,96 @@ function FloatInput({
 
 function PhoneInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const id = useId();
+  const [focused, setFocused] = useState(false);
+
   const fmt = (v: string) => {
     const d = v.replace(/\D/g, '').slice(0, 11);
-    if (d.length <= 2) return d;
+    if (d.length === 0) return '';
+    if (d.length <= 2) return `(${d}`;
     if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
     if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
     return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
   };
-  return <FloatInput id={id} label="Telefone / WhatsApp" type="tel" autoComplete="tel" value={value} onChange={v => onChange(fmt(v))} />;
+
+  const raised = true;
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          display: 'flex', alignItems: 'center',
+          width: '100%', boxSizing: 'border-box',
+          background: '#0d2d4e',
+          border: `1.5px solid ${focused ? '#f37126' : 'rgba(255,255,255,0.1)'}`,
+          borderRadius: 12,
+          padding: '22px 18px 8px',
+          transition: 'border-color 0.2s, background 0.2s',
+          cursor: 'text',
+          overflow: 'hidden',
+        }}
+        onClick={() => document.getElementById(id)?.focus()}
+      >
+        <span style={{
+          color: 'rgba(255,255,255,0.5)',
+          fontSize: 15,
+          fontWeight: 600,
+          marginRight: 6,
+          userSelect: 'none',
+          flexShrink: 0,
+          fontFamily: 'inherit',
+        }}>+55</span>
+        <input
+          id={id}
+          type="tel"
+          autoComplete="tel"
+          value={value}
+          onChange={e => onChange(fmt(e.target.value))}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+            boxShadow: 'none',
+            WebkitAppearance: 'none',
+            color: '#fff',
+            fontSize: 15,
+            padding: 0,
+            fontFamily: 'inherit',
+            letterSpacing: '0.01em',
+          }}
+        />
+      </div>
+      <label
+        htmlFor={id}
+        style={{
+          position: 'absolute',
+          left: 18,
+          top: raised ? 8 : '50%',
+          transform: raised ? 'none' : 'translateY(-50%)',
+          fontSize: raised ? 10 : 14,
+          color: focused ? '#f37126' : 'rgba(255,255,255,0.38)',
+          fontWeight: raised ? 700 : 400,
+          letterSpacing: raised ? '0.08em' : '0.01em',
+          textTransform: raised ? 'uppercase' : 'none',
+          pointerEvents: 'none',
+          transition: 'all 0.18s cubic-bezier(0.4,0,0.2,1)',
+          userSelect: 'none',
+        }}
+      >
+        Telefone / WhatsApp
+      </label>
+      <span style={{
+        position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+        height: 2, width: focused ? '92%' : 0,
+        background: 'linear-gradient(90deg, #f37126, #faa71d)',
+        borderRadius: 2, transition: 'width 0.25s ease',
+        pointerEvents: 'none',
+      }} />
+    </div>
+  );
 }
 
 /* ── Package dropdown select ─────────────────────────── */
