@@ -16,7 +16,7 @@ export default function Navbar() {
       {/* New Top Banner */}
       <div className="w-full px-8 pt-4 pb-2 text-xs flex flex-col md:flex-row justify-center md:justify-between items-center gap-2 text-neutral-100 font-medium">
         <span className="text-center">
-          Confira nosso <a href="#events" onClick={scrollTo('events')} className="underline text-gold hover:text-white transition-colors font-bold">calendário completo de eventos</a>
+          Confira nosso <a href="/" onClick={scrollTo('events')} className="underline text-gold hover:text-white transition-colors font-bold">calendário completo de eventos</a>
         </span>
         <a href="tel:+5511999999999" className="flex items-center justify-center gap-2 tracking-wide text-sm text-gold font-semibold hover:text-white cursor-pointer transition-colors">
           +55 (11) 99999-9999 <Headphones size={16} strokeWidth={2.5} className="mb-[2px]" />
@@ -34,9 +34,9 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center space-x-7 text-[13px] text-neutral-300 font-medium">
-            <a href="#trending" onClick={scrollTo('trending')} className="hover:text-gold transition-colors duration-200">Em Alta</a>
-            <a href="#events" onClick={scrollTo('events')} className="hover:text-gold transition-colors duration-200">Eventos</a>
-            <a href="#platinum" onClick={scrollTo('platinum')} className="hover:text-gold transition-colors duration-200">Acesso Platinum</a>
+            <a href="/" onClick={scrollTo('trending')} className="hover:text-gold transition-colors duration-200">Em Alta</a>
+            <a href="/" onClick={scrollTo('events')} className="hover:text-gold transition-colors duration-200">Eventos</a>
+            <a href="/" onClick={scrollTo('platinum')} className="hover:text-gold transition-colors duration-200">Acesso Platinum</a>
 
           </div>
 
@@ -58,9 +58,9 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl lg:hidden pt-24 px-6 flex flex-col">
           <div className="flex flex-col gap-6 text-xl font-medium text-center text-white">
-            <a href="#trending" className="hover:text-gold" onClick={scrollTo('trending')}>Em Alta</a>
-            <a href="#events" className="hover:text-gold" onClick={scrollTo('events')}>Eventos</a>
-            <a href="#platinum" className="hover:text-gold" onClick={scrollTo('platinum')}>Acesso Platinum</a>
+            <a href="/" className="hover:text-gold" onClick={scrollTo('trending')}>Em Alta</a>
+            <a href="/" className="hover:text-gold" onClick={scrollTo('events')}>Eventos</a>
+            <a href="/" className="hover:text-gold" onClick={scrollTo('platinum')}>Acesso Platinum</a>
 
 
           </div>

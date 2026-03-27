@@ -33,7 +33,10 @@ function SitePage() {
   return (
     <SelectedPackageProvider>
       <div className="min-h-screen bg-primary-main text-white selection:bg-gold selection:text-white pb-0">
-        <Navbar />
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <Navbar />
+        </div>
+        <div className="h-[110px]" />
         <HeroSection />
         <PartnersMarquee />
         <TrendingPackages />

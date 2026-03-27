@@ -70,7 +70,8 @@ export default function HeroSection() {
             Vivencie momentos inesquecíveis com Ingressos Oficiais, VIP e Hospitalidade para os melhores eventos esportivos do mundo, feitos sob medida para você e seus convidados.
           </p>
           <a
-            href="#trending"
+            href="/"
+            onClick={(e) => { e.preventDefault(); document.getElementById('trending')?.scrollIntoView({ behavior: 'smooth' }); }}
             className="inline-flex items-center gap-3 bg-gold text-black font-bold text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300 shadow-lg shadow-gold/20 group"
           >
             Ver Pacotes
