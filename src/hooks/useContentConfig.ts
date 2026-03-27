@@ -277,7 +277,8 @@ export function useContentConfig() {
   }, [content, persist]);
 
   const removePackage = useCallback((i: number) => {
-    const user = getAdminUser();
+    const masterVal = localStorage.getItem('emais_master_auth');
+    const user = (masterVal && masterVal !== '1') ? masterVal : getAdminUser();
     return persist({ ...content, packages: content.packages.map((p, idx) =>
       idx === i ? { ...p, deletedAt: now(), deletedBy: user } : p
     )});
