@@ -4,6 +4,7 @@ import { Check, X, ChevronDown, ChevronUp, Shield, LogOut, Upload, Plus, Trash2,
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
+import { useDialog } from '../components/ui/DialogProvider';
 
 const MASTER_AUTH_KEY = 'emais_master_auth';
 
@@ -194,6 +195,7 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }
   const masterUser = localStorage.getItem(MASTER_AUTH_KEY) ?? 'master';
   const now = () => new Date().toISOString();
   const { toast } = useToast();
+  const { showAlert } = useDialog();
 
   const handleSaveApprove = () => { onUpdate({ ...local, status: 'approved', updatedBy: masterUser, updatedAt: now() }); toast('Edições salvas com sucesso!', 'success'); };
   const handleSaveOnly    = () => { onUpdate({ ...local, updatedBy: masterUser, updatedAt: now() }); toast('Salvo sem aprovar.', 'info'); };
@@ -291,7 +293,7 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, trendingCount }
               <label style={{ fontSize: 10, color: local.isTrending ? '#f37126' : '#4a7fa8', fontWeight: local.isTrending ? 700 : 600, textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}><Flame size={11} /> Em Alta</label>
               <button type="button" onClick={() => {
                 if (!local.isTrending && trendingCount >= MAX_TRENDING) {
-                  alert(`Limite atingido! Já existem ${MAX_TRENDING} pacotes em "Pacotes em Alta". Desative um antes de ativar este.`);
+                  showAlert(`Já existem ${MAX_TRENDING} pacotes em "Pacotes em Alta". Desative um antes de ativar este.`, 'warning');
                   return;
                 }
                 set({ isTrending: !local.isTrending });
@@ -355,6 +357,7 @@ const masterHeaders = () => ({
 });
 
 function UsersTab() {
+  const { showAlert, showConfirm } = useDialog();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -426,11 +429,12 @@ function UsersTab() {
   };
 
   const handleDelete = async (u: AdminUser) => {
-    if (!confirm(`Excluir o usuário "${u.username}"? Esta ação não pode ser desfeita.`)) return;
+    const ok = await showConfirm(`Excluir o usuário "${u.username}"? Esta ação não pode ser desfeita.`, { type: 'danger', confirmText: 'Excluir', title: 'Excluir Usuário' });
+    if (!ok) return;
     try {
       await fetch(`/api/auth/users/${u.id}`, { method: 'DELETE', headers: masterHeaders() });
       fetchUsers();
-    } catch { alert('Erro ao excluir'); }
+    } catch { showAlert('Erro ao excluir usuário.', 'error'); }
   };
 
   const roleLabel = (r: string) => r === 'master' ? '🔑 Master' : '👤 Admin';

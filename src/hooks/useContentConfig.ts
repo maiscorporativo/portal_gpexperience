@@ -257,12 +257,12 @@ export function useContentConfig() {
 
   const approvePackage = useCallback((i: number) => {
     const user = getMasterUser();
-    return persist({ ...content, packages: content.packages.map((p, idx) => idx === i ? { ...p, status: 'approved', approvedBy: user, approvedAt: now() } : p) });
+    return persist({ ...content, packages: content.packages.map((p, idx) => idx === i ? { ...p, status: 'approved', approvedBy: user, approvedAt: now(), rejectedBy: undefined, rejectedAt: undefined } : p) });
   }, [content, persist]);
 
   const rejectPackage = useCallback((i: number) => {
     const user = getMasterUser();
-    return persist({ ...content, packages: content.packages.map((p, idx) => idx === i ? { ...p, status: 'rejected', rejectedBy: user, rejectedAt: now() } : p) });
+    return persist({ ...content, packages: content.packages.map((p, idx) => idx === i ? { ...p, status: 'rejected', rejectedBy: user, rejectedAt: now(), approvedBy: undefined, approvedAt: undefined } : p) });
   }, [content, persist]);
 
   const masterUpdatePackage = useCallback((i: number, d: Partial<TrendingPackage>) => {

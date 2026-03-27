@@ -12,6 +12,7 @@ import { useImageConfig } from '../hooks/useImageConfig';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
+import { useDialog } from '../components/ui/DialogProvider';
 
 /* ── Auth ───────────────────────────────────────────────────────── */
 const AUTH_KEY = 'emais_admin_auth';
@@ -609,6 +610,7 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const { showAlert, showConfirm } = useDialog();
   const [trendMsg, setTrendMsg] = useState<string | null>(null);
   const [hasEdited, setHasEdited] = useState(false);
 
@@ -621,7 +623,7 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
 
   const handleTrendToggle = () => {
     if (!pkg.isTrending && trendingCount >= MAX_TRENDING) {
-      alert(`Limite atingido! Já existem ${MAX_TRENDING} pacotes em "Pacotes em Alta". Desative um antes de ativar este.`);
+      showAlert(`Já existem ${MAX_TRENDING} pacotes em "Pacotes em Alta". Desative um antes de ativar este.`, 'warning');
       return;
     }
     const next = !pkg.isTrending;
@@ -646,7 +648,7 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
         <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
           <button onClick={e => { e.stopPropagation(); onReorder('up'); }} disabled={index === 0} style={iconBtn(index === 0)} title="Mover para cima"><ChevronUp size={14} /></button>
           <button onClick={e => { e.stopPropagation(); onReorder('down'); }} disabled={index === total - 1} style={iconBtn(index === total - 1)} title="Mover para baixo"><ChevronDown size={14} /></button>
-          <button onClick={e => { e.stopPropagation(); if (confirm('Remover este pacote?')) onRemove(); }} style={iconBtn(false, true)} title="Remover"><Trash2 size={14} /></button>
+          <button onClick={async e => { e.stopPropagation(); if (await showConfirm('Remover este pacote?', { type: 'danger', confirmText: 'Remover', title: 'Remover Pacote' })) onRemove(); }} style={iconBtn(false, true)} title="Remover"><Trash2 size={14} /></button>
         </div>
         <span style={{ color: '#4a6f93', fontSize: 12 }}>{isOpen ? '▴' : '▾'}</span>
       </div>
@@ -919,6 +921,7 @@ function EmojiPicker({ currentEmoji, onChange }: {
 function CategoriesTab() {
   const { categories, categoryIcons, addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon } = useContentConfig();
   const { toast } = useToast();
+  const { showConfirm } = useDialog();
   const [newName, setNewName] = useState('');
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editVal, setEditVal] = useState('');
@@ -1003,7 +1006,7 @@ function CategoriesTab() {
             ) : (
               <button onClick={() => startEdit(i)} style={{ background: '#0d2540', border: '1px solid #1a3150', borderRadius: 6, color: '#7bc4e8', fontSize: 11, padding: '5px 10px', cursor: 'pointer' }}>Editar</button>
             )}
-            <button onClick={() => { if (confirm(`Remover a categoria "${cat}"?`)) { removeCategory(i); toast(`Categoria "${cat}" removida.`, 'warning'); } }} style={{ background: '#2a0a0a', border: '1px solid #3a1a1a', borderRadius: 6, color: '#ff6b6b', fontSize: 11, padding: '5px 8px', cursor: 'pointer' }}><Trash2 size={12} /></button>
+            <button onClick={async () => { if (await showConfirm(`Remover a categoria "${cat}"?`, { type: 'danger', confirmText: 'Remover', title: 'Remover Categoria' })) { removeCategory(i); toast(`Categoria "${cat}" removida.`, 'warning'); } }} style={{ background: '#2a0a0a', border: '1px solid #3a1a1a', borderRadius: 6, color: '#ff6b6b', fontSize: 11, padding: '5px 8px', cursor: 'pointer' }}><Trash2 size={12} /></button>
           </div>
         ))}
       </div>
@@ -1015,6 +1018,7 @@ function CategoriesTab() {
 function TrashTab() {
   const { packages, restorePackage, permanentRemovePackage } = useContentConfig();
   const { toast } = useToast();
+  const { showConfirm } = useDialog();
   const deleted = packages
     .map((p, realIdx) => ({ p, realIdx }))
     .filter(({ p }) => !!p.deletedAt);
@@ -1051,7 +1055,7 @@ function TrashTab() {
               <RotateCcw size={13} /> Restaurar
             </button>
             <button
-              onClick={() => { if (confirm('Excluir permanentemente? Esta ação não pode ser desfeita.')) { permanentRemovePackage(realIdx); toast('Pacote excluído permanentemente.', 'error'); } }}
+              onClick={async () => { if (await showConfirm('Excluir permanentemente? Esta ação não pode ser desfeita.', { type: 'danger', confirmText: 'Excluir', title: 'Exclusão Permanente' })) { permanentRemovePackage(realIdx); toast('Pacote excluído permanentemente.', 'error'); } }}
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#2a0a0a', color: '#ff6b6b', border: '1px solid #3a1a1a', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
             >
               <Trash2 size={13} /> Deletar
