@@ -267,8 +267,8 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
             </div>
           </div>
 
-          {/* Row 3: tag / sigla badge */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {/* Row 3: tag / sigla / categoria / em alta */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10, alignItems: 'end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 10, color: '#4a7fa8', fontWeight: 600, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}><Award size={11} /> Tag do Card</label>
               <select value={local.tag} onChange={e => set({ tag: e.target.value })}
@@ -278,10 +278,6 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
               </select>
             </div>
             <MField label="Sigla do Badge" icon={<Type size={11} />} value={local.badge} onChange={v => set({ badge: v })} />
-          </div>
-
-          {/* Categoria + Em Alta */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 10, color: '#4a7fa8', fontWeight: 600, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}><Package size={11} /> Categoria</label>
               <select value={local.category || ''} onChange={e => set({ category: e.target.value })}

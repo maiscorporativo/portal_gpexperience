@@ -715,16 +715,13 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
                   {!TAG_OPTIONS.includes(pkg.tag) && <option value={pkg.tag}>{pkg.tag}</option>}
                 </select>
               </div>
-            </div>
-
-            {/* Categoria + Em Alta */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* Categoria */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <label style={{ fontSize: 11, color: '#4a6f93', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 4 }}><Package size={11} /> Categoria</label>
                 <select
                   value={pkg.category || ''}
                   onChange={e => onUpdate({ category: e.target.value })}
-                  style={{ background: '#09182a', border: '1px solid #1a3150', borderRadius: 8, color: '#e8edf2', fontSize: 13, padding: '10px 12px', outline: 'none', cursor: 'pointer' }}
+                  style={{ background: '#060f1c', border: '1px solid #1a3150', borderRadius: 7, color: '#e8edf2', fontSize: 13, padding: '9px 12px', outline: 'none', cursor: 'pointer' }}
                   onFocus={e => { e.target.style.borderColor = '#f37126'; }}
                   onBlur={e => { e.target.style.borderColor = '#1a3150'; }}
                 >
