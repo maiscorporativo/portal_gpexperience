@@ -96,7 +96,7 @@ router.get('/', async (req, res) => {
     });
   } catch (err) {
     console.error('[GET /api/content]', err.message);
-    res.status(500).json({ error: 'Database error' });
+    res.status(500).json({ error: 'Database error', details: err.message, sqlState: err.sqlState || err.code });
   }
 });
 
