@@ -13,12 +13,12 @@ export default function PartnersMarquee() {
         <div className="flex w-max animate-marquee opacity-40 hover:opacity-100 transition-opacity duration-300">
           {[1, 2, 3, 4].map((set) => (
             <div key={set} className="flex items-center justify-around gap-16 md:gap-32 px-8 md:px-16 w-max" aria-hidden={set !== 1 ? "true" : "false"}>
-              <span className="font-bold text-xl md:text-3xl">NFL</span>
-              <span className="font-bold text-xl md:text-3xl">NCAA</span>
-              <span className="font-bold text-xl md:text-3xl">UFC</span>
-              <span className="font-bold text-xl md:text-3xl">FIFA</span>
-              <span className="font-bold text-xl md:text-3xl italic">olympics</span>
-              <span className="font-bold text-lg md:text-2xl">Wimbledon</span>
+              <img src="/partners/nfl.png" alt="NFL" className="h-8 md:h-12 w-auto object-contain" />
+              <img src="/partners/libertadores.png" alt="Libertadores" className="h-8 md:h-12 w-auto object-contain" />
+              <img src="/partners/ufc.png" alt="UFC" className="h-8 md:h-12 w-auto object-contain" />
+              <img src="/partners/copa%202026.png" alt="Copa 2026" className="h-8 md:h-12 w-auto object-contain" />
+              <img src="/partners/olimpiadas.png" alt="Olimpíadas" className="h-8 md:h-12 w-auto object-contain" />
+              <img src="/partners/wimbledon.png" alt="Wimbledon" className="h-8 md:h-12 w-auto object-contain" />
             </div>
           ))}
         </div>
