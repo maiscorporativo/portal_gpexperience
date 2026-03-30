@@ -10,6 +10,9 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME     || 'emais_cms',
   waitForConnections: true,
   connectionLimit: 10,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+  connectTimeout: 60000,
 });
 
 export default pool;
