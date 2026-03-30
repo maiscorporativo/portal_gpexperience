@@ -5,7 +5,7 @@ export default function PartnersMarquee() {
         Eventos mais iconicos e importantes do mundo
       </p>
 
-      <div className="w-full relative flex overflow-hidden">
+      <div className="w-full relative flex overflow-hidden py-4">
         {/* Gradient masks for smooth fade in/out on edges */}
         <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#041121] to-transparent z-10 pointer-events-none"></div>
         <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#041121] to-transparent z-10 pointer-events-none"></div>
