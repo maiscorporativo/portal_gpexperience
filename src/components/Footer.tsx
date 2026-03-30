@@ -39,7 +39,7 @@ export default function Footer() {
                     <div className="flex items-center justify-center gap-6 text-sm text-neutral-500 w-full max-w-lg">
                         <a href="mailto:joao.kubo@maiscorporativo.tur.br" className="hover:text-white transition-colors flex-1 text-right">joao.kubo@maiscorporativo.tur.br</a>
                         <span className="w-px h-4 bg-white/15 flex-shrink-0" />
-                        <a href="tel:+5518997624457" className="hover:text-white transition-colors flex-1 text-left">+55 (18) 99762-4457</a>
+                        <a href="https://api.whatsapp.com/send/?phone=5518997624457&text=Ol%C3%A1,%20tudo%20bem?%20Gostaria%20de%20falar%20com%20um%20consultor.&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex-1 text-left">+55 (18) 99762-4457</a>
                     </div>
                     <div className="flex gap-3 pt-1">
                         <a href="https://www.instagram.com/emais.viagensesportivas/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-neutral-400 hover:text-[#E1306C] hover:border-[#E1306C]/40 hover:bg-[#E1306C]/5 transition-all">

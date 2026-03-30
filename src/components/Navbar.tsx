@@ -18,8 +18,8 @@ export default function Navbar() {
         <span className="text-center">
           Confira nosso <a href="/" onClick={scrollTo('events')} className="underline text-gold hover:text-white transition-colors font-bold">calendário completo de eventos</a>
         </span>
-        <a href="tel:+5511999999999" className="flex items-center justify-center gap-2 tracking-wide text-sm text-gold font-semibold hover:text-white cursor-pointer transition-colors">
-          +55 (11) 99999-9999 <Headphones size={16} strokeWidth={2.5} className="mb-[2px]" />
+        <a href="https://api.whatsapp.com/send/?phone=5518997624457&text=Ol%C3%A1,%20tudo%20bem?%20Gostaria%20de%20falar%20com%20um%20consultor.&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 tracking-wide text-sm text-gold font-semibold hover:text-white cursor-pointer transition-colors">
+          +55 (18) 99762-4457 <Headphones size={16} strokeWidth={2.5} className="mb-[2px]" />
         </a>
       </div>
 
