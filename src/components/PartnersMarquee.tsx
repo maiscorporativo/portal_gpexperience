@@ -10,15 +10,15 @@ export default function PartnersMarquee() {
         <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#041121] to-transparent z-10 pointer-events-none"></div>
         <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#041121] to-transparent z-10 pointer-events-none"></div>
 
-        <div className="flex w-max animate-marquee opacity-40 hover:opacity-100 transition-opacity duration-300">
+        <div className="flex w-max animate-marquee">
           {[1, 2, 3, 4].map((set) => (
             <div key={set} className="flex items-center justify-around gap-16 md:gap-32 px-8 md:px-16 w-max" aria-hidden={set !== 1 ? "true" : "false"}>
-              <img src="/partners/nfl.png" alt="NFL" className="h-8 md:h-12 w-auto object-contain" />
-              <img src="/partners/libertadores.png" alt="Libertadores" className="h-8 md:h-12 w-auto object-contain" />
-              <img src="/partners/ufc.png" alt="UFC" className="h-8 md:h-12 w-auto object-contain" />
-              <img src="/partners/copa%202026.png" alt="Copa 2026" className="h-8 md:h-12 w-auto object-contain" />
-              <img src="/partners/olimpiadas.png" alt="Olimpíadas" className="h-8 md:h-12 w-auto object-contain" />
-              <img src="/partners/wimbledon.png" alt="Wimbledon" className="h-8 md:h-12 w-auto object-contain" />
+              <img src="/partners/nfl.png" alt="NFL" className="h-8 md:h-12 w-auto object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
+              <img src="/partners/libertadores.png" alt="Libertadores" className="h-8 md:h-12 w-auto object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
+              <img src="/partners/ufc.png" alt="UFC" className="h-8 md:h-12 w-auto object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
+              <img src="/partners/copa%202026.png" alt="Copa 2026" className="h-8 md:h-12 w-auto object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
+              <img src="/partners/olimpiadas.png" alt="Olimpíadas" className="h-8 md:h-12 w-auto object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
+              <img src="/partners/wimbledon.png" alt="Wimbledon" className="h-8 md:h-12 w-auto object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
             </div>
           ))}
         </div>
