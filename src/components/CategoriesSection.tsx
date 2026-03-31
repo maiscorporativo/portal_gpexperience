@@ -118,7 +118,7 @@ function CategoryAccordion({
 
 /* ── Main Section ── */
 export default function CategoriesSection() {
-  const { packages: allPackages, categoryIcons } = useContentConfig();
+  const { packages: allPackages, categoryIcons, categories: configCategories } = useContentConfig();
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   // Filtrar apenas aprovados
@@ -132,11 +132,17 @@ export default function CategoriesSection() {
     return acc;
   }, {});
 
-  const categories = Object.keys(grouped).sort((a, b) =>
-    a === 'Outros' ? 1 : b === 'Outros' ? -1 : a.localeCompare(b)
-  );
+  // Ordenar conforme a ordem salva no Admin, mas só mostrar categorias com pacotes ativos
+  const displayCategories = configCategories.filter(cat => grouped[cat]);
+  
+  // Categorias "órfãs" (que têm pacotes, mas não estão na lista de config do Admin) aparecem no final
+  Object.keys(grouped).forEach(cat => {
+    if (!displayCategories.includes(cat)) {
+      displayCategories.push(cat);
+    }
+  });
 
-  if (categories.length === 0) return null;
+  if (displayCategories.length === 0) return null;
 
   return (
     <section id="events" className="px-6 py-16 max-w-[1400px] mx-auto">
@@ -153,7 +159,7 @@ export default function CategoriesSection() {
       </Reveal>
 
       <div className="flex flex-col gap-3">
-        {categories.map((cat, i) => (
+        {displayCategories.map((cat, i) => (
           <Reveal key={cat} delay={i * 60}>
             <CategoryAccordion
               category={cat}
