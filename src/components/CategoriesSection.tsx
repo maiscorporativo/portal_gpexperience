@@ -133,7 +133,8 @@ export default function CategoriesSection() {
   }, {});
 
   // Ordenar conforme a ordem salva no Admin, mas só mostrar categorias com pacotes ativos
-  const displayCategories = (configCategories || []).filter(cat => grouped[cat]);
+  const safeConfigCats = Array.isArray(configCategories) ? configCategories : [];
+  const displayCategories = safeConfigCats.filter(cat => grouped[cat]);
   
   // Categorias "órfãs" (que têm pacotes, mas não estão na lista de config do Admin) aparecem no final
   Object.keys(grouped).forEach(cat => {
