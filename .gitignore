@@ -26,3 +26,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Uploads — imagens enviadas pelo admin existem SÓ no servidor de produção
+# NUNCA devem ser sobrescritas pelo git deploy
+public/uploads/*
+!public/uploads/.gitkeep
