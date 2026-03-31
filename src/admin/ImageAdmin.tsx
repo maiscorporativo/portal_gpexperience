@@ -5,14 +5,32 @@ import {
   Upload, Download, Eye, Shield, X, Plus, Trash2,
   ChevronUp, ChevronDown, CalendarDays, MapPin, Tag,
   DollarSign, FileText, Plane, BedDouble, Ticket, Save,
-  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock,
+  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 import { DEFAULT_IMAGES, type ImageKey } from '../imageConfig';
 import { useImageConfig } from '../hooks/useImageConfig';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
 import { useDialog } from '../components/ui/DialogProvider';
+
 
 /* ── Auth ───────────────────────────────────────────────────────── */
 const AUTH_KEY = 'emais_admin_auth';
@@ -600,7 +618,7 @@ function PriceMaskInput({
 }
 const MAX_TRENDING = 8;
 
-function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, onRemove, onReorder, onSetTrending, onSaved, isOpen, onToggle }: {
+function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, onRemove, onReorder, onSetTrending, onSaved, isOpen, onToggle, dragHandleProps }: {
   pkg: TrendingPackage; index: number; total: number; trendingCount: number; categories: string[];
   onUpdate: (d: Partial<TrendingPackage>) => void;
   onRemove: () => void;
@@ -609,6 +627,7 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
   onSaved?: () => void;
   isOpen: boolean;
   onToggle: () => void;
+  dragHandleProps?: any;
 }) {
   const { showAlert, showConfirm } = useDialog();
   const [trendMsg, setTrendMsg] = useState<string | null>(null);
@@ -645,11 +664,16 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
           </div>
           <div style={{ fontSize: 12, color: '#4a6f93', marginTop: 2 }}>{pkg.date} · {pkg.loc} · {pkg.currency || 'BRL'} {pkg.price}</div>
         </div>
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          <button onClick={e => { e.stopPropagation(); onReorder('up'); }} disabled={index === 0} style={iconBtn(index === 0)} title="Mover para cima"><ChevronUp size={14} /></button>
-          <button onClick={e => { e.stopPropagation(); onReorder('down'); }} disabled={index === total - 1} style={iconBtn(index === total - 1)} title="Mover para baixo"><ChevronDown size={14} /></button>
-          <button onClick={async e => { e.stopPropagation(); if (await showConfirm('Remover este pacote?', { type: 'danger', confirmText: 'Remover', title: 'Remover Pacote' })) onRemove(); }} style={iconBtn(false, true)} title="Remover"><Trash2 size={14} /></button>
-        </div>
+          <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+            {dragHandleProps && (
+              <button {...dragHandleProps} onClick={e => e.stopPropagation()} style={{ ...iconBtn(false), cursor: 'grab' }} title="Arrastar pacote">
+                <GripVertical size={14} />
+              </button>
+            )}
+            <button onClick={e => { e.stopPropagation(); onReorder('up'); }} disabled={index === 0} style={iconBtn(index === 0)} title="Mover para cima"><ChevronUp size={14} /></button>
+            <button onClick={e => { e.stopPropagation(); onReorder('down'); }} disabled={index === total - 1} style={iconBtn(index === total - 1)} title="Mover para baixo"><ChevronDown size={14} /></button>
+            <button onClick={async e => { e.stopPropagation(); if (await showConfirm('Remover este pacote?', { type: 'danger', confirmText: 'Remover', title: 'Remover Pacote' })) onRemove(); }} style={iconBtn(false, true)} title="Remover"><Trash2 size={14} /></button>
+          </div>
         <span style={{ color: '#4a6f93', fontSize: 12 }}>{isOpen ? '▴' : '▾'}</span>
       </div>
       {isOpen && (
@@ -785,15 +809,46 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
   );
 }
 
+function SortablePackageCard(props: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, setActivatorNodeRef, isDragging } = useSortable({ id: props.id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    position: 'relative',
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      <PackageCard {...props} dragHandleProps={{ ref: setActivatorNodeRef, ...attributes, ...listeners }} />
+    </div>
+  );
+}
+
 function PackagesTab() {
   const { packages, categories, updatePackage, addPackage, removePackage, reorderPackage, setPackageTrending } = useContentConfig();
   const { toast } = useToast();
   const [openRealIdx, setOpenRealIdx] = useState<number | null>(null);
-  // Mostra apenas pacotes NÃO deletados
   const activePackages = packages
     .map((p, realIdx) => ({ p, realIdx }))
     .filter(({ p }) => !p.deletedAt);
   const trendingCount = activePackages.filter(({ p }) => p.isTrending === true).length;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = activePackages.findIndex(x => x.realIdx === active.id);
+      const newIndex = activePackages.findIndex(x => x.realIdx === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        reorderPackage(activePackages[oldIndex].realIdx, activePackages[newIndex].realIdx);
+      }
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -811,17 +866,28 @@ function PackagesTab() {
           <AlertTriangle size={13} /> <strong>Limite atingido:</strong> já há {MAX_TRENDING} pacotes em "Em Alta". Desative um antes de ativar outro.
         </div>
       )}
-      {activePackages.map(({ p: pkg, realIdx }) => (
-        <PackageCard key={realIdx} pkg={pkg} index={realIdx} total={packages.length} trendingCount={trendingCount} categories={categories}
-          isOpen={openRealIdx === realIdx}
-          onToggle={() => setOpenRealIdx(prev => prev === realIdx ? null : realIdx)}
-          onUpdate={d => updatePackage(realIdx, d)}
-          onSetTrending={v => setPackageTrending(realIdx, v)}
-          onRemove={() => { removePackage(realIdx); toast('Pacote movido para a lixeira.', 'warning'); }}
-          onReorder={dir => reorderPackage(realIdx, dir === 'up' ? realIdx - 1 : realIdx + 1)}
-          onSaved={() => toast('Pacote atualizado!', 'success')}
-        />
-      ))}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={activePackages.map(x => x.realIdx)} strategy={verticalListSortingStrategy}>
+          {activePackages.map(({ p: pkg, realIdx }) => (
+            <SortablePackageCard
+              key={realIdx}
+              id={realIdx}
+              pkg={pkg}
+              index={realIdx}
+              total={packages.length}
+              trendingCount={trendingCount}
+              categories={categories}
+              isOpen={openRealIdx === realIdx}
+              onToggle={() => setOpenRealIdx(prev => prev === realIdx ? null : realIdx)}
+              onUpdate={(d: any) => updatePackage(realIdx, d)}
+              onSetTrending={(v: any) => setPackageTrending(realIdx, v)}
+              onRemove={() => { removePackage(realIdx); toast('Pacote movido para a lixeira.', 'warning'); }}
+              onReorder={(dir: string) => reorderPackage(realIdx, dir === 'up' ? realIdx - 1 : realIdx + 1)}
+              onSaved={() => toast('Pacote atualizado!', 'success')}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
       {activePackages.length === 0 && <EmptyState text="Nenhum pacote ativo. Verifique a Lixeira ou clique em Adicionar Pacote." />}
     </div>
   );
@@ -915,6 +981,53 @@ function EmojiPicker({ currentEmoji, onChange }: {
 }
 
 
+function SortableCategoryItem({ cat, i, categoryIcons, updateCategoryIcon, reorderCategory, editIdx, editVal, setEditVal, confirmEdit, setEditIdx, startEdit, removeCategory, categoriesCount, toast, showConfirm }: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, setActivatorNodeRef, isDragging } = useSortable({ id: cat });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    position: 'relative',
+    display: 'flex', alignItems: 'center', gap: 8, background: '#09182a', border: '1px solid #1a3150', borderRadius: 8, padding: '10px 12px'
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <button ref={setActivatorNodeRef} {...attributes} {...listeners} style={{ background: 'none', border: 'none', color: '#4a6f93', cursor: 'grab', padding: 0 }} title="Arrastar">
+        <GripVertical size={14} />
+      </button>
+
+      {/* Emoji picker */}
+      <EmojiPicker currentEmoji={categoryIcons[cat] ?? ''} onChange={emoji => updateCategoryIcon(cat, emoji)} />
+
+      {/* Reorder buttons */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <button onClick={() => reorderCategory(i, i - 1)} disabled={i === 0} style={{ background: 'none', border: 'none', color: i === 0 ? '#1a3150' : '#4a6f93', cursor: i === 0 ? 'default' : 'pointer', padding: 0, lineHeight: 1 }}><ChevronUp size={13} /></button>
+        <button onClick={() => reorderCategory(i, i + 1)} disabled={i === categoriesCount - 1} style={{ background: 'none', border: 'none', color: i === categoriesCount - 1 ? '#1a3150' : '#4a6f93', cursor: i === categoriesCount - 1 ? 'default' : 'pointer', padding: 0, lineHeight: 1 }}><ChevronDown size={13} /></button>
+      </div>
+
+      {editIdx === i ? (
+        <input
+          value={editVal}
+          onChange={e => setEditVal(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') confirmEdit(); if (e.key === 'Escape') setEditIdx(null); }}
+          autoFocus
+           style={{ flex: 1, background: '#060f1c', border: '1px solid #f37126', borderRadius: 6, color: '#e8edf2', fontSize: 13, padding: '6px 10px', outline: 'none' }}
+        />
+      ) : (
+        <span style={{ flex: 1, fontSize: 13, color: '#e8edf2' }}>{cat}</span>
+      )}
+
+      {editIdx === i ? (
+        <button onClick={confirmEdit} style={{ background: '#0d3320', border: '1px solid #1a5c38', borderRadius: 6, color: '#4ade80', fontSize: 11, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>✓ Salvar</button>
+      ) : (
+        <button onClick={() => startEdit(i)} style={{ background: '#0d2540', border: '1px solid #1a3150', borderRadius: 6, color: '#7bc4e8', fontSize: 11, padding: '5px 10px', cursor: 'pointer' }}>Editar</button>
+      )}
+      <button onClick={async () => { if (await showConfirm(`Remover a categoria "${cat}"?`, { type: 'danger', confirmText: 'Remover', title: 'Remover Categoria' })) { removeCategory(i); toast(`Categoria "${cat}" removida.`, 'warning'); } }} style={{ background: '#2a0a0a', border: '1px solid #3a1a1a', borderRadius: 6, color: '#ff6b6b', fontSize: 11, padding: '5px 8px', cursor: 'pointer' }}><Trash2 size={12} /></button>
+    </div>
+  );
+}
+
 /* ── Categories Tab ───────────────────────────────────────────── */
 function CategoriesTab() {
   const { categories, categoryIcons, addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon } = useContentConfig();
@@ -936,6 +1049,22 @@ function CategoriesTab() {
   const confirmEdit = () => {
     if (editIdx !== null && editVal.trim()) { updateCategory(editIdx, editVal); toast('Categoria atualizada!', 'info'); }
     setEditIdx(null);
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = categories.indexOf(active.id as string);
+      const newIndex = categories.indexOf(over.id as string);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        reorderCategory(oldIndex, newIndex);
+      }
+    }
   };
 
   return (
@@ -972,42 +1101,32 @@ function CategoriesTab() {
       {categories.length === 0 && (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#4a6f93', fontSize: 13 }}>Nenhuma categoria. Adicione uma acima.</div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {categories.map((cat, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#09182a', border: '1px solid #1a3150', borderRadius: 8, padding: '10px 12px' }}>
-            {/* Emoji picker */}
-            <EmojiPicker
-              currentEmoji={categoryIcons[cat] ?? ''}
-              onChange={emoji => updateCategoryIcon(cat, emoji)}
-            />
-
-            {/* Reorder buttons */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <button onClick={() => reorderCategory(i, i - 1)} disabled={i === 0} style={{ background: 'none', border: 'none', color: i === 0 ? '#1a3150' : '#4a6f93', cursor: i === 0 ? 'default' : 'pointer', padding: 0, lineHeight: 1 }}><ChevronUp size={13} /></button>
-              <button onClick={() => reorderCategory(i, i + 1)} disabled={i === categories.length - 1} style={{ background: 'none', border: 'none', color: i === categories.length - 1 ? '#1a3150' : '#4a6f93', cursor: i === categories.length - 1 ? 'default' : 'pointer', padding: 0, lineHeight: 1 }}><ChevronDown size={13} /></button>
-            </div>
-
-            {editIdx === i ? (
-              <input
-                value={editVal}
-                onChange={e => setEditVal(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') confirmEdit(); if (e.key === 'Escape') setEditIdx(null); }}
-                autoFocus
-                style={{ flex: 1, background: '#060f1c', border: '1px solid #f37126', borderRadius: 6, color: '#e8edf2', fontSize: 13, padding: '6px 10px', outline: 'none' }}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={categories} strategy={verticalListSortingStrategy}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {categories.map((cat, i) => (
+              <SortableCategoryItem
+                key={cat}
+                cat={cat}
+                i={i}
+                categoriesCount={categories.length}
+                categoryIcons={categoryIcons}
+                updateCategoryIcon={updateCategoryIcon}
+                reorderCategory={reorderCategory}
+                editIdx={editIdx}
+                editVal={editVal}
+                setEditVal={setEditVal}
+                confirmEdit={confirmEdit}
+                setEditIdx={setEditIdx}
+                startEdit={startEdit}
+                removeCategory={removeCategory}
+                toast={toast}
+                showConfirm={showConfirm}
               />
-            ) : (
-              <span style={{ flex: 1, fontSize: 13, color: '#e8edf2' }}>{cat}</span>
-            )}
-
-            {editIdx === i ? (
-              <button onClick={confirmEdit} style={{ background: '#0d3320', border: '1px solid #1a5c38', borderRadius: 6, color: '#4ade80', fontSize: 11, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>✓ Salvar</button>
-            ) : (
-              <button onClick={() => startEdit(i)} style={{ background: '#0d2540', border: '1px solid #1a3150', borderRadius: 6, color: '#7bc4e8', fontSize: 11, padding: '5px 10px', cursor: 'pointer' }}>Editar</button>
-            )}
-            <button onClick={async () => { if (await showConfirm(`Remover a categoria "${cat}"?`, { type: 'danger', confirmText: 'Remover', title: 'Remover Categoria' })) { removeCategory(i); toast(`Categoria "${cat}" removida.`, 'warning'); } }} style={{ background: '#2a0a0a', border: '1px solid #3a1a1a', borderRadius: 6, color: '#ff6b6b', fontSize: 11, padding: '5px 8px', cursor: 'pointer' }}><Trash2 size={12} /></button>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
