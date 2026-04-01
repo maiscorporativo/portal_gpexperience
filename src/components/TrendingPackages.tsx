@@ -55,8 +55,9 @@ export default function TrendingPackages() {
               style={{ perspective: '1000px' }}
             >
               <div
-                className="bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300 border border-neutral-200 flex flex-col group h-full relative z-10 hover:shadow-2xl"
+                className="bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300 border border-neutral-200 flex flex-col group h-full relative z-10 hover:shadow-2xl cursor-pointer"
                 style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
+                onClick={() => handleOpenModal(pkg)}
                 onMouseMove={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const x = e.clientX - rect.left;
@@ -96,13 +97,16 @@ export default function TrendingPackages() {
                     <div className="flex items-center justify-between mt-1">
                       <span className="font-semibold text-lg">{getCurrencySymbol(pkg.currency || 'BRL')} {formatDisplayPrice(pkg.price, pkg.currency || 'BRL')}</span>
                       <button
-                        onClick={() => handleOpenModal(pkg)}
+                        onClick={(e) => { e.stopPropagation(); handleOpenModal(pkg); }}
                         className="text-sm font-semibold text-gold hover:text-black transition-colors flex items-center gap-1"
                         aria-label={`Ver pacote ${pkg.title}`}
                       >
                         Ver pacote <ArrowRight size={14} />
                       </button>
                     </div>
+                    <p className="text-[10px] text-neutral-400 mt-2 leading-tight">
+                      Preços e condições sujeitos a disponibilidade e alterações sem prévio aviso.
+                    </p>
                   </div>
                 </div>
               </div>

@@ -235,6 +235,9 @@ export default function PackageModal({ isOpen, onClose, pkg }: PackageModalProps
                   Falar com um Consultor
                 </a>
               </div>
+              <p style={{ fontSize: 10, color: '#9ca3af', lineHeight: 1.5, margin: '16px 0 0', textAlign: 'center' }}>
+                Preços e condições sujeitos a disponibilidade e alterações sem prévio aviso.
+              </p>
             </div>
           </div>
 
