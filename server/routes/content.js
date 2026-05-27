@@ -73,6 +73,9 @@ router.get('/events', (req, res) => {
 
 /* ── GET /api/content ─────────────────────────────────────────── */
 router.get('/', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   try {
     const [rows] = await pool.query('SELECT * FROM site_content WHERE id = 1');
     if (!rows.length) {
