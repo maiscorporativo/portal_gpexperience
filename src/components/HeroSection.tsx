@@ -71,7 +71,16 @@ export default function HeroSection() {
           </p>
           <a
             href="/"
-            onClick={(e) => { e.preventDefault(); document.getElementById('trending')?.scrollIntoView({ behavior: 'smooth' }); }}
+            onClick={(e) => { 
+              e.preventDefault(); 
+              const trendingSection = document.getElementById('trending');
+              const eventsSection = document.getElementById('events');
+              if (trendingSection) {
+                trendingSection.scrollIntoView({ behavior: 'smooth' });
+              } else if (eventsSection) {
+                eventsSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
             className="inline-flex items-center gap-3 bg-gold text-black font-bold text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300 shadow-lg shadow-gold/20 group"
           >
             Ver Pacotes
