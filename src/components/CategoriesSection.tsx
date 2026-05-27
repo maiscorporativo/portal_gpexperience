@@ -40,15 +40,15 @@ function PackageCard({ pkg, onClick }: { pkg: TrendingPackage & { originalIndex:
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <h4 className="font-bold text-white text-base mb-2 leading-tight">{pkg.title}</h4>
+      <div className="p-4 flex flex-col h-[130px]">
+        <h4 className="font-bold text-white text-base mb-2 leading-tight line-clamp-1">{pkg.title}</h4>
         <div className="flex items-center gap-1.5 text-neutral-400 text-xs mb-1">
-          <MapPin size={11} className="text-gold" />{pkg.loc}
+          <MapPin size={11} className="text-gold flex-shrink-0" /><span className="truncate">{pkg.loc}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-neutral-400 text-xs mb-3">
-          <Calendar size={11} className="text-gold" />{pkg.date}
+        <div className="flex items-center gap-1.5 text-neutral-400 text-xs mb-auto">
+          <Calendar size={11} className="text-gold flex-shrink-0" /><span className="truncate">{pkg.date}</span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-3">
           <div>
             <p className="text-[10px] text-neutral-500 uppercase tracking-wider">a partir de</p>
             <p className="text-gold font-bold text-lg">{getCurrencySymbol(curr)} {formatDisplayPrice(pkg.price, curr)}</p>
@@ -62,31 +62,30 @@ function PackageCard({ pkg, onClick }: { pkg: TrendingPackage & { originalIndex:
   );
 }
 
-/* ── Accordion item ── */
-function CategoryAccordion({
-  category, packages, isOpen, onToggle, iconEmoji,
+/* ── Category Group (Always open) ── */
+function CategoryGroup({
+  category, packages, iconEmoji,
 }: {
   category: string;
   packages: (TrendingPackage & { originalIndex: number })[];
-  isOpen: boolean;
-  onToggle: () => void;
   iconEmoji?: string;
 }) {
   const navigate = useNavigate();
   const displayIcon = iconEmoji || CATEGORY_ICONS[category] || '🎟️';
 
-  const handleNavigate = (idx: number) => {
-    navigate(`/pacote/${idx}`);
-    window.scrollTo(0, 0);
+  const handleNavigate = (idx: number, externalUrl?: string) => {
+    if (externalUrl && externalUrl.trim() !== '') {
+      window.location.href = externalUrl;
+    } else {
+      navigate(`/pacote/${idx}`);
+      window.scrollTo(0, 0);
+    }
   };
 
   return (
-    <div className="border border-white/10 rounded-2xl overflow-hidden transition-all duration-300">
+    <div className="border border-white/10 rounded-2xl overflow-hidden bg-black/20 mb-6">
       {/* Header */}
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center gap-4 px-6 py-5 text-left hover:bg-white/5 transition-colors duration-200"
-      >
+      <div className="w-full flex items-center gap-4 px-6 py-5 text-left border-b border-white/5">
         <span className="text-2xl">{displayIcon}</span>
         <div className="flex-1">
           <span className="text-white font-semibold text-lg">{category}</span>
@@ -94,32 +93,22 @@ function CategoryAccordion({
             {packages.length} pacote{packages.length !== 1 ? 's' : ''}
           </span>
         </div>
-        <div className={`w-8 h-8 rounded-full bg-white/5 flex items-center justify-center transition-transform duration-300 ${isOpen ? 'rotate-180 bg-gold/20' : ''}`}>
-          <ChevronDown size={16} className={isOpen ? 'text-gold' : 'text-neutral-400'} />
-        </div>
-      </button>
-
-      {/* Body — accordion content */}
-      <div
-        className="overflow-hidden transition-all duration-500 ease-in-out"
-        style={{ maxHeight: isOpen ? `${packages.length * 400 + 80}px` : '0px', opacity: isOpen ? 1 : 0 }}
-      >
-        <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 border-t border-white/5 pt-5">
-          {packages.map((pkg) => (
-            <PackageCard key={pkg.originalIndex} pkg={pkg} onClick={() => handleNavigate(pkg.originalIndex)} />
-          ))}
-        </div>
       </div>
 
-      {/* Modal removed */}
+      {/* Body — always visible */}
+      <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-5">
+        {packages.map((pkg) => (
+          <PackageCard key={pkg.originalIndex} pkg={pkg} onClick={() => handleNavigate(pkg.originalIndex, pkg.externalUrl)} />
+        ))}
+      </div>
     </div>
   );
 }
 
+
 /* ── Main Section ── */
 export default function CategoriesSection() {
   const { packages: allPackages, categoryIcons, categories: configCategories } = useContentConfig();
-  const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   // Filtrar apenas aprovados, preservando o index original
   const packages = allPackages
@@ -164,11 +153,9 @@ export default function CategoriesSection() {
       <div className="flex flex-col gap-3">
         {displayCategories.map((cat, i) => (
           <Reveal key={cat} delay={i * 60}>
-            <CategoryAccordion
+            <CategoryGroup
               category={cat}
               packages={grouped[cat]}
-              isOpen={openCategory === cat}
-              onToggle={() => setOpenCategory(prev => prev === cat ? null : cat)}
               iconEmoji={categoryIcons[cat]}
             />
           </Reveal>
