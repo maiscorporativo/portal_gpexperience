@@ -204,6 +204,10 @@ export default function PackageLP() {
         navigate('/');
         return;
       }
+      if (p.externalUrl && p.externalUrl.trim() !== '') {
+        window.location.href = p.externalUrl;
+        return;
+      }
       setPkg(p);
       setNotFound(false);
       if (p.title) document.title = `${p.title} | GP Experience`;
