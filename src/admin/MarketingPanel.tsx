@@ -601,6 +601,12 @@ function MarketingEditor({ pkg, onUpdate, onCancel }: {
               </div>
 
               <div style={fieldStyle}>
+                <label style={labelStyle}><LinkIcon size={14} color="#ef4444" /> URL de LP Externa (Opcional)</label>
+                <div style={{ fontSize: '11px', color: '#999', marginBottom: '8px' }}>Se preenchido, o clique no pacote abrirá esta URL em vez de gerar a página interna.</div>
+                <input value={local.externalUrl || ''} onChange={e => setLocal({...local, externalUrl: e.target.value})} placeholder="Ex: https://indy500.gpexperience.com.br" style={IS} className="admin-input" />
+              </div>
+
+              <div style={fieldStyle}>
                 <label style={labelStyle}><Database size={14} color="#8b5cf6" /> Webhook Clint Digital</label>
                 <input value={local.webhookClint || ''} onChange={e => setLocal({...local, webhookClint: e.target.value})} placeholder="https://..." style={IS} className="admin-input" />
               </div>

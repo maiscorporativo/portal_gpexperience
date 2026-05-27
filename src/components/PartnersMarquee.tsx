@@ -1,8 +1,8 @@
 export default function PartnersMarquee() {
   return (
-    <section className="py-20 border-b border-white/5 overflow-hidden flex flex-col items-center" style={{ background: 'linear-gradient(to bottom, transparent 0%, #09090b 60%)' }}>
-      <p className="text-[11px] text-[#4a6f93] uppercase tracking-[0.2em] mb-10 font-bold z-10 px-6 text-center">
-        Eventos mais iconicos e importantes do mundo
+    <section className="pt-6 pb-12 border-b border-white/5 overflow-hidden flex flex-col items-center" style={{ background: 'linear-gradient(to bottom, transparent 0%, #09090b 60%)' }}>
+      <p className="text-[11px] text-[#4a6f93] uppercase tracking-[0.2em] mb-4 font-bold z-10 px-6 text-center">
+        Os eventos mais iconicos e importantes do universo automotivo!
       </p>
 
       <div className="w-full relative flex overflow-hidden py-4">
@@ -19,7 +19,6 @@ export default function PartnersMarquee() {
               <img src="/partners/motogp.svg" alt="MotoGP" className="h-8 md:h-12 w-auto object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
               <img src="/partners/Indy.png" alt="Indy" className="h-8 md:h-18 w-auto object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
               <img src="/partners/formula2.png" alt="F2" className="h-8 md:h-18 w-auto object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
-              <img src="/partners/stockcar.png" alt="Stock Car" className="h-8 md:h-18 w-auto object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
               <img src="/partners/Nascar.png" alt="Nascar" className="h-8 md:h-26 w-auto object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer" />
             </div>
           ))}

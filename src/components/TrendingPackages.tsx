@@ -17,9 +17,13 @@ export default function TrendingPackages() {
     .filter(p => (!p.status || p.status === 'approved') && p.isTrending === true && !p.deletedAt)
     .slice(0, 8);
 
-  const handleNavigate = (idx: number) => {
-    navigate(`/pacote/${idx}`);
-    window.scrollTo(0, 0);
+  const handleNavigate = (idx: number, externalUrl?: string) => {
+    if (externalUrl && externalUrl.trim() !== '') {
+      window.location.href = externalUrl;
+    } else {
+      navigate(`/pacote/${idx}`);
+      window.scrollTo(0, 0);
+    }
   };
 
   if (packagesWithIndex.length === 0) return null;
@@ -48,7 +52,7 @@ export default function TrendingPackages() {
               <div
                 className="bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300 border border-neutral-200 flex flex-col group h-full relative z-10 hover:shadow-2xl cursor-pointer"
                 style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
-                onClick={() => handleNavigate(pkg.originalIndex)}
+                onClick={() => handleNavigate(pkg.originalIndex, pkg.externalUrl)}
                 onMouseMove={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const x = e.clientX - rect.left;
@@ -88,7 +92,7 @@ export default function TrendingPackages() {
                     <div className="flex items-center justify-between mt-1">
                       <span className="font-semibold text-lg">{getCurrencySymbol(pkg.currency || 'BRL')} {formatDisplayPrice(pkg.price, pkg.currency || 'BRL')}</span>
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleNavigate(pkg.originalIndex); }}
+                        onClick={(e) => { e.stopPropagation(); handleNavigate(pkg.originalIndex, pkg.externalUrl); }}
                         className="text-sm font-semibold text-gold hover:text-black transition-colors flex items-center gap-1"
                         aria-label={`Ver pacote ${pkg.title}`}
                       >

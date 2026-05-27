@@ -14,20 +14,12 @@ export default function Navbar() {
   return (
     <>
 
-      {/* Top Banner */}
-      <div className="w-full px-8 pt-4 pb-2 text-xs flex justify-center items-center text-neutral-100 font-medium">
-        <span className="text-center">
-          Confira nosso <a href="/" onClick={scrollTo('events')} className="underline text-gold hover:text-white transition-colors font-bold">calendário completo de eventos</a>
-        </span>
-      </div>
-
-
-      <nav className="w-full sticky top-4 z-50 px-4 transition-all mb-6">
-        <div className="mx-auto w-full max-w-[1400px] flex items-center justify-between h-[86px] bg-[#09090b]/60 backdrop-blur-lg rounded-lg px-6 shadow-xl border border-white/10 font-sans">
+      <nav className="w-full sticky top-4 z-50 px-4 transition-all mb-6 mt-4">
+        <div className="mx-auto w-full max-w-[1400px] flex items-center justify-between h-[130px] bg-[#09090b]/60 backdrop-blur-lg rounded-lg px-6 shadow-xl border border-white/10 font-sans">
 
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center cursor-pointer py-1" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <img src="/logo-gpexperience.webp" alt="GP Experience" className="h-[65px] object-contain" />
+          <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <img src="/logo-gpexperience.webp" alt="GP Experience" className="h-[130px] object-contain" />
           </div>
 
           {/* Desktop Menu */}

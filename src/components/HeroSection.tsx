@@ -57,7 +57,7 @@ export default function HeroSection() {
   const { getImage } = useImageConfig();
 
   return (
-    <section className="relative pt-6 pb-16 px-4 sm:px-6 max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
+    <section className="relative pt-24 pb-8 px-4 sm:px-6 max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
       {/* Left Content */}
       <Reveal className="w-full lg:w-5/12 z-10 flex flex-col justify-between py-2">
         <div>

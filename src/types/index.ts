@@ -48,6 +48,7 @@ export interface TrendingPackage {
   webhookClint?: string;
   mauticFormCode?: string;
   redirectUrl?: string;
+  externalUrl?: string; // Link externo para pular a Landing Page interna
   marketingUpdatedAt?: string;
   marketingUpdatedBy?: string;
   /* ── Enhanced Marketing fields ── */
