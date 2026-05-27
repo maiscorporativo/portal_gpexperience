@@ -26,7 +26,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center space-x-7 text-[13px] text-neutral-300 font-medium">
             <a href="/" onClick={scrollTo('trending')} className="hover:text-gold transition-colors duration-200">Em Alta</a>
             <a href="/" onClick={scrollTo('events')} className="hover:text-gold transition-colors duration-200">Eventos</a>
-            <a href="/" onClick={scrollTo('platinum')} className="hover:text-gold transition-colors duration-200">Acesso Platinum</a>
+            {/* <a href="/" onClick={scrollTo('platinum')} className="hover:text-gold transition-colors duration-200">Acesso Platinum</a> */}
 
           </div>
 
@@ -50,7 +50,7 @@ export default function Navbar() {
           <div className="flex flex-col gap-6 text-xl font-medium text-center text-white">
             <a href="/" className="hover:text-gold" onClick={scrollTo('trending')}>Em Alta</a>
             <a href="/" className="hover:text-gold" onClick={scrollTo('events')}>Eventos</a>
-            <a href="/" className="hover:text-gold" onClick={scrollTo('platinum')}>Acesso Platinum</a>
+            {/* <a href="/" className="hover:text-gold" onClick={scrollTo('platinum')}>Acesso Platinum</a> */}
 
 
           </div>

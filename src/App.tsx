@@ -44,8 +44,7 @@ function SitePage() {
       <TrendingPackages />
       <CategoriesSection />
       <ContactForm />
-      <PlatinumAccess />
-
+      {/* <PlatinumAccess /> */}
       <Footer />
       <BackToTop />
     </div>
