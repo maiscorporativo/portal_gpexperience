@@ -61,6 +61,7 @@ export interface TrendingPackage {
   programacaoTituloDestaque?: string; // Título da seção Programação (parte vermelha — padrão: "Fim de Semana")
   programacaoSubtitulo?: string; // Subtítulo da seção Programação (padrão: "Dias de ação e emoção")
   lpSections?: string; // JSON de visibilidade das seções da LP: { cards, programacao, pacotes, experiencia, galeria, destaque, parceria } — todas true por padrão
+  videoBgSections?: string; // JSON: seções com fundo animado da bandeira { programacao, pacotes, experiencia } — padrão: só programacao
   highlights?: string; // Semicolon separated features/highlights
   sectionBackground?: string;
   /* ── New GP Experience LP Sections ── */

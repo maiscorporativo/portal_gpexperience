@@ -296,6 +296,16 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
   const vis: Record<string, boolean> = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSONSafe<Record<string, boolean>>(pkg.lpSections, {}) };
   const setVis = (key: string, value: boolean) => onUpdate({ lpSections: JSON.stringify({ ...vis, [key]: value }) });
 
+  // Fundo animado da bandeira quadriculada por seção (padrão: só na Programação)
+  const videoBg: Record<string, boolean> = { programacao: true, pacotes: false, experiencia: false, ...parseJSONSafe<Record<string, boolean>>(pkg.videoBgSections, {}) };
+  const setVideoBg = (key: string, value: boolean) => onUpdate({ videoBgSections: JSON.stringify({ ...videoBg, [key]: value }) });
+  const videoBgRow = (key: string) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#0d0d0d', borderRadius: 10, border: '1px solid #1a1a1a' }}>
+      <span style={hint}>🏁 Fundo animado com o vídeo da bandeira quadriculada nesta seção</span>
+      <VisSwitch on={videoBg[key]} onChange={v => setVideoBg(key, v)} label="Fundo bandeira" />
+    </div>
+  );
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <style>{`@keyframes lp-spin { to { transform: rotate(360deg); } } .lp-spin { animation: lp-spin 1s linear infinite; }`}</style>
@@ -380,6 +390,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
         toggle={{ on: vis.programacao, onChange: v => setVis('programacao', v) }}
         subtitle="Título da seção, abas de dias (Sexta / Sábado / Domingo) e as atividades de cada dia.">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {videoBgRow('programacao')}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, padding: 12, background: '#0d0d0d', borderRadius: 10, border: '1px solid #1a1a1a' }}>
             <div style={fieldCol}>
               <label style={lbl}>Título da seção (parte branca)</label>
@@ -432,6 +443,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
         toggle={{ on: vis.pacotes, onChange: v => setVis('pacotes', v) }}
         subtitle='Cards de venda da LP. O "Tipo do Pacote" vira o selo colorido no topo do card (ex: PACOTE PREMIUM, PACOTE VIP EXCLUSIVO), como na página da Indy 500.'>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {videoBgRow('pacotes')}
           {pacotes.opcoes_hospedagem.map((op, i) => (
             <div key={i} style={{ background: '#0d0d0d', padding: 16, borderRadius: 12, border: '1px solid #1a1a1a', display: 'grid', gap: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -518,6 +530,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
         toggle={{ on: vis.experiencia, onChange: v => setVis('experiencia', v) }}
         subtitle='Bloco "Uma Experiência Inesquecível": texto à esquerda e imagens à direita. Escolha as imagens a partir do Banco de Imagens.'>
         <div style={{ display: 'grid', gap: 12 }}>
+          {videoBgRow('experiencia')}
           <div style={fieldCol}>
             <label style={lbl}>Texto da seção</label>
             <textarea rows={4} value={pkg.experienciaSection || ''} onChange={e => onUpdate({ experienciaSection: e.target.value })}

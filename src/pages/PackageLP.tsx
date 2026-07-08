@@ -137,6 +137,19 @@ function Speedometer() {
   );
 }
 
+/* --- Fundo animado: vídeo da bandeira quadriculada + gradiente vermelho --- */
+function FlagVideoBg() {
+  return (
+    <>
+      <video autoPlay muted loop playsInline
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.15, pointerEvents: 'none' }}>
+        <source src="/flag_quadriculada.mp4" type="video/mp4" />
+      </video>
+      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%', background: 'linear-gradient(to right, transparent, rgba(228,60,68,0.15))', pointerEvents: 'none' }} />
+    </>
+  );
+}
+
 /* --- Package Navbar Component --- */
 function PackageNavbar({ onBook }: { onBook: () => void }) {
   const scrollTo = (id: string) => (e: React.MouseEvent) => {
@@ -410,6 +423,9 @@ export default function PackageLP() {
   // Visibilidade das seções da LP (configurável no admin — todas visíveis por padrão)
   const vis = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSON(pkg.lpSections, {}) };
 
+  // Fundo animado da bandeira por seção (configurável no admin — padrão: só na Programação)
+  const videoBg = { programacao: true, pacotes: false, experiencia: false, ...parseJSON(pkg.videoBgSections, {}) };
+
   return (
     <div style={{ background: '#050505', color: '#fff', fontFamily: 'Outfit, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
       <PackageNavbar onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
@@ -491,19 +507,7 @@ export default function PackageLP() {
       <section id="programacao" style={{
         position: 'relative', padding: '100px 20px', background: '#050505', overflow: 'hidden'
       }}>
-        {/* Local Background Video */}
-        <video 
-          autoPlay muted loop playsInline 
-          style={{ 
-            position: 'absolute', inset: 0, width: '100%', height: '100%', 
-            objectFit: 'cover', opacity: 0.15, pointerEvents: 'none' 
-          }}
-        >
-          <source src="/flag_quadriculada.mp4" type="video/mp4" />
-        </video>
-
-        {/* Red speed gradient */}
-        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%', background: 'linear-gradient(to right, transparent, rgba(228,60,68,0.15))', pointerEvents: 'none' }} />
+        {videoBg.programacao && <FlagVideoBg />}
 
         <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 8px' }}>
@@ -552,8 +556,9 @@ export default function PackageLP() {
 
       {/* --- PACOTES --- */}
       {vis.pacotes && (
-      <section id="pacotes" style={{ padding: '100px 20px', background: '#0a0a0b' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <section id="pacotes" style={{ padding: '100px 20px', background: '#0a0a0b', position: 'relative', overflow: 'hidden' }}>
+        {videoBg.pacotes && <FlagVideoBg />}
+        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
             <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 16px' }}>Pacotes de <span style={{ color: '#e43c44' }}>Viagem Completos</span></h2>
             <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Voe com tudo incluído. Hospedagem, transporte e ingressos em um único pacote.</p>
@@ -640,21 +645,17 @@ export default function PackageLP() {
                       </div>
                     </div>
 
-                    <button 
+                    <button
                       onClick={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })}
-                      style={{ 
-                        background: i === 0 ? '#e43c44' : '#111', 
-                        color: '#fff', 
-                        border: i === 0 ? 'none' : '1px solid #333', 
-                        borderRadius: 12, padding: '16px', fontSize: 14, fontWeight: 800, 
+                      style={{
+                        background: i === 0 ? '#e43c44' : '#fbbf24',
+                        color: i === 0 ? '#fff' : '#000',
+                        border: 'none',
+                        borderRadius: 12, padding: '16px', fontSize: 14, fontWeight: 800,
                         cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase'
                       }}
-                      onMouseOver={e => {
-                        if (i !== 0) e.currentTarget.style.borderColor = '#fbbf24';
-                      }}
-                      onMouseOut={e => {
-                        if (i !== 0) e.currentTarget.style.borderColor = '#333';
-                      }}
+                      onMouseOver={e => { e.currentTarget.style.filter = 'brightness(1.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseOut={e => { e.currentTarget.style.filter = ''; e.currentTarget.style.transform = ''; }}
                     >
                       Solicitar Cotação
                     </button>
@@ -705,8 +706,9 @@ export default function PackageLP() {
 
       {/* --- EXPERIÊNCIA --- */}
       {vis.experiencia && (
-      <section id="experiencia" style={{ padding: '100px 20px', background: '#050505' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+      <section id="experiencia" style={{ padding: '100px 20px', background: '#050505', position: 'relative', overflow: 'hidden' }}>
+        {videoBg.experiencia && <FlagVideoBg />}
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center', position: 'relative', zIndex: 10 }}>
           <div>
             <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 900, margin: '0 0 24px', lineHeight: 1.1 }}>Uma Experiência <span style={{ color: '#e43c44' }}>Inesquecível</span></h2>
             <div style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: pkg.experienciaSection || 'Nossos pacotes garantem que você vivencie cada momento memorável com conforto, segurança e acesso a áreas exclusivas que a maioria dos visitantes nunca experimenta.' }} />
