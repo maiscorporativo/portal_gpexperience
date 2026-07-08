@@ -58,25 +58,43 @@ async function uploadImage(file: File, tokenKey: string): Promise<string> {
   return data.url as string;
 }
 
+/* ── Switch liga/desliga ── */
+function VisSwitch({ on, onChange, label = 'Exibir na LP' }: { on: boolean; onChange: (v: boolean) => void; label?: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+      <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: on ? '#4ade80' : '#666' }}>{label}</span>
+      <button type="button" onClick={() => onChange(!on)} title={on ? 'Seção visível — clique para ocultar' : 'Seção oculta — clique para exibir'}
+        style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background .2s', background: on ? '#16a34a' : '#333', padding: 0 }}>
+        <span style={{ position: 'absolute', top: 3, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left .2s', left: on ? 21 : 3 }} />
+      </button>
+    </div>
+  );
+}
+
 /* ── Wrapper de seção, com etiqueta indicando onde o conteúdo aparece na LP ── */
-function LPSection({ badge, title, subtitle, icon: Icon, color, children }: {
+function LPSection({ badge, title, subtitle, icon: Icon, color, toggle, children }: {
   badge: string; title: string; subtitle: string;
   icon: React.ComponentType<{ size?: number | string; color?: string }>;
-  color: string; children: React.ReactNode;
+  color: string;
+  toggle?: { on: boolean; onChange: (v: boolean) => void };
+  children: React.ReactNode;
 }) {
+  const hidden = toggle && !toggle.on;
   return (
-    <div style={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ background: '#0a0a0a', border: `1px solid ${hidden ? '#1a1a1a' : '#222'}`, borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 16, opacity: hidden ? 0.65 : 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid #1a1a1a', paddingBottom: 14 }}>
         <div style={{ width: 38, height: 38, background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Icon size={18} color={color} />
         </div>
-        <div style={{ minWidth: 0 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 9, fontWeight: 900, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '2px 8px', borderRadius: 100, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{badge}</span>
             <h3 style={{ fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>{title}</h3>
+            {hidden && <span style={{ fontSize: 9, fontWeight: 800, color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', padding: '2px 8px', borderRadius: 100, textTransform: 'uppercase' }}>Oculta na LP</span>}
           </div>
           <p style={{ ...hint, marginTop: 4 }}>{subtitle}</p>
         </div>
+        {toggle && <VisSwitch on={toggle.on} onChange={toggle.onChange} />}
       </div>
       {children}
     </div>
@@ -274,13 +292,18 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
   const destaque = parseJSONSafe<Destaque>(pkg.destaqueSection, {});
   const setDestaque = (d: Destaque) => onUpdate({ destaqueSection: JSON.stringify(d) });
 
+  // Visibilidade das seções na LP (todas visíveis por padrão)
+  const vis: Record<string, boolean> = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSONSafe<Record<string, boolean>>(pkg.lpSections, {}) };
+  const setVis = (key: string, value: boolean) => onUpdate({ lpSections: JSON.stringify({ ...vis, [key]: value }) });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <style>{`@keyframes lp-spin { to { transform: rotate(360deg); } } .lp-spin { animation: lp-spin 1s linear infinite; }`}</style>
 
       {/* ══ BANCO DE IMAGENS ══ */}
-      <LPSection badge="Base de imagens" title="Banco de Imagens" icon={Images} color="#3b82f6"
-        subtitle='Envie aqui TODAS as fotos do pacote. Elas aparecem automaticamente na seção "Galeria de Fotos" da LP e podem ser reaproveitadas nas seções Experiência e Destaque abaixo.'>
+      <LPSection badge="Base de imagens · Seção 6" title="Banco de Imagens" icon={Images} color="#3b82f6"
+        toggle={{ on: vis.galeria, onChange: v => setVis('galeria', v) }}
+        subtitle='Envie aqui TODAS as fotos do pacote. Elas aparecem automaticamente na seção "Galeria de Fotos" da LP (o botão ao lado liga/desliga essa seção) e podem ser reaproveitadas nas seções Experiência e Destaque abaixo.'>
         <ImageBankManager value={pkg.galleryImages || ''} onChange={v => onUpdate({ galleryImages: v })} tokenKey={tokenKey} />
       </LPSection>
 
@@ -322,6 +345,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
 
       {/* ══ SEÇÃO 2 — CARDS DE BENEFÍCIOS ══ */}
       <LPSection badge="Seção 2 da LP" title="Cards de Benefícios" icon={LayoutGrid} color="#ec4899"
+        toggle={{ on: vis.cards, onChange: v => setVis('cards', v) }}
         subtitle='Os 3 cards logo abaixo do Hero (ex: "Experiência Completa", "Acesso Exclusivo", "Suporte 24/7").'>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {cards.map((c: any, i: number) => (
@@ -353,6 +377,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
 
       {/* ══ SEÇÃO 3 — PROGRAMAÇÃO ══ */}
       <LPSection badge="Seção 3 da LP" title="Programação do Evento" icon={CalendarDays} color="#f59e0b"
+        toggle={{ on: vis.programacao, onChange: v => setVis('programacao', v) }}
         subtitle="Título da seção, abas de dias (Sexta / Sábado / Domingo) e as atividades de cada dia.">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, padding: 12, background: '#0d0d0d', borderRadius: 10, border: '1px solid #1a1a1a' }}>
@@ -404,6 +429,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
 
       {/* ══ SEÇÃO 4 — PACOTES & TIPOS ══ */}
       <LPSection badge="Seção 4 da LP" title="Pacotes & Tipos (Premium / VIP)" icon={BedDouble} color="#10b981"
+        toggle={{ on: vis.pacotes, onChange: v => setVis('pacotes', v) }}
         subtitle='Cards de venda da LP. O "Tipo do Pacote" vira o selo colorido no topo do card (ex: PACOTE PREMIUM, PACOTE VIP EXCLUSIVO), como na página da Indy 500.'>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {pacotes.opcoes_hospedagem.map((op, i) => (
@@ -489,6 +515,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
 
       {/* ══ SEÇÃO 5 — EXPERIÊNCIA ══ */}
       <LPSection badge="Seção 5 da LP" title="Experiência" icon={Star} color="#8b5cf6"
+        toggle={{ on: vis.experiencia, onChange: v => setVis('experiencia', v) }}
         subtitle='Bloco "Uma Experiência Inesquecível": texto à esquerda e imagens à direita. Escolha as imagens a partir do Banco de Imagens.'>
         <div style={{ display: 'grid', gap: 12 }}>
           <div style={fieldCol}>
@@ -506,7 +533,8 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
 
       {/* ══ SEÇÃO 7 — DESTAQUE (opcional) ══ */}
       <LPSection badge="Seção 7 da LP · opcional" title="Seção Destaque" icon={Sparkles} color="#fbbf24"
-        subtitle='Bloco extra de imagem + texto (como "O Troféu Borg-Warner" na LP da Indy 500). Deixe o título vazio para ocultar a seção.'>
+        toggle={{ on: vis.destaque, onChange: v => setVis('destaque', v) }}
+        subtitle='Bloco extra de imagem + texto (como "O Troféu Borg-Warner" na LP da Indy 500). Também fica oculta se o título e o texto estiverem vazios.'>
         <div style={{ display: 'grid', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div style={fieldCol}>
@@ -535,8 +563,16 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
         </div>
       </LPSection>
 
+      {/* ══ SEÇÃO 8 — PARCERIA (conteúdo fixo, exibição configurável) ══ */}
+      <div style={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: 14, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, opacity: vis.parceria ? 1 : 0.65 }}>
+        <p style={{ ...hint, margin: 0 }}>
+          <strong style={{ color: '#ccc' }}>Seção 8 — Parceria ("Realizado por")</strong>: cards fixos Mais Corporativo + E-Mais. Use o botão ao lado para exibir ou ocultar na LP deste pacote.
+        </p>
+        <VisSwitch on={vis.parceria} onChange={v => setVis('parceria', v)} />
+      </div>
+
       <p style={{ ...hint, padding: '10px 14px', background: '#0d0d0d', borderRadius: 10, border: '1px solid #1a1a1a' }}>
-        ℹ️ A <strong style={{ color: '#ccc' }}>Seção 6 — Galeria de Fotos</strong> é montada automaticamente com todas as imagens do Banco de Imagens. As seções Parceria, Formulário e Rodapé são fixas do template.
+        ℹ️ A <strong style={{ color: '#ccc' }}>Seção 6 — Galeria de Fotos</strong> é montada automaticamente com todas as imagens do Banco de Imagens (liga/desliga no bloco "Banco de Imagens"). O Hero, o Formulário de cotação e o Rodapé são fixos do template.
       </p>
     </div>
   );

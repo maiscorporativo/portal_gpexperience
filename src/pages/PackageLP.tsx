@@ -386,6 +386,9 @@ export default function PackageLP() {
     { titulo: 'Suporte 24/7', descricao: 'Nossa equipe está disponível antes, durante e após o evento para garantir sua satisfação.', icone: 'Headset' }
   ]);
 
+  // Visibilidade das seções da LP (configurável no admin — todas visíveis por padrão)
+  const vis = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSON(pkg.lpSections, {}) };
+
   return (
     <div style={{ background: '#050505', color: '#fff', fontFamily: 'Outfit, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
       <PackageNavbar onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
@@ -439,6 +442,7 @@ export default function PackageLP() {
       </section>
 
       {/* --- CARDS DE BENEFÍCIOS --- */}
+      {vis.cards && (
       <section style={{ padding: '0 20px', position: 'relative', zIndex: 20, marginTop: '-80px', marginBottom: '80px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
           {cards.map((c: any, i: number) => (
@@ -459,9 +463,11 @@ export default function PackageLP() {
           ))}
         </div>
       </section>
+      )}
 
       {/* --- PROGRAMAÇÃO --- */}
-      <section id="programacao" style={{ 
+      {vis.programacao && (
+      <section id="programacao" style={{
         position: 'relative', padding: '100px 20px', background: '#050505', overflow: 'hidden'
       }}>
         {/* Local Background Video */}
@@ -521,8 +527,10 @@ export default function PackageLP() {
           </div>
         </div>
       </section>
+      )}
 
       {/* --- PACOTES --- */}
+      {vis.pacotes && (
       <section id="pacotes" style={{ padding: '100px 20px', background: '#0a0a0b' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
@@ -599,7 +607,7 @@ export default function PackageLP() {
                     <div style={{ flex: 1, marginBottom: 32 }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: '#444', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 16 }}>O que está incluso:</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        {showInclusos.slice(0, 5).map((inc: any, j: number) => (
+                        {showInclusos.map((inc: any, j: number) => (
                           <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                             <CheckCircle2 size={16} color={i === 0 ? '#e43c44' : '#fbbf24'} style={{ marginTop: 2, flexShrink: 0 }} />
                             <div>
@@ -672,8 +680,10 @@ export default function PackageLP() {
           )}
         </div>
       </section>
+      )}
 
       {/* --- EXPERIÊNCIA --- */}
+      {vis.experiencia && (
       <section id="experiencia" style={{ padding: '100px 20px', background: '#050505' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
@@ -698,9 +708,11 @@ export default function PackageLP() {
           </div>
         </div>
       </section>
+      )}
 
       {/* --- GALERIA DE FOTOS (todas as imagens do Banco de Imagens) --- */}
       {(() => {
+        if (!vis.galeria) return null;
         const bank = (pkg.galleryImages || '').split(';').map(s => s.trim()).filter(Boolean);
         if (bank.length === 0) return null;
         return (
@@ -723,6 +735,7 @@ export default function PackageLP() {
 
       {/* --- SEÇÃO DESTAQUE (estilo "Troféu Borg-Warner" da Indy 500) --- */}
       {(() => {
+        if (!vis.destaque) return null;
         const destaque = parseJSON(pkg.destaqueSection, null);
         if (!destaque || (!destaque.titulo && !destaque.texto)) return null;
         const img = destaque.imagem ? (
@@ -747,6 +760,7 @@ export default function PackageLP() {
       })()}
 
       {/* --- PARCERIA --- */}
+      {vis.parceria && (
       <section style={{ padding: '100px 20px', background: '#111', borderTop: '1px solid #222', borderBottom: '1px solid #222', textAlign: 'center' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <p style={{ fontSize: 14, color: '#e43c44', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Realizado por:</p>
@@ -782,6 +796,7 @@ export default function PackageLP() {
           </div>
         </div>
       </section>
+      )}
 
       {/* --- CONVERSION / FORM SECTION --- */}
       <section id="conversion-section" style={{ padding: '120px 20px', background: '#0a0a0b', position: 'relative', overflow: 'hidden' }}>
