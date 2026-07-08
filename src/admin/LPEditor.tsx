@@ -297,7 +297,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
   const setVis = (key: string, value: boolean) => onUpdate({ lpSections: JSON.stringify({ ...vis, [key]: value }) });
 
   // Fundo animado da bandeira quadriculada por seção (padrão: só na Programação)
-  const videoBg: Record<string, boolean> = { programacao: true, pacotes: false, experiencia: false, ...parseJSONSafe<Record<string, boolean>>(pkg.videoBgSections, {}) };
+  const videoBg: Record<string, boolean> = { programacao: true, pacotes: false, experiencia: false, galeria: false, ...parseJSONSafe<Record<string, boolean>>(pkg.videoBgSections, {}) };
   const setVideoBg = (key: string, value: boolean) => onUpdate({ videoBgSections: JSON.stringify({ ...videoBg, [key]: value }) });
   const videoBgRow = (key: string) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#0d0d0d', borderRadius: 10, border: '1px solid #1a1a1a' }}>
@@ -314,6 +314,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
       <LPSection badge="Base de imagens · Seção 6" title="Banco de Imagens" icon={Images} color="#3b82f6"
         toggle={{ on: vis.galeria, onChange: v => setVis('galeria', v) }}
         subtitle='Envie aqui TODAS as fotos do pacote. Elas aparecem automaticamente na seção "Galeria de Fotos" da LP (o botão ao lado liga/desliga essa seção) e podem ser reaproveitadas nas seções Experiência e Destaque abaixo.'>
+        {videoBgRow('galeria')}
         <ImageBankManager value={pkg.galleryImages || ''} onChange={v => onUpdate({ galleryImages: v })} tokenKey={tokenKey} />
       </LPSection>
 

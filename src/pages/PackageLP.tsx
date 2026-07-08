@@ -424,7 +424,7 @@ export default function PackageLP() {
   const vis = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSON(pkg.lpSections, {}) };
 
   // Fundo animado da bandeira por seção (configurável no admin — padrão: só na Programação)
-  const videoBg = { programacao: true, pacotes: false, experiencia: false, ...parseJSON(pkg.videoBgSections, {}) };
+  const videoBg = { programacao: true, pacotes: false, experiencia: false, galeria: false, ...parseJSON(pkg.videoBgSections, {}) };
 
   return (
     <div style={{ background: '#050505', color: '#fff', fontFamily: 'Outfit, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
@@ -737,8 +737,9 @@ export default function PackageLP() {
       {(() => {
         if (!vis.galeria || galleryList.length === 0) return null;
         return (
-          <section id="galeria" style={{ padding: '100px 20px', background: '#0a0a0b' }}>
-            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <section id="galeria" style={{ padding: '100px 20px', background: '#0a0a0b', position: 'relative', overflow: 'hidden' }}>
+            {videoBg.galeria && <FlagVideoBg />}
+            <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
               <div style={{ textAlign: 'center', marginBottom: 60 }}>
                 <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 16px' }}>Galeria de <span style={{ color: '#e43c44' }}>Fotos</span></h2>
                 <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Um gostinho do que espera por você. Clique para ampliar.</p>
