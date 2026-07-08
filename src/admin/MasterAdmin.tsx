@@ -5,6 +5,7 @@ import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
 import { useDialog } from '../components/ui/DialogProvider';
+import LPContentEditor from './LPEditor';
 
 const MASTER_AUTH_KEY = 'emais_master_auth';
 
@@ -321,6 +322,12 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
           <MField label="Detalhes do Voo"        icon={<Plane size={11} />} value={local.flightDetails ?? ''} onChange={v => set({ flightDetails: v })} textarea />
           <MField label="Detalhes da Hospedagem" icon={<BedDouble size={11} />} value={local.hotelDetails ?? ''}  onChange={v => set({ hotelDetails: v })} textarea />
           <MField label="Detalhes dos Ingressos" icon={<Ticket size={11} />} value={local.ticketDetails ?? ''} onChange={v => set({ ticketDetails: v })} textarea />
+
+          {/* ── Conteúdo da Landing Page — editor compartilhado (Admin/Master/Marketing) ── */}
+          <div style={{ borderTop: '1px solid #333333', paddingTop: 14, marginTop: 4 }}>
+            <p style={{ fontSize: 11, color: '#737373', margin: '0 0 12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conteúdo da Landing Page do Pacote</p>
+            <LPContentEditor pkg={local} onUpdate={set} tokenKey="emais_master_token" />
+          </div>
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 4 }}>

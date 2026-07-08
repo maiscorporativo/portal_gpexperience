@@ -31,3 +31,8 @@ dist-ssr
 # NUNCA devem ser sobrescritas pelo git deploy
 public/uploads/*
 !public/uploads/.gitkeep
+dist/uploads/*
+
+# Artefatos de deploy e dumps de banco — não versionar
+deploy_hostinger.zip
+hostinger_import.sql

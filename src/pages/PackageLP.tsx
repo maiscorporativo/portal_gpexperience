@@ -422,7 +422,7 @@ export default function PackageLP() {
             <span style={{ fontSize: 12, fontWeight: 900, color: '#e43c44', letterSpacing: '0.15em' }}>{pkg.tag || '110ª EDIÇÃO'}</span>
           </div>
           <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 900, lineHeight: 1.1, margin: '0 0 24px', textShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-            Seu lugar no grid
+            {pkg.title || 'Seu lugar no grid'}
           </h1>
           <p style={{ fontSize: 'clamp(1.1rem, 2vw, 1.3rem)', lineHeight: 1.6, color: '#ccc', maxWidth: 650, margin: '0 auto 40px', fontWeight: 400 }}>
             {pkg.description || 'Viva a emoção da corrida com um pacote completo: passagens aéreas, hospedagem e ingressos garantidos, além de experiências exclusivas que vão muito além da corrida.'}
@@ -480,9 +480,9 @@ export default function PackageLP() {
 
         <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 8px' }}>
-            Programação do <span style={{ color: '#e43c44' }}>Fim de Semana</span>
+            {pkg.programacaoTitulo || 'Programação do'} <span style={{ color: '#e43c44' }}>{pkg.programacaoTituloDestaque || 'Fim de Semana'}</span>
           </h2>
-          <p style={{ fontSize: 16, color: '#aaa', margin: '0 0 40px' }}>Dias de ação e emoção</p>
+          <p style={{ fontSize: 16, color: '#aaa', margin: '0 0 40px' }}>{pkg.programacaoSubtitulo || 'Dias de ação e emoção'}</p>
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 40, flexWrap: 'wrap' }}>
             {programacao.map((p: any, i: number) => (
@@ -577,8 +577,14 @@ export default function PackageLP() {
                   className="package-card-hover"
                   >
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 4, background: i === 0 ? '#e43c44' : '#fbbf24' }} />
-                    
+
+                    {op.selo && (
+                      <div style={{ alignSelf: 'flex-start', background: i === 0 ? '#e43c44' : '#fbbf24', color: i === 0 ? '#fff' : '#000', padding: '5px 16px', borderRadius: 100, fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>
+                        {op.selo}
+                      </div>
+                    )}
                     <h3 style={{ fontSize: 24, fontWeight: 900, margin: '0 0 8px', color: '#fff' }}>{op.nome || op.tipo}</h3>
+                    {op.subtitulo && <p style={{ color: '#bbb', fontSize: 15, lineHeight: 1.5, margin: '0 0 8px' }}>{op.subtitulo}</p>}
                     <p style={{ color: '#888', fontSize: 14, lineHeight: 1.5, marginBottom: 24 }}>{op.descricao_card || 'Experiência completa com todo o conforto e exclusividade.'}</p>
 
                     <div style={{ borderTop: '1px solid #222', borderBottom: '1px solid #222', margin: '0 0 32px', padding: '24px 0' }}>
@@ -623,6 +629,18 @@ export default function PackageLP() {
                     >
                       Solicitar Cotação
                     </button>
+
+                    {op.nota_oferta && (
+                      <div style={{
+                        marginTop: 16, padding: '12px 16px', borderRadius: 12,
+                        background: i === 0 ? 'rgba(228,60,68,0.08)' : 'rgba(251,191,36,0.08)',
+                        border: `1px solid ${i === 0 ? 'rgba(228,60,68,0.25)' : 'rgba(251,191,36,0.25)'}`,
+                        fontSize: 13, color: '#ccc', lineHeight: 1.5
+                      }}>
+                        <span style={{ fontWeight: 800, color: i === 0 ? '#e43c44' : '#fbbf24' }}>⚠️ Oferta Limitada: </span>
+                        {op.nota_oferta}
+                      </div>
+                    )}
                   </div>
                 );
               });
@@ -663,16 +681,70 @@ export default function PackageLP() {
             <div style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: pkg.experienciaSection || 'Nossos pacotes garantem que você vivencie cada momento memorável com conforto, segurança e acesso a áreas exclusivas que a maioria dos visitantes nunca experimenta.' }} />
           </div>
           <div style={{ display: 'grid', gap: 20 }}>
-            {pkg.galleryImages ? (
-              pkg.galleryImages.split(';').filter(Boolean).slice(0, 2).map((img, i) => (
-                <img key={i} src={fixImgPath(img.trim())} alt="Experiência" style={{ width: '100%', borderRadius: 24, border: '1px solid #222' }} />
-              ))
-            ) : (
-              <div style={{ width: '100%', height: 300, background: '#111', borderRadius: 24, border: '1px solid #222' }} />
-            )}
+            {(() => {
+              // Usa as imagens escolhidas no admin (experienciaImages); se não houver,
+              // usa as 2 primeiras do Banco de Imagens como fallback.
+              const bank = (pkg.galleryImages || '').split(';').map(s => s.trim()).filter(Boolean);
+              const picked = (pkg.experienciaImages || '').split(';').map(s => s.trim()).filter(Boolean);
+              const imgs = picked.length > 0 ? picked : bank.slice(0, 2);
+              return imgs.length > 0 ? (
+                imgs.map((img, i) => (
+                  <img key={i} src={fixImgPath(img)} alt="Experiência" style={{ width: '100%', borderRadius: 24, border: '1px solid #222' }} />
+                ))
+              ) : (
+                <div style={{ width: '100%', height: 300, background: '#111', borderRadius: 24, border: '1px solid #222' }} />
+              );
+            })()}
           </div>
         </div>
       </section>
+
+      {/* --- GALERIA DE FOTOS (todas as imagens do Banco de Imagens) --- */}
+      {(() => {
+        const bank = (pkg.galleryImages || '').split(';').map(s => s.trim()).filter(Boolean);
+        if (bank.length === 0) return null;
+        return (
+          <section id="galeria" style={{ padding: '100px 20px', background: '#0a0a0b' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: 60 }}>
+                <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 16px' }}>Galeria de <span style={{ color: '#e43c44' }}>Fotos</span></h2>
+                <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Um gostinho do que espera por você.</p>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+                {bank.map((img, i) => (
+                  <img key={i} src={fixImgPath(img)} alt={`Foto ${i + 1}`} loading="lazy"
+                    style={{ width: '100%', height: 260, objectFit: 'cover', borderRadius: 20, border: '1px solid #222' }} />
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* --- SEÇÃO DESTAQUE (estilo "Troféu Borg-Warner" da Indy 500) --- */}
+      {(() => {
+        const destaque = parseJSON(pkg.destaqueSection, null);
+        if (!destaque || (!destaque.titulo && !destaque.texto)) return null;
+        const img = destaque.imagem ? (
+          <img src={fixImgPath(destaque.imagem)} alt={destaque.titulo || 'Destaque'}
+            style={{ width: '100%', borderRadius: 24, border: '1px solid #222', objectFit: 'cover' }} />
+        ) : null;
+        const texto = (
+          <div>
+            <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 900, margin: '0 0 24px', lineHeight: 1.1 }}>
+              {destaque.titulo}{destaque.titulo_destaque && <> <span style={{ color: '#fbbf24' }}>{destaque.titulo_destaque}</span></>}
+            </h2>
+            <div style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{destaque.texto}</div>
+          </div>
+        );
+        return (
+          <section style={{ padding: '100px 20px', background: '#050505' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: img ? '1fr 1fr' : '1fr', gap: 60, alignItems: 'center' }}>
+              {destaque.invertido ? <>{img}{texto}</> : <>{texto}{img}</>}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* --- PARCERIA --- */}
       <section style={{ padding: '100px 20px', background: '#111', borderTop: '1px solid #222', borderBottom: '1px solid #222', textAlign: 'center' }}>
@@ -724,7 +796,7 @@ export default function PackageLP() {
               {[
                 'Atendimento humanizado 24h durante o evento',
                 'Pagamento facilitado em até 10x',
-                'Empresa consolidada há mais de 15 anos'
+                'Empresa consolidada há mais de 20 anos'
               ].map((text, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   <div style={{ width: 24, height: 24, background: '#e43c44', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

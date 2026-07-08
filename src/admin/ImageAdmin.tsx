@@ -5,7 +5,7 @@ import {
   Upload, Download, Eye, Shield, X, Plus, Trash2,
   ChevronUp, ChevronDown, CalendarDays, MapPin, Tag,
   DollarSign, FileText, Plane, BedDouble, Ticket, Save,
-  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical, Star
+  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical
 } from 'lucide-react';
 import {
   DndContext,
@@ -29,6 +29,7 @@ import { useImageConfig } from '../hooks/useImageConfig';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
+import LPContentEditor from './LPEditor';
 import { useDialog } from '../components/ui/DialogProvider';
 
 
@@ -111,18 +112,6 @@ function AdminSection({ title, icon: Icon, children, color = '#e43c44' }: { titl
         </div>
         <h4 style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>{title}</h4>
       </div>
-      {children}
-    </div>
-  );
-}
-
-function AdminSubSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginTop: 16, padding: 16, background: '#111', borderRadius: 10, border: '1px solid #1a1a1a' }}>
-      <h5 style={{ fontSize: 10, fontWeight: 800, color: '#737373', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#e43c44' }}></div>
-        {title}
-      </h5>
       {children}
     </div>
   );
@@ -901,165 +890,8 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
               </div>
             </AdminSection>
 
-            <AdminSection title="Hospedagem Detalhada (Landing Page)" icon={BedDouble} color="#10b981">
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-                <button onClick={() => {
-                  let pacotesObj = { opcoes_hospedagem: [], datas: { partida: '', retorno: '', duracao: '' }, inclusos: [] };
-                  try { 
-                    const parsed = JSON.parse(pkg.pacotesOptionsData || '{}');
-                    pacotesObj = Array.isArray(parsed) ? { ...pacotesObj, opcoes_hospedagem: parsed } : { ...pacotesObj, ...parsed };
-                  } catch {}
-                  pacotesObj.opcoes_hospedagem.push({ nome: '', descricao_card: '', valor_individual: '', valor_duplo: '', moeda: 'USD', parcelas: '10', inclusos: [] });
-                  onUpdate({ pacotesOptionsData: JSON.stringify(pacotesObj) });
-                }} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Plus size={12} /> Novo Card de Hospedagem
-                </button>
-              </div>
-
-              {(() => {
-                let pacotesObj = { opcoes_hospedagem: [], datas: { partida: '', retorno: '', duracao: '' }, inclusos: [] };
-                try { 
-                  const parsed = JSON.parse(pkg.pacotesOptionsData || '{}');
-                  pacotesObj = Array.isArray(parsed) ? { ...pacotesObj, opcoes_hospedagem: parsed } : { ...pacotesObj, ...parsed };
-                } catch {}
-
-                const updatePacotes = (newObj: any) => onUpdate({ pacotesOptionsData: JSON.stringify(newObj) });
-
-                return (
-                  <div style={{ display: 'grid', gap: 16 }}>
-                    {pacotesObj.opcoes_hospedagem.map((op: any, i: number) => (
-                      <div key={`op-${i}`} style={{ background: '#0a0a0a', padding: 16, borderRadius: 10, border: '1px solid #1a1a1a' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                          <input placeholder="Nome da Hospedagem..." value={op.nome || ''} onChange={e => { const n={...pacotesObj}; n.opcoes_hospedagem[i].nome=e.target.value; updatePacotes(n); }} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, outline: 'none', width: '80%' }} />
-                          <button onClick={() => { const n={...pacotesObj}; n.opcoes_hospedagem.splice(i, 1); updatePacotes(n); }} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }}><X size={14} /></button>
-                        </div>
-                        
-                        <div style={{ display: 'grid', gap: 12 }}>
-                          <Textarea label="Breve Descrição do Card" value={op.descricao_card || ''} onChange={v => { const n={...pacotesObj}; n.opcoes_hospedagem[i].descricao_card=v; updatePacotes(n); }} rows={2} />
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                            <Field label="V. Individual" value={op.valor_individual || ''} onChange={v => { const n={...pacotesObj}; n.opcoes_hospedagem[i].valor_individual=v; updatePacotes(n); }} />
-                            <Field label="V. Duplo" value={op.valor_duplo || ''} onChange={v => { const n={...pacotesObj}; n.opcoes_hospedagem[i].valor_duplo=v; updatePacotes(n); }} />
-                            <Field label="Moeda" value={op.moeda || 'USD'} onChange={v => { const n={...pacotesObj}; n.opcoes_hospedagem[i].moeda=v; updatePacotes(n); }} />
-                          </div>
-
-                          <AdminSubSection title="Inclusos Específicos">
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-                              <button onClick={() => {
-                                const n = { ...pacotesObj };
-                                if(!n.opcoes_hospedagem[i].inclusos) n.opcoes_hospedagem[i].inclusos = [];
-                                n.opcoes_hospedagem[i].inclusos.push({ titulo: '', descricao: '' });
-                                updatePacotes(n);
-                              }} style={{ background: 'transparent', border: '1px solid #333', color: '#aaa', padding: '2px 6px', borderRadius: 4, cursor: 'pointer', fontSize: 9 }}>+ Item</button>
-                            </div>
-                            {(op.inclusos || []).map((inc: any, j: number) => (
-                              <div key={`inc-local-${j}`} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 6, marginBottom: 6 }}>
-                                <input placeholder="Título..." value={inc.titulo || ''} onChange={e => { const n={...pacotesObj}; n.opcoes_hospedagem[i].inclusos[j].titulo=e.target.value; updatePacotes(n); }} style={{ background: '#050505', border: '1px solid #222', borderRadius: 4, color: '#eee', fontSize: 11, padding: '4px 8px' }} />
-                                <input placeholder="Desc..." value={inc.descricao || ''} onChange={e => { const n={...pacotesObj}; n.opcoes_hospedagem[i].inclusos[j].descricao=e.target.value; updatePacotes(n); }} style={{ background: '#050505', border: '1px solid #222', borderRadius: 4, color: '#eee', fontSize: 11, padding: '4px 8px' }} />
-                                <button onClick={() => { const n={...pacotesObj}; n.opcoes_hospedagem[i].inclusos.splice(j, 1); updatePacotes(n); }} style={{ background: 'transparent', border: 'none', color: '#555', cursor: 'pointer' }}><X size={12} /></button>
-                              </div>
-                            ))}
-                          </AdminSubSection>
-                        </div>
-                      </div>
-                    ))}
-
-                    <AdminSubSection title="Datas & Inclusos Globais (Fallback)">
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
-                        <Field label="Partida" value={pacotesObj.datas?.partida || ''} onChange={v => { const n={...pacotesObj}; if(!n.datas) n.datas={} as any; n.datas.partida=v; updatePacotes(n); }} />
-                        <Field label="Retorno" value={pacotesObj.datas?.retorno || ''} onChange={v => { const n={...pacotesObj}; if(!n.datas) n.datas={} as any; n.datas.retorno=v; updatePacotes(n); }} />
-                        <Field label="Resumo" value={pacotesObj.datas?.duracao || ''} onChange={v => { const n={...pacotesObj}; if(!n.datas) n.datas={} as any; n.datas.duracao=v; updatePacotes(n); }} />
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                        <span style={{ fontSize: 10, color: '#555', fontWeight: 800 }}>INCLUSOS PADRÃO</span>
-                        <button onClick={() => {
-                          const n = { ...pacotesObj }; if(!n.inclusos) n.inclusos=[]; n.inclusos.push({ titulo: '', descricao: '' });
-                          updatePacotes(n);
-                        }} style={{ background: '#111', border: '1px solid #333', color: '#fff', padding: '2px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 9 }}>+ Adicionar Item Global</button>
-                      </div>
-                      {(pacotesObj.inclusos || []).map((inc: any, i: number) => (
-                        <div key={`inc-global-${i}`} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: 8, marginBottom: 6 }}>
-                          <input placeholder="Título..." value={inc.titulo || ''} onChange={e => { const n={...pacotesObj}; n.inclusos[i].titulo=e.target.value; updatePacotes(n); }} style={{ background: '#050505', border: '1px solid #222', borderRadius: 4, color: '#eee', fontSize: 11, padding: '4px 8px' }} />
-                          <input placeholder="Descrição..." value={inc.descricao || ''} onChange={e => { const n={...pacotesObj}; n.inclusos[i].descricao=e.target.value; updatePacotes(n); }} style={{ background: '#050505', border: '1px solid #222', borderRadius: 4, color: '#eee', fontSize: 11, padding: '4px 8px' }} />
-                          <button onClick={() => { const n={...pacotesObj}; n.inclusos.splice(i, 1); updatePacotes(n); }} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }}><X size={14} /></button>
-                        </div>
-                      ))}
-                    </AdminSubSection>
-                  </div>
-                );
-              })()}
-            </AdminSection>
-
-            <AdminSection title="Programação do Evento" icon={CalendarDays} color="#8b5cf6">
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-                <button onClick={() => {
-                  const p = (() => { try { return JSON.parse(pkg.programacaoData || '[]'); } catch { return []; } })();
-                  p.push({ titulo_aba: '', titulo_dia: '', atividades: [] });
-                  onUpdate({ programacaoData: JSON.stringify(p) });
-                }} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Plus size={12} /> Adicionar Dia
-                </button>
-              </div>
-              {(() => {
-                const prog = (() => { try { return JSON.parse(pkg.programacaoData || '[]'); } catch { return []; } })();
-                return (
-                  <div style={{ display: 'grid', gap: 12 }}>
-                    {prog.map((day: any, i: number) => (
-                      <div key={`prog-comm-${i}`} style={{ background: '#0a0a0a', padding: 16, borderRadius: 10, border: '1px solid #1a1a1a' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr auto', gap: 8, marginBottom: 12 }}>
-                          <Field label="Aba" value={day.titulo_aba || ''} onChange={v => { const n=[...prog]; n[i].titulo_aba=v; onUpdate({ programacaoData: JSON.stringify(n) }); }} />
-                          <Field label="Título do Dia" value={day.titulo_dia || ''} onChange={v => { const n=[...prog]; n[i].titulo_dia=v; onUpdate({ programacaoData: JSON.stringify(n) }); }} />
-                          <button onClick={() => { const n=[...prog]; n.splice(i, 1); onUpdate({ programacaoData: JSON.stringify(n) }); }} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', marginTop: 20 }}><Trash2 size={14} /></button>
-                        </div>
-                        <AdminSubSection title="Atividades">
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-                            <button onClick={() => {
-                              const n = [...prog]; if(!n[i].atividades) n[i].atividades = [];
-                              n[i].atividades.push({ horario: '', descricao: '' });
-                              onUpdate({ programacaoData: JSON.stringify(n) });
-                            }} style={{ background: 'transparent', border: '1px solid #333', color: '#aaa', padding: '2px 6px', borderRadius: 4, cursor: 'pointer', fontSize: 9 }}>+ Atividade</button>
-                          </div>
-                          {(day.atividades || []).map((ativ: any, j: number) => (
-                            <div key={`ativ-comm-${j}`} style={{ display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: 6, marginBottom: 6 }}>
-                              <input placeholder="08:00" value={ativ.horario || ''} onChange={e => { const n=[...prog]; n[i].atividades[j].horario=e.target.value; onUpdate({ programacaoData: JSON.stringify(n) }); }} style={{ background: '#050505', border: '1px solid #222', borderRadius: 4, color: '#eee', fontSize: 11, padding: '4px 8px' }} />
-                              <input placeholder="Descrição..." value={ativ.descricao || ''} onChange={e => { const n=[...prog]; n[i].atividades[j].descricao=e.target.value; onUpdate({ programacaoData: JSON.stringify(n) }); }} style={{ background: '#050505', border: '1px solid #222', borderRadius: 4, color: '#eee', fontSize: 11, padding: '4px 8px' }} />
-                              <button onClick={() => { const n=[...prog]; n[i].atividades.splice(j, 1); onUpdate({ programacaoData: JSON.stringify(n) }); }} style={{ background: 'transparent', border: 'none', color: '#555', cursor: 'pointer' }}><X size={12} /></button>
-                            </div>
-                          ))}
-                        </AdminSubSection>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-            </AdminSection>
-
-            <AdminSection title="Experiência & Benefícios (Cards)" icon={Star} color="#ec4899">
-              <div style={{ display: 'grid', gap: 16 }}>
-                <Textarea label="Texto da Seção Experiência" value={pkg.experienciaSection ?? ''} onChange={v => onUpdate({ experienciaSection: v })} rows={3} />
-                
-                <AdminSubSection title="Cards de Destaque">
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-                    <button onClick={() => {
-                      const c = (() => { try { return JSON.parse(pkg.cardsData || '[]'); } catch { return []; } })();
-                      c.push({ titulo: '', descricao: '', icone: 'Zap' });
-                      onUpdate({ cardsData: JSON.stringify(c) });
-                    }} style={{ background: '#222', border: '1px solid #333', color: '#fff', padding: '4px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 11 }}>+ Adicionar Card</button>
-                  </div>
-                  {(() => {
-                    const cards = (() => { try { return JSON.parse(pkg.cardsData || '[]'); } catch { return []; } })();
-                    return cards.map((c: any, i: number) => (
-                      <div key={`card-comm-${i}`} style={{ background: '#0a0a0a', padding: 12, borderRadius: 8, border: '1px solid #1a1a1a', marginBottom: 8 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                          <input placeholder="Título do Card..." value={c.titulo || ''} onChange={e => { const n=[...cards]; n[i].titulo=e.target.value; onUpdate({ cardsData: JSON.stringify(n) }); }} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, outline: 'none' }} />
-                          <button onClick={() => { const n=[...cards]; n.splice(i, 1); onUpdate({ cardsData: JSON.stringify(n) }); }} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }}><X size={12} /></button>
-                        </div>
-                        <Textarea label="Descrição do Card" value={c.descricao || ''} onChange={v => { const n=[...cards]; n[i].descricao=v; onUpdate({ cardsData: JSON.stringify(n) }); }} rows={2} />
-                      </div>
-                    ));
-                  })()}
-                </AdminSubSection>
-              </div>
-            </AdminSection>
+            {/* ── Conteúdo da Landing Page — editor compartilhado (Admin/Master/Marketing) ── */}
+            <LPContentEditor pkg={pkg} onUpdate={handleUpdate} tokenKey="emais_admin_token" />
 
             <div style={{ marginTop: 24, padding: 16, background: '#3a0d0d1a', borderRadius: 12, border: '1px solid #3a0d0d', display: 'flex', alignItems: 'center', gap: 12 }}>
               <AlertTriangle size={20} color="#f87171" />

@@ -54,7 +54,12 @@ export interface TrendingPackage {
   /* ── Enhanced Marketing fields ── */
   heroType?: 'video' | 'image';
   heroImage?: string;
-  galleryImages?: string; // Semicolon separated URLs
+  galleryImages?: string; // Banco de Imagens — URLs separadas por ";" (alimenta a seção Galeria da LP)
+  experienciaImages?: string; // Imagens escolhidas do banco para a seção Experiência (URLs separadas por ";")
+  destaqueSection?: string; // JSON { titulo, titulo_destaque, texto, imagem, invertido } — seção destaque estilo "Troféu" da Indy 500
+  programacaoTitulo?: string; // Título da seção Programação (parte branca — padrão: "Programação do")
+  programacaoTituloDestaque?: string; // Título da seção Programação (parte vermelha — padrão: "Fim de Semana")
+  programacaoSubtitulo?: string; // Subtítulo da seção Programação (padrão: "Dias de ação e emoção")
   highlights?: string; // Semicolon separated features/highlights
   sectionBackground?: string;
   /* ── New GP Experience LP Sections ── */
