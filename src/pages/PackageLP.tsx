@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  CheckCircle2, Plane, BedDouble, Ticket, 
-  MapPin, Calendar, ChevronDown, Users, 
-  MessageCircle, AlertTriangle, Zap, Trophy, Headset, ChevronRight
+  CheckCircle2, Plane, BedDouble, Ticket,
+  MapPin, Calendar, ChevronDown, Users,
+  MessageCircle, AlertTriangle, Zap, Trophy, Headset, ChevronRight, ChevronLeft, X
 } from 'lucide-react';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
@@ -193,6 +193,27 @@ export default function PackageLP() {
   const [activeTab, setActiveTab] = useState(0); // Para a seção de Programação
   const [activePkgTab, setActivePkgTab] = useState(0); // Para a seção de Pacotes
   const [pricingMode, setPricingMode] = useState<'individual' | 'duplo'>('duplo');
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null); // Galeria ampliada
+
+  // Imagens do Banco de Imagens (usadas na Galeria e no lightbox)
+  const galleryList = (pkg?.galleryImages || '').split(';').map(s => s.trim()).filter(Boolean);
+
+  // Navegação do lightbox por teclado (ESC fecha, setas trocam de foto)
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const total = galleryList.length;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxIdx(null);
+      if (e.key === 'ArrowRight') setLightboxIdx(i => i === null ? null : (i + 1) % total);
+      if (e.key === 'ArrowLeft') setLightboxIdx(i => i === null ? null : (i - 1 + total) % total);
+    };
+    window.addEventListener('keydown', handler);
+    document.body.style.overflow = 'hidden'; // trava o scroll da página
+    return () => {
+      window.removeEventListener('keydown', handler);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxIdx, galleryList.length]);
   const mauticContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -712,26 +733,66 @@ export default function PackageLP() {
 
       {/* --- GALERIA DE FOTOS (todas as imagens do Banco de Imagens) --- */}
       {(() => {
-        if (!vis.galeria) return null;
-        const bank = (pkg.galleryImages || '').split(';').map(s => s.trim()).filter(Boolean);
-        if (bank.length === 0) return null;
+        if (!vis.galeria || galleryList.length === 0) return null;
         return (
           <section id="galeria" style={{ padding: '100px 20px', background: '#0a0a0b' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: 60 }}>
                 <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 16px' }}>Galeria de <span style={{ color: '#e43c44' }}>Fotos</span></h2>
-                <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Um gostinho do que espera por você.</p>
+                <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Um gostinho do que espera por você. Clique para ampliar.</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-                {bank.map((img, i) => (
-                  <img key={i} src={fixImgPath(img)} alt={`Foto ${i + 1}`} loading="lazy"
-                    style={{ width: '100%', height: 260, objectFit: 'cover', borderRadius: 20, border: '1px solid #222' }} />
+                {galleryList.map((img, i) => (
+                  <button key={i} onClick={() => setLightboxIdx(i)} title="Clique para ampliar"
+                    className="gallery-thumb"
+                    style={{ padding: 0, border: '1px solid #222', borderRadius: 20, overflow: 'hidden', cursor: 'zoom-in', background: '#111', height: 260 }}>
+                    <img src={fixImgPath(img)} alt={`Foto ${i + 1}`} loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }} />
+                  </button>
                 ))}
               </div>
             </div>
           </section>
         );
       })()}
+
+      {/* --- LIGHTBOX DA GALERIA --- */}
+      {lightboxIdx !== null && galleryList[lightboxIdx] && (
+        <div onClick={() => setLightboxIdx(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.94)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.25s ease' }}>
+          {/* Fechar */}
+          <button onClick={() => setLightboxIdx(null)} title="Fechar (ESC)"
+            style={{ position: 'absolute', top: 20, right: 20, width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+            <X size={22} />
+          </button>
+
+          {/* Anterior */}
+          {galleryList.length > 1 && (
+            <button onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryList.length) % galleryList.length); }} title="Anterior (←)"
+              style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+              <ChevronLeft size={28} />
+            </button>
+          )}
+
+          {/* Imagem ampliada */}
+          <img src={fixImgPath(galleryList[lightboxIdx])} alt={`Foto ${lightboxIdx + 1}`}
+            onClick={e => e.stopPropagation()}
+            style={{ maxWidth: '92vw', maxHeight: '86vh', objectFit: 'contain', borderRadius: 12, boxShadow: '0 30px 80px rgba(0,0,0,0.8)' }} />
+
+          {/* Próxima */}
+          {galleryList.length > 1 && (
+            <button onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryList.length); }} title="Próxima (→)"
+              style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+              <ChevronRight size={28} />
+            </button>
+          )}
+
+          {/* Contador */}
+          <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', color: '#ccc', fontSize: 14, fontWeight: 700, background: 'rgba(0,0,0,0.6)', padding: '6px 18px', borderRadius: 100, border: '1px solid rgba(255,255,255,0.1)' }}>
+            {lightboxIdx + 1} / {galleryList.length}
+          </div>
+        </div>
+      )}
 
       {/* --- SEÇÃO DESTAQUE (estilo "Troféu Borg-Warner" da Indy 500) --- */}
       {(() => {
@@ -861,6 +922,7 @@ export default function PackageLP() {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
         
         .animate-fade-in { animation: fadeIn 1.2s ease-out; }
+        .gallery-thumb:hover img { transform: scale(1.06); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         
