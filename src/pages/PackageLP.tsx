@@ -167,7 +167,7 @@ function PackageNavbar({ onBook }: { onBook: () => void }) {
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logos */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/logo-gpexperience.webp" alt="GP Experience" style={{ height: 35, objectFit: 'contain' }} />
+          <img src="/logo-gpexperience.webp" alt="GP Experience" style={{ height: 64, objectFit: 'contain' }} />
         </div>
 
         {/* Links */}
