@@ -6,6 +6,7 @@ import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
 import { useDialog } from '../components/ui/DialogProvider';
 import LPContentEditor from './LPEditor';
+import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
 
 const MASTER_AUTH_KEY = 'emais_master_auth';
 
@@ -255,8 +256,8 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
             <MField label="Data"     icon={<CalendarDays size={11} />} value={local.date}  onChange={v => set({ date: v })} />
           </div>
 
-          {/* Row 2: preço / moeda */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {/* Row 2: preço / moeda / parcelas */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
             <MField label="Preço" icon={<DollarSign size={11} />} value={local.price} onChange={v => set({ price: v })} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 10, color: '#737373', fontWeight: 600, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}><Globe2 size={11} /> Moeda</label>
@@ -265,6 +266,17 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
                 onFocus={e => e.target.style.borderColor = '#e43c44'} onBlur={e => e.target.style.borderColor = '#333333'}>
                 {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
               </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={{ fontSize: 10, color: '#737373', fontWeight: 600, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}><DollarSign size={11} /> Parcelas (card)</label>
+              <input value={local.installments ?? ''} onChange={e => set({ installments: e.target.value.replace(/\D/g, '').slice(0, 2) })}
+                placeholder="Ex: 10 (vazio = à vista)" inputMode="numeric" style={IS}
+                onFocus={e => e.target.style.borderColor = '#e43c44'} onBlur={e => e.target.style.borderColor = '#333333'} />
+              <span style={{ fontSize: 10, color: '#4ade80' }}>
+                Card exibirá: {parseInstallments(local.installments) > 1
+                  ? `${parseInstallments(local.installments)}x de ${getCurrencySymbol(local.currency || 'BRL')} ${formatInstallmentValue(local.price, local.currency || 'BRL', parseInstallments(local.installments))}`
+                  : `${getCurrencySymbol(local.currency || 'BRL')} ${formatDisplayPrice(local.price, local.currency || 'BRL')} (à vista)`}
+              </span>
             </div>
           </div>
 

@@ -34,3 +34,18 @@ export function formatDisplayPrice(rawPrice: string, currencyCode: string): stri
   const locale = CURRENCY_LOCALES[currencyCode] || 'pt-BR';
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
 }
+
+/** Valor de cada parcela (total ÷ parcelas), com 2 casas decimais no locale da moeda. */
+export function formatInstallmentValue(rawPrice: string, currencyCode: string, installments: number): string {
+  const digits = rawPrice.replace(/\D/g, '');
+  if (!digits || installments < 1) return rawPrice;
+  const per = parseInt(digits, 10) / installments;
+  const locale = CURRENCY_LOCALES[currencyCode] || 'pt-BR';
+  return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(per);
+}
+
+/** Nº de parcelas válido (>= 2) a partir do campo do pacote; 1 = à vista. */
+export function parseInstallments(raw?: string): number {
+  const n = parseInt((raw || '').replace(/\D/g, ''), 10);
+  return Number.isFinite(n) && n >= 2 ? n : 1;
+}

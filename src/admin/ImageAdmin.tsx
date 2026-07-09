@@ -25,6 +25,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 import { DEFAULT_IMAGES, type ImageKey } from '../imageConfig';
+import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
 import { useImageConfig } from '../hooks/useImageConfig';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
@@ -805,6 +806,22 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
                 <DateRangeField value={pkg.date} onChange={v => onUpdate({ date: v })} />
                 <PriceMaskInput price={pkg.price} currency={pkg.currency || 'BRL'} onPriceChange={v => onUpdate({ price: v })} />
                 <CurrencySelect value={pkg.currency || 'BRL'} onChange={v => onUpdate({ currency: v })} />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <label style={{ fontSize: 11, color: '#737373', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Parcelas (card do site)</label>
+                  <input
+                    value={pkg.installments ?? ''}
+                    onChange={e => onUpdate({ installments: e.target.value.replace(/\D/g, '').slice(0, 2) })}
+                    placeholder="Ex: 10 (vazio = à vista)"
+                    inputMode="numeric"
+                    style={{ background: '#050505', border: '1px solid #333333', borderRadius: 7, color: '#e8edf2', fontSize: 13, padding: '9px 12px', outline: 'none' }}
+                  />
+                  <span style={{ fontSize: 10, color: '#4ade80' }}>
+                    Card exibirá: {parseInstallments(pkg.installments) > 1
+                      ? `${parseInstallments(pkg.installments)}x de ${getCurrencySymbol(pkg.currency || 'BRL')} ${formatInstallmentValue(pkg.price, pkg.currency || 'BRL', parseInstallments(pkg.installments))}`
+                      : `${getCurrencySymbol(pkg.currency || 'BRL')} ${formatDisplayPrice(pkg.price, pkg.currency || 'BRL')} (à vista)`}
+                  </span>
+                </div>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <label style={{ fontSize: 11, color: '#737373', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 4 }}><Award size={11} /> Tag do Card</label>

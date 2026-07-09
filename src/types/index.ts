@@ -22,6 +22,7 @@ export interface TrendingPackage {
   date: string;
   price: string;
   currency?: string;
+  installments?: string; // Nº de parcelas exibido no card do site (ex: "10" → "10x de R$ ..."); vazio/1 = valor à vista
   img: string;
   badge: string;
   badgeImg?: string;
