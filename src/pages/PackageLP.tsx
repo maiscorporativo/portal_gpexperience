@@ -722,9 +722,10 @@ export default function PackageLP() {
           <div style={{ display: 'grid', gap: 20 }}>
             {(() => {
               // Usa as imagens escolhidas no admin (experienciaImages); se não houver,
-              // usa as 2 primeiras do Banco de Imagens como fallback.
+              // usa as 2 primeiras do Banco de Imagens como fallback. Imagens que foram
+              // removidas do banco ("órfãs") são ignoradas automaticamente.
               const bank = (pkg.galleryImages || '').split(';').map(s => s.trim()).filter(Boolean);
-              const picked = (pkg.experienciaImages || '').split(';').map(s => s.trim()).filter(Boolean);
+              const picked = (pkg.experienciaImages || '').split(';').map(s => s.trim()).filter(Boolean).filter(u => bank.includes(u));
               const imgs = picked.length > 0 ? picked : bank.slice(0, 2);
               return imgs.length > 0 ? (
                 imgs.map((img, i) => (
@@ -808,6 +809,8 @@ export default function PackageLP() {
         if (!vis.destaque) return null;
         const destaque = parseJSON(pkg.destaqueSection, null);
         if (!destaque || (!destaque.titulo && !destaque.texto)) return null;
+        // Ignora imagem que não existe mais no Banco de Imagens
+        if (destaque.imagem && !galleryList.includes(destaque.imagem)) destaque.imagem = '';
         const img = destaque.imagem ? (
           <img src={fixImgPath(destaque.imagem)} alt={destaque.titulo || 'Destaque'}
             style={{ width: '100%', borderRadius: 24, border: '1px solid #222', objectFit: 'cover' }} />

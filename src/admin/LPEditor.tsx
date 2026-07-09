@@ -205,7 +205,10 @@ function BankPicker({ bank, selected, multiple, onChange }: {
   bank: string[]; selected: string[]; multiple: boolean;
   onChange: (urls: string[]) => void;
 }) {
-  if (bank.length === 0) {
+  // Imagens selecionadas que não existem mais no banco (ex: apagadas após duplicar
+  // um pacote) — exibidas em vermelho para poderem ser removidas da seleção.
+  const orphans = selected.filter(u => !bank.includes(u));
+  if (bank.length === 0 && orphans.length === 0) {
     return <p style={{ ...hint, padding: 12, background: '#0d0d0d', borderRadius: 8, border: '1px dashed #222' }}>O Banco de Imagens está vazio — envie fotos na seção "Banco de Imagens" acima para poder selecioná-las aqui.</p>;
   }
   const toggle = (url: string) => {
@@ -213,7 +216,26 @@ function BankPicker({ bank, selected, multiple, onChange }: {
     else onChange(multiple ? [...selected, url] : [url]);
   };
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(84px, 1fr))', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {orphans.length > 0 && (
+        <div style={{ padding: 10, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#f87171', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            ⚠️ Imagens selecionadas que não estão mais no Banco de Imagens — clique no X para removê-las
+          </span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(84px, 1fr))', gap: 8 }}>
+            {orphans.map((img, idx) => (
+              <button key={`orfa-${idx}`} onClick={() => toggle(img)} title="Remover esta imagem da seção"
+                style={{ position: 'relative', aspectRatio: '1', borderRadius: 8, overflow: 'hidden', padding: 0, cursor: 'pointer', border: '2px solid #ef4444' }}>
+                <img src={img} alt={`Imagem removida do banco ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.7 }} />
+                <span style={{ position: 'absolute', top: 4, right: 4, width: 18, height: 18, borderRadius: '50%', background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X size={11} color="#fff" />
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(84px, 1fr))', gap: 8 }}>
       {bank.map((img, idx) => {
         const isSel = selected.includes(img);
         return (
@@ -228,6 +250,7 @@ function BankPicker({ bank, selected, multiple, onChange }: {
           </button>
         );
       })}
+      </div>
     </div>
   );
 }
