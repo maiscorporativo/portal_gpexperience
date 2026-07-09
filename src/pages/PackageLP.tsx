@@ -457,7 +457,7 @@ export default function PackageLP() {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(5,5,5,1) 100%)' }} />
         </div>
 
-        <div className="container animate-fade-in" style={{ maxWidth: 1000, margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 10 }}>
+        <div className="container animate-fade-in" style={{ maxWidth: 1000, margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 10, transform: 'translateY(-60px)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
             <span style={{ fontSize: 12, fontWeight: 900, color: '#e43c44', letterSpacing: '0.15em' }}>{pkg.tag || '110ª EDIÇÃO'}</span>
           </div>
@@ -480,22 +480,24 @@ export default function PackageLP() {
 
       {/* --- CARDS DE BENEFÍCIOS --- */}
       {vis.cards && (
-      <section style={{ padding: '0 20px', position: 'relative', zIndex: 20, marginTop: '-80px', marginBottom: '80px' }}>
+      <section style={{ padding: '0 20px', position: 'relative', zIndex: 20, marginTop: '-180px', marginBottom: '80px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
           {cards.map((c: any, i: number) => (
-            <div key={i} style={{ 
-              background: '#0a0a0a', border: '1px solid #222', borderRadius: 16, padding: '32px', 
+            <div key={i} style={{
+              background: '#0a0a0a', border: '1px solid #222', borderRadius: 16, padding: '18px 22px',
               boxShadow: '0 20px 40px rgba(0,0,0,0.5)', transition: 'border-color 0.3s',
               cursor: 'default'
             }}
             onMouseOver={e => e.currentTarget.style.borderColor = '#4ade80'}
             onMouseOut={e => e.currentTarget.style.borderColor = '#222'}
             >
-              <div style={{ width: 48, height: 48, background: '#e43c44', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-                {c.icone === 'Zap' ? <Zap size={24} color="#fff" /> : c.icone === 'Trophy' ? <Trophy size={24} color="#fff" /> : <Headset size={24} color="#fff" />}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
+                <div style={{ width: 40, height: 40, background: '#e43c44', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {c.icone === 'Zap' ? <Zap size={20} color="#fff" /> : c.icone === 'Trophy' ? <Trophy size={20} color="#fff" /> : <Headset size={20} color="#fff" />}
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>{c.titulo}</h3>
               </div>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 12px' }}>{c.titulo}</h3>
-              <p style={{ color: '#888', lineHeight: 1.6, margin: 0, fontSize: 14 }}>{c.descricao}</p>
+              <p style={{ color: '#888', lineHeight: 1.5, margin: 0, fontSize: 13 }}>{c.descricao}</p>
             </div>
           ))}
         </div>
