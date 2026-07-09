@@ -7,6 +7,7 @@ import { useToast } from '../components/ui/ToastProvider';
 import { useDialog } from '../components/ui/DialogProvider';
 import LPContentEditor from './LPEditor';
 import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { sanitizeSlugInput } from '../utils/slug';
 
 const MASTER_AUTH_KEY = 'emais_master_auth';
 
@@ -325,6 +326,15 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
                 <span style={{ fontSize: 9, color: '#f87171', textAlign: 'center', lineHeight: 1.3 }}>Lotado ({trendingCount}/{MAX_TRENDING})</span>
               )}
             </div>
+          </div>
+
+          {/* Slug — URL permanente da LP */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label style={{ fontSize: 10, color: '#737373', fontWeight: 600, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}><Globe2 size={11} /> URL da LP (slug)</label>
+            <input value={local.slug ?? ''} onChange={e => set({ slug: sanitizeSlugInput(e.target.value) })}
+              placeholder="ex: f1-las-vegas-2026" style={IS}
+              onFocus={e => e.target.style.borderColor = '#e43c44'} onBlur={e => e.target.style.borderColor = '#333333'} />
+            <span style={{ fontSize: 10, color: '#4ade80' }}>Link da LP: /pacote/{local.slug || '<índice numérico>'}</span>
           </div>
 
           {/* Descrição */}

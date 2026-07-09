@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { EventHighlight, TrendingPackage } from '../types';
+import { slugify, uniqueSlug } from '../utils/slug';
 import {
   DEFAULT_EVENTS,
   DEFAULT_PACKAGES,
@@ -259,7 +260,15 @@ export function useContentConfig() {
   const updatePackage = useCallback((i: number, d: Partial<TrendingPackage>) => {
     const user = getAdminUser();
     const audit = { updatedBy: user, updatedAt: now(), status: 'pending' as const };
-    return persist({ ...content, packages: content.packages.map((p, idx) => idx === i ? { ...p, ...d, ...audit } : p) });
+    const patch = { ...d };
+    // Slug automático: acompanha o título enquanto não for personalizado manualmente
+    const src = content.packages[i];
+    if (src && patch.title !== undefined && patch.slug === undefined) {
+      if (!src.slug || src.slug === slugify(src.title)) {
+        patch.slug = uniqueSlug(slugify(patch.title), content.packages.filter((_, j) => j !== i).map(p => p.slug || ''));
+      }
+    }
+    return persist({ ...content, packages: content.packages.map((p, idx) => idx === i ? { ...p, ...patch, ...audit } : p) });
   }, [content, persist]);
 
   const setPackageTrending = useCallback((i: number, isTrending: boolean) =>
@@ -302,6 +311,7 @@ export function useContentConfig() {
     const copy: TrendingPackage = {
       ...src,
       title: `${src.title} (cópia)`,
+      slug: src.slug ? uniqueSlug(`${src.slug}-copia`, content.packages.map(p => p.slug || '')) : undefined,
       status: 'pending',
       isTrending: false,
       createdBy: user, createdAt: now(),

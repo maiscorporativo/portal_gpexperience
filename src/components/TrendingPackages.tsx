@@ -5,6 +5,7 @@ import Reveal from './Reveal';
 import PackageModal from './PackageModal';
 import { useContentConfig } from '../hooks/useContentConfig';
 import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { appendCurrentQuery } from '../utils/slug';
 
 
 
@@ -17,11 +18,11 @@ export default function TrendingPackages() {
     .filter(p => (!p.status || p.status === 'approved') && p.isTrending === true && !p.deletedAt)
     .slice(0, 8);
 
-  const handleNavigate = (idx: number, externalUrl?: string) => {
+  const handleNavigate = (idx: number, externalUrl?: string, slug?: string) => {
     if (externalUrl && externalUrl.trim() !== '') {
-      window.location.href = externalUrl;
+      window.location.href = appendCurrentQuery(externalUrl.trim());
     } else {
-      navigate(`/pacote/${idx}`);
+      navigate(`/pacote/${slug || idx}`);
       window.scrollTo(0, 0);
     }
   };
@@ -52,7 +53,7 @@ export default function TrendingPackages() {
               <div
                 className="bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300 border border-neutral-200 flex flex-col group h-full relative z-10 hover:shadow-2xl cursor-pointer"
                 style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
-                onClick={() => handleNavigate(pkg.originalIndex, pkg.externalUrl)}
+                onClick={() => handleNavigate(pkg.originalIndex, pkg.externalUrl, pkg.slug)}
                 onMouseMove={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const x = e.clientX - rect.left;
@@ -96,7 +97,7 @@ export default function TrendingPackages() {
                           : `${getCurrencySymbol(pkg.currency || 'BRL')} ${formatDisplayPrice(pkg.price, pkg.currency || 'BRL')}`}
                       </span>
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleNavigate(pkg.originalIndex, pkg.externalUrl); }}
+                        onClick={(e) => { e.stopPropagation(); handleNavigate(pkg.originalIndex, pkg.externalUrl, pkg.slug); }}
                         className="text-sm font-semibold text-gold hover:text-black transition-colors flex items-center gap-1"
                         aria-label={`Ver pacote ${pkg.title}`}
                       >

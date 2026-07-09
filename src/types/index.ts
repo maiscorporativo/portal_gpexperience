@@ -18,6 +18,7 @@ export interface EventHighlight {
 export interface TrendingPackage {
   tag: string;
   title: string;
+  slug?: string; // URL permanente da LP: /pacote/<slug> (único; gerado do título, editável no admin)
   loc: string;
   date: string;
   price: string;

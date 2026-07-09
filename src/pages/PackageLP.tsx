@@ -6,6 +6,7 @@ import {
   MessageCircle, AlertTriangle, Zap, Trophy, Headset, ChevronRight, ChevronLeft, X
 } from 'lucide-react';
 import { useContentConfig } from '../hooks/useContentConfig';
+import { appendCurrentQuery } from '../utils/slug';
 import type { TrendingPackage } from '../types';
 
 // Helper to convert YouTube URL to Embed URL
@@ -231,15 +232,18 @@ export default function PackageLP() {
 
   useEffect(() => {
     if (!loading && packages.length > 0) {
-      const index = Number(id);
-      const p = packages[index];
+      // Resolve por slug (URL permanente) e, se for numérico, pelo índice (links antigos)
+      const raw = (id || '').toLowerCase();
+      let p = packages.find(pk => (pk.slug || '').toLowerCase() === raw);
+      if (!p && /^\d+$/.test(raw)) p = packages[Number(raw)];
       if (!p) { setNotFound(true); return; }
       if (p.status !== 'approved' && !localStorage.getItem('emais_marketing_auth')) {
         navigate('/');
         return;
       }
       if (p.externalUrl && p.externalUrl.trim() !== '') {
-        window.location.href = p.externalUrl;
+        // Repassa UTMs/fbclid/gclid da URL atual para a LP externa
+        window.location.href = appendCurrentQuery(p.externalUrl.trim());
         return;
       }
       setPkg(p);

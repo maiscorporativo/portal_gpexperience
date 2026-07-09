@@ -5,7 +5,7 @@ import {
   Upload, Download, Eye, Shield, X, Plus, Trash2,
   ChevronUp, ChevronDown, CalendarDays, MapPin, Tag,
   DollarSign, FileText, Plane, BedDouble, Ticket, Save,
-  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical, Copy
+  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical, Copy, Link as LinkIcon
 } from 'lucide-react';
 import {
   DndContext,
@@ -26,6 +26,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { DEFAULT_IMAGES, type ImageKey } from '../imageConfig';
 import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { slugify, sanitizeSlugInput, uniqueSlug } from '../utils/slug';
 import { useImageConfig } from '../hooks/useImageConfig';
 import { useContentConfig } from '../hooks/useContentConfig';
 import type { TrendingPackage } from '../types';
@@ -701,8 +702,9 @@ function DateRangeField({ value, onChange }: { value: string; onChange: (v: stri
 
 const MAX_TRENDING = 8;
 
-function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, onRemove, onReorder, onSetTrending, onDuplicate, onSaved, isOpen, onToggle, dragHandleProps }: {
+function PackageCard({ pkg, index, total, trendingCount, categories, otherSlugs = [], onUpdate, onRemove, onReorder, onSetTrending, onDuplicate, onSaved, isOpen, onToggle, dragHandleProps }: {
   pkg: TrendingPackage; index: number; total: number; trendingCount: number; categories: string[];
+  otherSlugs?: string[];
   onUpdate: (d: Partial<TrendingPackage>) => void;
   onRemove: () => void;
   onReorder: (dir: 'up' | 'down') => void;
@@ -810,6 +812,27 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
                 <DateRangeField value={pkg.date} onChange={v => onUpdate({ date: v })} />
                 <PriceMaskInput price={pkg.price} currency={pkg.currency || 'BRL'} onPriceChange={v => onUpdate({ price: v })} />
                 <CurrencySelect value={pkg.currency || 'BRL'} onChange={v => onUpdate({ currency: v })} />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 11, color: '#737373', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span><LinkIcon size={11} style={{ verticalAlign: 'middle', marginRight: 4 }} />URL da LP (slug — link permanente para campanhas)</span>
+                    <button type="button" onClick={() => onUpdate({ slug: uniqueSlug(slugify(pkg.title), otherSlugs) })}
+                      style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', padding: '2px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>
+                      Gerar do título
+                    </button>
+                  </label>
+                  <input
+                    value={pkg.slug ?? ''}
+                    onChange={e => onUpdate({ slug: sanitizeSlugInput(e.target.value) })}
+                    placeholder="ex: f1-las-vegas-2026 (gerado automaticamente ao editar o título)"
+                    style={{ background: '#050505', border: '1px solid #333333', borderRadius: 7, color: '#e8edf2', fontSize: 13, padding: '9px 12px', outline: 'none' }}
+                  />
+                  {pkg.slug && otherSlugs.includes(pkg.slug.toLowerCase()) ? (
+                    <span style={{ fontSize: 10, color: '#f87171' }}>⚠️ Este slug já é usado por outro pacote — escolha outro para não conflitar.</span>
+                  ) : (
+                    <span style={{ fontSize: 10, color: '#4ade80' }}>Link da LP: /pacote/{pkg.slug || index} {pkg.slug ? '(permanente — seguro para campanhas e UTMs)' : '(numérico — muda se a ordem dos pacotes mudar)'}</span>
+                  )}
+                </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <label style={{ fontSize: 11, color: '#737373', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Parcelas (card do site)</label>
@@ -996,6 +1019,7 @@ function PackagesTab() {
               total={packages.length}
               trendingCount={trendingCount}
               categories={categories}
+              otherSlugs={packages.filter((_, j) => j !== realIdx).map(p => (p.slug || '').toLowerCase()).filter(Boolean)}
               isOpen={openRealIdx === realIdx}
               onToggle={() => setOpenRealIdx(prev => prev === realIdx ? null : realIdx)}
               onUpdate={(d: any) => updatePackage(realIdx, d)}

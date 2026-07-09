@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useContentConfig } from '../hooks/useContentConfig';
 import Reveal from './Reveal';
 import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { appendCurrentQuery } from '../utils/slug';
 
 /* ── Category icons/emojis ── */
 const CATEGORY_ICONS: Record<string, string> = {
@@ -77,11 +78,11 @@ function CategoryGroup({
   const navigate = useNavigate();
   const displayIcon = iconEmoji || CATEGORY_ICONS[category] || '🎟️';
 
-  const handleNavigate = (idx: number, externalUrl?: string) => {
+  const handleNavigate = (idx: number, externalUrl?: string, slug?: string) => {
     if (externalUrl && externalUrl.trim() !== '') {
-      window.location.href = externalUrl;
+      window.location.href = appendCurrentQuery(externalUrl.trim());
     } else {
-      navigate(`/pacote/${idx}`);
+      navigate(`/pacote/${slug || idx}`);
       window.scrollTo(0, 0);
     }
   };
@@ -102,7 +103,7 @@ function CategoryGroup({
       {/* Body — always visible */}
       <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-5">
         {packages.map((pkg) => (
-          <PackageCard key={pkg.originalIndex} pkg={pkg} onClick={() => handleNavigate(pkg.originalIndex, pkg.externalUrl)} />
+          <PackageCard key={pkg.originalIndex} pkg={pkg} onClick={() => handleNavigate(pkg.originalIndex, pkg.externalUrl, pkg.slug)} />
         ))}
       </div>
     </div>

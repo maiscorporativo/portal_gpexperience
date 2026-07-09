@@ -358,7 +358,7 @@ export default function MarketingPanel() {
                         Configurar LP
                       </button>
                       <a 
-                        href={pkg.externalUrl && pkg.externalUrl.trim() !== '' ? pkg.externalUrl : `/pacote/${pkg.originalIndex}`} 
+                        href={pkg.externalUrl && pkg.externalUrl.trim() !== '' ? pkg.externalUrl : `/pacote/${pkg.slug || pkg.originalIndex}`} 
                         target="_blank" 
                         rel="noreferrer"
                         style={{ width: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0d0d0d', border: '1px solid #222', borderRadius: 10, color: '#737373', cursor: 'pointer' }}
