@@ -292,6 +292,29 @@ export function useContentConfig() {
     return persist({ ...content, packages: [...content.packages, { tag: 'NOVO', title: 'Novo Pacote', loc: 'Local', date: 'Data', price: '0', img: '', badge: 'novo', description: '', flightDetails: '', hotelDetails: '', ticketDetails: '', createdBy: user, createdAt: now() }] });
   }, [content, persist]);
 
+  /** Duplica um pacote com TODO o conteúdo da LP (hero, cards, programação,
+   *  pacotes/tipos, experiência, banco de imagens, fundos, integrações).
+   *  A cópia nasce pendente, fora de "Em Alta" e com auditoria zerada. */
+  const duplicatePackage = useCallback((i: number) => {
+    const src = content.packages[i];
+    if (!src) return;
+    const user = getAdminUser();
+    const copy: TrendingPackage = {
+      ...src,
+      title: `${src.title} (cópia)`,
+      status: 'pending',
+      isTrending: false,
+      createdBy: user, createdAt: now(),
+      updatedBy: undefined, updatedAt: undefined,
+      approvedBy: undefined, approvedAt: undefined,
+      rejectedBy: undefined, rejectedAt: undefined,
+      deletedAt: undefined, deletedBy: undefined,
+    };
+    const arr = [...content.packages];
+    arr.splice(i + 1, 0, copy);
+    return persist({ ...content, packages: arr });
+  }, [content, persist]);
+
   const removePackage = useCallback((i: number, deletedBy?: string) => {
     const user = deletedBy || getAdminUser();
     return persist({ ...content, packages: content.packages.map((p, idx) =>
@@ -359,7 +382,7 @@ export function useContentConfig() {
     loading, saving, saveError,
     updateEvent, addEvent, removeEvent, reorderEvent,
     approveEvent, rejectEvent, masterUpdateEvent,
-    updatePackage, addPackage, removePackage, restorePackage, permanentRemovePackage, reorderPackage,
+    updatePackage, addPackage, duplicatePackage, removePackage, restorePackage, permanentRemovePackage, reorderPackage,
     approvePackage, rejectPackage, masterUpdatePackage, marketingUpdatePackage, setPackageTrending,
     addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon,
     resetAll, exportConfig, importConfig,

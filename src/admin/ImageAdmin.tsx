@@ -5,7 +5,7 @@ import {
   Upload, Download, Eye, Shield, X, Plus, Trash2,
   ChevronUp, ChevronDown, CalendarDays, MapPin, Tag,
   DollarSign, FileText, Plane, BedDouble, Ticket, Save,
-  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical
+  Flame, AlertTriangle, Award, Type, Package, ImageIcon as ImgIcon, CheckCircle2, XCircle, Globe2, Clock, GripVertical, Copy
 } from 'lucide-react';
 import {
   DndContext,
@@ -701,12 +701,13 @@ function DateRangeField({ value, onChange }: { value: string; onChange: (v: stri
 
 const MAX_TRENDING = 8;
 
-function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, onRemove, onReorder, onSetTrending, onSaved, isOpen, onToggle, dragHandleProps }: {
+function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, onRemove, onReorder, onSetTrending, onDuplicate, onSaved, isOpen, onToggle, dragHandleProps }: {
   pkg: TrendingPackage; index: number; total: number; trendingCount: number; categories: string[];
   onUpdate: (d: Partial<TrendingPackage>) => void;
   onRemove: () => void;
   onReorder: (dir: 'up' | 'down') => void;
   onSetTrending: (v: boolean) => void;
+  onDuplicate?: () => void;
   onSaved?: () => void;
   isOpen: boolean;
   onToggle: () => void;
@@ -755,6 +756,9 @@ function PackageCard({ pkg, index, total, trendingCount, categories, onUpdate, o
             )}
             <button onClick={e => { e.stopPropagation(); onReorder('up'); }} disabled={index === 0} style={iconBtn(index === 0)} title="Mover para cima"><ChevronUp size={14} /></button>
             <button onClick={e => { e.stopPropagation(); onReorder('down'); }} disabled={index === total - 1} style={iconBtn(index === total - 1)} title="Mover para baixo"><ChevronDown size={14} /></button>
+            {onDuplicate && (
+              <button onClick={e => { e.stopPropagation(); onDuplicate(); }} style={iconBtn(false)} title="Duplicar pacote (copia toda a landing page)"><Copy size={14} /></button>
+            )}
             <button onClick={async e => { e.stopPropagation(); if (await showConfirm('Remover este pacote?', { type: 'danger', confirmText: 'Remover', title: 'Remover Pacote' })) onRemove(); }} style={iconBtn(false, true)} title="Remover"><Trash2 size={14} /></button>
           </div>
         <span style={{ color: '#737373', fontSize: 12 }}>{isOpen ? '▴' : '▾'}</span>
@@ -940,7 +944,7 @@ function SortablePackageCard(props: any) {
 }
 
 function PackagesTab() {
-  const { packages, categories, updatePackage, addPackage, removePackage, reorderPackage, setPackageTrending } = useContentConfig();
+  const { packages, categories, updatePackage, addPackage, duplicatePackage, removePackage, reorderPackage, setPackageTrending } = useContentConfig();
   const { toast } = useToast();
   const [openRealIdx, setOpenRealIdx] = useState<number | null>(null);
   const activePackages = packages
@@ -997,6 +1001,7 @@ function PackagesTab() {
               onUpdate={(d: any) => updatePackage(realIdx, d)}
               onSetTrending={(v: any) => setPackageTrending(realIdx, v)}
               onRemove={() => { removePackage(realIdx); toast('Pacote movido para a lixeira.', 'warning'); }}
+              onDuplicate={() => { duplicatePackage(realIdx); toast('Pacote duplicado! A cópia está logo abaixo — edite os campos e envie para aprovação. 📋', 'success'); }}
               onReorder={(dir: string) => reorderPackage(realIdx, dir === 'up' ? realIdx - 1 : realIdx + 1)}
               onSaved={() => toast('Pacote atualizado!', 'success')}
             />
