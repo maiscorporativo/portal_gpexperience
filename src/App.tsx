@@ -18,7 +18,7 @@ import NotFound from './components/NotFound';
 import { SelectedPackageProvider } from './hooks/useSelectedPackage';
 
 const PAGE_TITLES: Record<string, string> = {
-  '/':            'GP Experience - o universo do automobilismo ao seu alcance!',
+  '/':            'GP Experience | Experiências Premium em Automobilismo',
   '/admin':       'Admin Vendas | GP Experience',
   '/admin-master': 'Admin Mestre | GP Experience',
   '/marketing':    'Marketing & Conversão | GP Experience',
