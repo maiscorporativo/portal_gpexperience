@@ -18,7 +18,7 @@ import NotFound from './components/NotFound';
 import { SelectedPackageProvider } from './hooks/useSelectedPackage';
 
 const PAGE_TITLES: Record<string, string> = {
-  '/':            'E-Mais — Experiências Premium em Eventos Esportivos',
+  '/':            'GP Experience - o universo do automobilismo ao seu alcance!',
   '/admin':       'Admin Vendas | GP Experience',
   '/admin-master': 'Admin Mestre | GP Experience',
   '/marketing':    'Marketing & Conversão | GP Experience',
@@ -27,7 +27,7 @@ const PAGE_TITLES: Record<string, string> = {
 function usePageTitle() {
   const { pathname } = useLocation();
   useEffect(() => {
-    document.title = PAGE_TITLES[pathname] ?? 'E-Mais';
+    document.title = PAGE_TITLES[pathname] ?? 'GP Experience';
   }, [pathname]);
 }
 
