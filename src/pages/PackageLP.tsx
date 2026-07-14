@@ -584,7 +584,7 @@ export default function PackageLP() {
         <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
             <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 16px' }}>Pacotes de <span style={{ color: '#e43c44' }}>Viagem Completos</span></h2>
-            <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Voe com tudo incluído. Hospedagem, transporte e ingressos em um único pacote.</p>
+            <p style={{ fontSize: 20, color: '#aaa', maxWidth: 672, margin: '0 auto' }}>Voe com tudo incluído. Hospedagem, transporte e ingressos em um único pacote.</p>
             
             {/* Pricing Toggle */}
             <div style={{ marginTop: 40, display: 'inline-flex', background: '#111', padding: 6, borderRadius: 100, border: '1px solid #222' }}>
@@ -593,7 +593,7 @@ export default function PackageLP() {
                 style={{ 
                   background: pricingMode === 'individual' ? '#e43c44' : 'transparent',
                   color: pricingMode === 'individual' ? '#fff' : '#888',
-                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s'
+                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s'
                 }}
               >
                 Quarto Individual
@@ -603,7 +603,7 @@ export default function PackageLP() {
                 style={{ 
                   background: pricingMode === 'duplo' ? '#e43c44' : 'transparent',
                   color: pricingMode === 'duplo' ? '#fff' : '#888',
-                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s'
+                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s'
                 }}
               >
                 Quarto Duplo
@@ -611,7 +611,7 @@ export default function PackageLP() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32, maxWidth: 1024, margin: '0 auto' }}>
             {(() => {
               const data = pacotes && !Array.isArray(pacotes) ? pacotes : { opcoes_hospedagem: Array.isArray(pacotes) ? pacotes : [], inclusos: [] };
               const options = data.opcoes_hospedagem || [];
@@ -636,32 +636,32 @@ export default function PackageLP() {
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 4, background: i === 0 ? '#e43c44' : '#fbbf24' }} />
 
                     {op.selo && (
-                      <div style={{ alignSelf: 'flex-start', background: i === 0 ? '#e43c44' : '#fbbf24', color: i === 0 ? '#fff' : '#000', padding: '5px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>
+                      <div style={{ alignSelf: 'flex-start', background: i === 0 ? '#e43c44' : '#fbbf24', color: i === 0 ? '#fff' : '#000', padding: '5px 16px', borderRadius: 100, fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>
                         {op.selo}
                       </div>
                     )}
-                    <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px', color: '#fff' }}>{op.nome || op.tipo}</h3>
-                    {op.subtitulo && <p style={{ color: '#bbb', fontSize: 15, lineHeight: 1.5, margin: '0 0 8px' }}>{op.subtitulo}</p>}
-                    <p style={{ color: '#888', fontSize: 14, lineHeight: 1.5, marginBottom: 24 }}>{op.descricao_card || 'Experiência completa com todo o conforto e exclusividade.'}</p>
+                    <h3 style={{ fontSize: 36, fontWeight: 700, margin: '0 0 8px', color: '#fff' }}>{op.nome || op.tipo}</h3>
+                    {op.subtitulo && <p style={{ color: '#bbb', fontSize: 18, lineHeight: 1.5, margin: '0 0 8px' }}>{op.subtitulo}</p>}
+                    <p style={{ color: '#999', fontSize: 16, lineHeight: 1.5, marginBottom: 24 }}>{op.descricao_card || 'Experiência completa com todo o conforto e exclusividade.'}</p>
 
                     <div style={{ borderTop: '1px solid #222', borderBottom: '1px solid #222', margin: '0 0 32px', padding: '24px 0' }}>
-                      <div style={{ fontSize: 13, color: '#666', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>{parcelas}x de</div>
+                      <div style={{ fontSize: 16, color: '#888', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>{parcelas}x de</div>
                       <div style={{ fontSize: 36, fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24', display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                        <span style={{ fontSize: 18 }}>{op.moeda || 'USD'}</span>
+                        <span style={{ fontSize: 22 }}>{op.moeda || 'USD'}</span>
                         <span style={{ fontSize: 36 }}>{price || op.valor_parcela || op.preço || '---'}</span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#555', marginTop: 8 }}>por pessoa em quarto {pricingMode}</div>
+                      <div style={{ fontSize: 16, color: '#888', marginTop: 8 }}>por pessoa em quarto {pricingMode}</div>
                     </div>
 
                     <div style={{ flex: 1, marginBottom: 32 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: '#444', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 16 }}>O que está incluso:</div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 16 }}>O Que Está Incluído</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         {showInclusos.map((inc: any, j: number) => (
                           <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                            <CheckCircle2 size={16} color={i === 0 ? '#e43c44' : '#fbbf24'} style={{ marginTop: 2, flexShrink: 0 }} />
+                            <CheckCircle2 size={18} color={i === 0 ? '#e43c44' : '#fbbf24'} style={{ marginTop: 3, flexShrink: 0 }} />
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#eee' }}>{inc.titulo}</div>
-                              {inc.descricao && <div style={{ fontSize: 12, color: '#777', marginTop: 2 }}>{inc.descricao}</div>}
+                              <div style={{ fontSize: 16, fontWeight: 600, color: '#eee' }}>{inc.titulo}</div>
+                              {inc.descricao && <div style={{ fontSize: 14, color: '#999', marginTop: 2 }}>{inc.descricao}</div>}
                             </div>
                           </div>
                         ))}
@@ -674,7 +674,7 @@ export default function PackageLP() {
                         background: i === 0 ? '#e43c44' : '#fbbf24',
                         color: i === 0 ? '#fff' : '#000',
                         border: 'none',
-                        borderRadius: 12, padding: '16px', fontSize: 14, fontWeight: 700,
+                        borderRadius: 12, padding: '18px 16px', fontSize: 18, fontWeight: 700,
                         cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase'
                       }}
                       onMouseOver={e => { e.currentTarget.style.filter = 'brightness(1.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -688,7 +688,7 @@ export default function PackageLP() {
                         marginTop: 16, padding: '12px 16px', borderRadius: 12,
                         background: i === 0 ? 'rgba(228,60,68,0.08)' : 'rgba(251,191,36,0.08)',
                         border: `1px solid ${i === 0 ? 'rgba(228,60,68,0.25)' : 'rgba(251,191,36,0.25)'}`,
-                        fontSize: 13, color: '#ccc', lineHeight: 1.5
+                        fontSize: 14, color: '#ccc', lineHeight: 1.5
                       }}>
                         <span style={{ fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24' }}>⚠️ Oferta Limitada: </span>
                         {op.nota_oferta}
