@@ -56,6 +56,7 @@ export interface TrendingPackage {
   /* ── Enhanced Marketing fields ── */
   heroType?: 'video' | 'image';
   heroImage?: string;
+  categoryLogo?: string; // Logo da categoria (F1, Le Mans, Stock Car...) exibido na navbar da LP, enviado pelo admin
   galleryImages?: string; // Banco de Imagens — URLs separadas por ";" (alimenta a seção Galeria da LP)
   experienciaImages?: string; // Imagens escolhidas do banco para a seção Experiência (URLs separadas por ";")
   destaqueSection?: string; // JSON { titulo, titulo_destaque, texto, imagem, invertido } — seção destaque estilo "Troféu" da Indy 500

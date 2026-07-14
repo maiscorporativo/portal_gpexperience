@@ -152,7 +152,7 @@ function FlagVideoBg() {
 }
 
 /* --- Package Navbar Component --- */
-function PackageNavbar({ onBook }: { onBook: () => void }) {
+function PackageNavbar({ onBook, categoryLogo }: { onBook: () => void; categoryLogo?: string }) {
   const scrollTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById(id);
@@ -160,15 +160,23 @@ function PackageNavbar({ onBook }: { onBook: () => void }) {
   };
 
   return (
-    <nav style={{ 
-      width: '100%', position: 'fixed', top: 0, zIndex: 1000, 
-      background: 'rgba(9, 9, 11, 0.8)', backdropFilter: 'blur(12px)', 
-      borderBottom: '1px solid rgba(255,255,255,0.05)' 
+    <nav style={{
+      width: '100%', position: 'fixed', top: 0, zIndex: 1000,
+      background: 'rgba(9, 9, 11, 0.8)', backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(255,255,255,0.05)'
     }}>
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {/* Logos */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        {/* Logos: GP (vermelho) | GP Experience | Categoria (F1, Le Mans...) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <img src="/logo-gp.png" alt="Grande Prêmio" style={{ height: 44, objectFit: 'contain' }} />
+          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 20, fontWeight: 300 }}>|</span>
           <img src="/logo-gpexperience.webp" alt="GP Experience" style={{ height: 64, objectFit: 'contain' }} />
+          {categoryLogo && (
+            <>
+              <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 20, fontWeight: 300 }}>|</span>
+              <img src={fixImgPath(categoryLogo)} alt="Categoria" style={{ height: 44, objectFit: 'contain' }} />
+            </>
+          )}
         </div>
 
         {/* Links */}
@@ -432,7 +440,7 @@ export default function PackageLP() {
 
   return (
     <div style={{ background: '#050505', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
-      <PackageNavbar onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
+      <PackageNavbar categoryLogo={pkg.categoryLogo} onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
       <Speedometer />
 
       {/* --- HERO SECTION --- */}
