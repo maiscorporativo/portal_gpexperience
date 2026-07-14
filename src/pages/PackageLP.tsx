@@ -173,7 +173,7 @@ function PackageNavbar({ onBook, categoryLogo }: { onBook: () => void; categoryL
           </a>
           <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 20, fontWeight: 300 }}>|</span>
           <a href="https://grandepremio.com/br/" target="_blank" rel="noopener noreferrer" title="Grande Prêmio" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logo-gp.png" alt="Grande Prêmio" style={{ height: 44, objectFit: 'contain' }} />
+            <img src="/logo-gp-v2.png" alt="Grande Prêmio" style={{ height: 44, objectFit: 'contain' }} />
           </a>
           {categoryLogo && (
             <>
@@ -875,7 +875,7 @@ export default function PackageLP() {
             <div style={{ background: 'rgba(5,5,5,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 24, padding: '40px', display: 'flex', flexDirection: 'column', transition: 'border-color 0.3s, transform 0.3s', boxShadow: '0 20px 40px rgba(0,0,0,0.25)' }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
               onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-              <img src="/logo-gp.png" alt="Grande Prêmio" style={{ height: 56, objectFit: 'contain', marginBottom: 24, alignSelf: 'flex-start' }} />
+              <img src="/logo-gp-v2.png" alt="Grande Prêmio" style={{ height: 56, objectFit: 'contain', marginBottom: 24, alignSelf: 'flex-start' }} />
               <p style={{ color: '#ccc', fontSize: 16, lineHeight: 1.6, flex: 1, marginBottom: 32 }}>
                 O Grande Prêmio é o maior portal de automobilismo do Brasil, cobrindo F1, Indy, Stock Car e tudo que acelera o coração dos fãs — agora ao seu lado nas maiores experiências do esporte.
               </p>
