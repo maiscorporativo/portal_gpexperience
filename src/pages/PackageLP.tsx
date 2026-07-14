@@ -131,8 +131,8 @@ function Speedometer() {
       
       {/* Speed text */}
       <div style={{ position: 'absolute', bottom: '15px', textAlign: 'center' }}>
-        <div style={{ fontSize: '24px', fontWeight: 900, color: '#fff', lineHeight: '1' }}>{speed}</div>
-        <div style={{ fontSize: '10px', fontWeight: 800, color: '#e43c44', letterSpacing: '1px' }}>KM/H</div>
+        <div style={{ fontSize: '24px', fontWeight: 700, color: '#fff', lineHeight: '1' }}>{speed}</div>
+        <div style={{ fontSize: '10px', fontWeight: 700, color: '#e43c44', letterSpacing: '1px' }}>KM/H</div>
       </div>
     </div>
   );
@@ -181,7 +181,7 @@ function PackageNavbar({ onBook }: { onBook: () => void }) {
         {/* CTA */}
         <button onClick={onBook} style={{ 
           background: '#e43c44', color: '#fff', border: 'none', borderRadius: 8, 
-          padding: '10px 20px', fontSize: 13, fontWeight: 800, cursor: 'pointer',
+          padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
           textTransform: 'uppercase', letterSpacing: '0.05em'
         }}>
           Comprar Pacote
@@ -396,8 +396,8 @@ export default function PackageLP() {
   if (notFound || !pkg) return (
     <div style={{ minHeight: '100vh', background: '#050505', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', padding: 20 }}>
       <AlertTriangle size={64} color="#e43c44" style={{ marginBottom: 24 }} />
-      <h1 style={{ fontSize: 32, fontWeight: 900 }}>Pacote indisponível</h1>
-      <button onClick={() => navigate('/')} style={{ background: '#e43c44', color: '#fff', fontWeight: 800, padding: '12px 32px', borderRadius: 8, marginTop: 24, cursor: 'pointer', border: 'none' }}>Voltar para Home</button>
+      <h1 style={{ fontSize: 32, fontWeight: 700 }}>Pacote indisponível</h1>
+      <button onClick={() => navigate('/')} style={{ background: '#e43c44', color: '#fff', fontWeight: 700, padding: '12px 32px', borderRadius: 8, marginTop: 24, cursor: 'pointer', border: 'none' }}>Voltar para Home</button>
     </div>
   );
 
@@ -431,7 +431,7 @@ export default function PackageLP() {
   const videoBg = { programacao: true, pacotes: false, experiencia: false, galeria: false, ...parseJSON(pkg.videoBgSections, {}) };
 
   return (
-    <div style={{ background: '#050505', color: '#fff', fontFamily: 'Outfit, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
+    <div style={{ background: '#050505', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
       <PackageNavbar onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
       <Speedometer />
 
@@ -463,17 +463,17 @@ export default function PackageLP() {
 
         <div className="container animate-fade-in" style={{ maxWidth: 1000, margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 10, transform: 'translateY(-60px)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 12, fontWeight: 900, color: '#e43c44', letterSpacing: '0.15em' }}>{pkg.tag || '110ª EDIÇÃO'}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#e43c44', letterSpacing: '0.15em' }}>{pkg.tag || '110ª EDIÇÃO'}</span>
           </div>
-          <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 900, lineHeight: 1.1, margin: '0 0 24px', textShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+          <h1 style={{ fontSize: 'clamp(1.875rem, 4vw, 3rem)', fontWeight: 700, lineHeight: 1.1, margin: '0 0 24px', textShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
             {pkg.title || 'Seu lugar no grid'}
           </h1>
-          <p style={{ fontSize: 'clamp(1.1rem, 2vw, 1.3rem)', lineHeight: 1.6, color: '#ccc', maxWidth: 650, margin: '0 auto 40px', fontWeight: 400 }}>
+          <p style={{ fontSize: 'clamp(1.125rem, 1.6vw, 1.25rem)', lineHeight: 1.6, color: '#ccc', maxWidth: 650, margin: '0 auto 40px', fontWeight: 400 }}>
             {pkg.description || 'Viva a emoção da corrida com um pacote completo: passagens aéreas, hospedagem e ingressos garantidos, além de experiências exclusivas que vão muito além da corrida.'}
           </p>
           <button 
             onClick={() => document.getElementById('pacotes')?.scrollIntoView({ behavior: 'smooth' })}
-            style={{ background: '#e43c44', color: '#fff', fontWeight: 800, fontSize: 15, padding: '16px 36px', borderRadius: 8, cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 10, transition: 'transform 0.2s' }}
+            style={{ background: '#e43c44', color: '#fff', fontWeight: 700, fontSize: 15, padding: '16px 36px', borderRadius: 8, cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 10, transition: 'transform 0.2s' }}
             onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
           >
@@ -499,7 +499,7 @@ export default function PackageLP() {
                 <div style={{ width: 40, height: 40, background: '#e43c44', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {c.icone === 'Zap' ? <Zap size={20} color="#fff" /> : c.icone === 'Trophy' ? <Trophy size={20} color="#fff" /> : <Headset size={20} color="#fff" />}
                 </div>
-                <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>{c.titulo}</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{c.titulo}</h3>
               </div>
               <p style={{ color: '#888', lineHeight: 1.5, margin: 0, fontSize: 13 }}>{c.descricao}</p>
             </div>
@@ -516,7 +516,7 @@ export default function PackageLP() {
         {videoBg.programacao && <FlagVideoBg />}
 
         <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 10 }}>
-          <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 8px' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 8px' }}>
             {pkg.programacaoTitulo || 'Programação do'} <span style={{ color: '#e43c44' }}>{pkg.programacaoTituloDestaque || 'Fim de Semana'}</span>
           </h2>
           <p style={{ fontSize: 16, color: '#aaa', margin: '0 0 40px' }}>{pkg.programacaoSubtitulo || 'Dias de ação e emoção'}</p>
@@ -530,7 +530,7 @@ export default function PackageLP() {
                   background: activeTab === i ? '#e43c44' : 'transparent',
                   color: activeTab === i ? '#fff' : '#888',
                   border: `1px solid ${activeTab === i ? '#e43c44' : '#333'}`,
-                  borderRadius: 8, padding: '12px 24px', fontSize: 13, fontWeight: 800,
+                  borderRadius: 8, padding: '12px 24px', fontSize: 13, fontWeight: 700,
                   cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em',
                   transition: 'all 0.3s'
                 }}
@@ -541,13 +541,13 @@ export default function PackageLP() {
           </div>
 
           <div style={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: 16, padding: '40px', minHeight: 200 }}>
-            <h3 style={{ fontSize: 24, color: '#e43c44', fontWeight: 800, margin: '0 0 24px' }}>{programacao[activeTab]?.titulo_dia || programacao[activeTab]?.data}</h3>
+            <h3 style={{ fontSize: 24, color: '#e43c44', fontWeight: 700, margin: '0 0 24px' }}>{programacao[activeTab]?.titulo_dia || programacao[activeTab]?.data}</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {(programacao[activeTab]?.atividades || []).length > 0 ? (
                 programacao[activeTab]?.atividades.map((ativ: any, i: number) => (
                   <div key={i} style={{ display: 'flex', gap: 24, padding: '16px 24px', borderRadius: 12, border: '1px solid #222', background: '#111' }}>
-                    <div style={{ color: '#fbbf24', fontWeight: 800, minWidth: 100 }}>{ativ.horario}</div>
+                    <div style={{ color: '#fbbf24', fontWeight: 700, minWidth: 100 }}>{ativ.horario}</div>
                     <div style={{ color: '#fff' }}>{ativ.descricao}</div>
                   </div>
                 ))
@@ -566,7 +566,7 @@ export default function PackageLP() {
         {videoBg.pacotes && <FlagVideoBg />}
         <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 16px' }}>Pacotes de <span style={{ color: '#e43c44' }}>Viagem Completos</span></h2>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 16px' }}>Pacotes de <span style={{ color: '#e43c44' }}>Viagem Completos</span></h2>
             <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Voe com tudo incluído. Hospedagem, transporte e ingressos em um único pacote.</p>
             
             {/* Pricing Toggle */}
@@ -576,7 +576,7 @@ export default function PackageLP() {
                 style={{ 
                   background: pricingMode === 'individual' ? '#e43c44' : 'transparent',
                   color: pricingMode === 'individual' ? '#fff' : '#888',
-                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s'
+                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s'
                 }}
               >
                 Quarto Individual
@@ -586,7 +586,7 @@ export default function PackageLP() {
                 style={{ 
                   background: pricingMode === 'duplo' ? '#e43c44' : 'transparent',
                   color: pricingMode === 'duplo' ? '#fff' : '#888',
-                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s'
+                  border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s'
                 }}
               >
                 Quarto Duplo
@@ -619,25 +619,25 @@ export default function PackageLP() {
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 4, background: i === 0 ? '#e43c44' : '#fbbf24' }} />
 
                     {op.selo && (
-                      <div style={{ alignSelf: 'flex-start', background: i === 0 ? '#e43c44' : '#fbbf24', color: i === 0 ? '#fff' : '#000', padding: '5px 16px', borderRadius: 100, fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>
+                      <div style={{ alignSelf: 'flex-start', background: i === 0 ? '#e43c44' : '#fbbf24', color: i === 0 ? '#fff' : '#000', padding: '5px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>
                         {op.selo}
                       </div>
                     )}
-                    <h3 style={{ fontSize: 24, fontWeight: 900, margin: '0 0 8px', color: '#fff' }}>{op.nome || op.tipo}</h3>
+                    <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px', color: '#fff' }}>{op.nome || op.tipo}</h3>
                     {op.subtitulo && <p style={{ color: '#bbb', fontSize: 15, lineHeight: 1.5, margin: '0 0 8px' }}>{op.subtitulo}</p>}
                     <p style={{ color: '#888', fontSize: 14, lineHeight: 1.5, marginBottom: 24 }}>{op.descricao_card || 'Experiência completa com todo o conforto e exclusividade.'}</p>
 
                     <div style={{ borderTop: '1px solid #222', borderBottom: '1px solid #222', margin: '0 0 32px', padding: '24px 0' }}>
-                      <div style={{ fontSize: 13, color: '#666', fontWeight: 800, textTransform: 'uppercase', marginBottom: 8 }}>{parcelas}x de</div>
-                      <div style={{ fontSize: 40, fontWeight: 900, color: i === 0 ? '#e43c44' : '#fbbf24', display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                        <span style={{ fontSize: 20 }}>{op.moeda || 'USD'}</span>
-                        <span style={{ fontSize: 48 }}>{price || op.valor_parcela || op.preço || '---'}</span>
+                      <div style={{ fontSize: 13, color: '#666', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>{parcelas}x de</div>
+                      <div style={{ fontSize: 36, fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                        <span style={{ fontSize: 18 }}>{op.moeda || 'USD'}</span>
+                        <span style={{ fontSize: 36 }}>{price || op.valor_parcela || op.preço || '---'}</span>
                       </div>
                       <div style={{ fontSize: 12, color: '#555', marginTop: 8 }}>por pessoa em quarto {pricingMode}</div>
                     </div>
 
                     <div style={{ flex: 1, marginBottom: 32 }}>
-                      <div style={{ fontSize: 12, fontWeight: 800, color: '#444', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 16 }}>O que está incluso:</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#444', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 16 }}>O que está incluso:</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         {showInclusos.map((inc: any, j: number) => (
                           <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
@@ -657,7 +657,7 @@ export default function PackageLP() {
                         background: i === 0 ? '#e43c44' : '#fbbf24',
                         color: i === 0 ? '#fff' : '#000',
                         border: 'none',
-                        borderRadius: 12, padding: '16px', fontSize: 14, fontWeight: 800,
+                        borderRadius: 12, padding: '16px', fontSize: 14, fontWeight: 700,
                         cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase'
                       }}
                       onMouseOver={e => { e.currentTarget.style.filter = 'brightness(1.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -673,7 +673,7 @@ export default function PackageLP() {
                         border: `1px solid ${i === 0 ? 'rgba(228,60,68,0.25)' : 'rgba(251,191,36,0.25)'}`,
                         fontSize: 13, color: '#ccc', lineHeight: 1.5
                       }}>
-                        <span style={{ fontWeight: 800, color: i === 0 ? '#e43c44' : '#fbbf24' }}>⚠️ Oferta Limitada: </span>
+                        <span style={{ fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24' }}>⚠️ Oferta Limitada: </span>
                         {op.nota_oferta}
                       </div>
                     )}
@@ -691,18 +691,18 @@ export default function PackageLP() {
             <div style={{ marginTop: 60, padding: '40px', background: '#111', borderRadius: 24, border: '1px solid #222', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, textAlign: 'center' }}>
               <div>
                 <div style={{ color: '#e43c44', marginBottom: 12 }}><Calendar size={32} style={{ margin: '0 auto' }} /></div>
-                <div style={{ fontSize: 12, color: '#666', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Partida</div>
-                <div style={{ fontSize: 18, fontWeight: 800 }}>{pacotes.datas.partida}</div>
+                <div style={{ fontSize: 12, color: '#666', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Partida</div>
+                <div style={{ fontSize: 18, fontWeight: 700 }}>{pacotes.datas.partida}</div>
               </div>
               <div>
                 <div style={{ color: '#e43c44', marginBottom: 12 }}><Calendar size={32} style={{ margin: '0 auto' }} /></div>
-                <div style={{ fontSize: 12, color: '#666', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Retorno</div>
-                <div style={{ fontSize: 18, fontWeight: 800 }}>{pacotes.datas.retorno}</div>
+                <div style={{ fontSize: 12, color: '#666', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Retorno</div>
+                <div style={{ fontSize: 18, fontWeight: 700 }}>{pacotes.datas.retorno}</div>
               </div>
               <div>
                 <div style={{ color: '#fbbf24', marginBottom: 12 }}><Users size={32} style={{ margin: '0 auto' }} /></div>
-                <div style={{ fontSize: 12, color: '#666', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Duração</div>
-                <div style={{ fontSize: 18, fontWeight: 800 }}>{pacotes.datas.duracao}</div>
+                <div style={{ fontSize: 12, color: '#666', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Duração</div>
+                <div style={{ fontSize: 18, fontWeight: 700 }}>{pacotes.datas.duracao}</div>
               </div>
             </div>
           )}
@@ -716,7 +716,7 @@ export default function PackageLP() {
         {videoBg.experiencia && <FlagVideoBg />}
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center', position: 'relative', zIndex: 10 }}>
           <div>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 900, margin: '0 0 24px', lineHeight: 1.1 }}>Uma Experiência <span style={{ color: '#e43c44' }}>Inesquecível</span></h2>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 24px', lineHeight: 1.1 }}>Uma Experiência <span style={{ color: '#e43c44' }}>Inesquecível</span></h2>
             <div style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: pkg.experienciaSection || 'Nossos pacotes garantem que você vivencie cada momento memorável com conforto, segurança e acesso a áreas exclusivas que a maioria dos visitantes nunca experimenta.' }} />
           </div>
           <div style={{ display: 'grid', gap: 20 }}>
@@ -748,7 +748,7 @@ export default function PackageLP() {
             {videoBg.galeria && <FlagVideoBg />}
             <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 10 }}>
               <div style={{ textAlign: 'center', marginBottom: 60 }}>
-                <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 900, margin: '0 0 16px' }}>Galeria de <span style={{ color: '#e43c44' }}>Fotos</span></h2>
+                <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 16px' }}>Galeria de <span style={{ color: '#e43c44' }}>Fotos</span></h2>
                 <p style={{ fontSize: 16, color: '#aaa', maxWidth: 600, margin: '0 auto' }}>Um gostinho do que espera por você. Clique para ampliar.</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
@@ -817,7 +817,7 @@ export default function PackageLP() {
         ) : null;
         const texto = (
           <div>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 900, margin: '0 0 24px', lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 24px', lineHeight: 1.1 }}>
               {destaque.titulo}{destaque.titulo_destaque && <> <span style={{ color: '#fbbf24' }}>{destaque.titulo_destaque}</span></>}
             </h2>
             <div style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{destaque.texto}</div>
@@ -832,37 +832,41 @@ export default function PackageLP() {
         );
       })()}
 
-      {/* --- PARCERIA --- */}
+      {/* --- PARCERIA (fundo laranja + cards pretos glassmórficos) --- */}
       {vis.parceria && (
-      <section style={{ padding: '100px 20px', background: '#111', borderTop: '1px solid #222', borderBottom: '1px solid #222', textAlign: 'center' }}>
+      <section style={{ padding: '100px 20px', background: '#f97316', textAlign: 'center' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <p style={{ fontSize: 14, color: '#e43c44', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Realizado por:</p>
-          <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 900, color: '#fff', margin: '0 0 16px' }}>Uma Parceria de Referência</h2>
-          <p style={{ fontSize: 18, color: '#aaa', maxWidth: 700, margin: '0 auto 60px', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: 16 }}>Realizado por</p>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, color: '#fff', margin: '0 0 16px' }}>Uma Parceria de Referência</h2>
+          <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.8)', maxWidth: 700, margin: '0 auto 60px', lineHeight: 1.6 }}>
             Duas empresas líderes unidas para levar você ao espetáculo mais emocionante do automobilismo mundial.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 30, textAlign: 'left' }}>
-            
-            {/* Card Mais Corporativo */}
-            <div style={{ background: '#050505', border: '1px solid #222', borderRadius: 24, padding: '40px', display: 'flex', flexDirection: 'column', transition: 'border-color 0.3s' }} onMouseOver={e => e.currentTarget.style.borderColor = '#e43c44'} onMouseOut={e => e.currentTarget.style.borderColor = '#222'}>
-              <img src="/logo_mais.png" alt="Mais Corporativo" style={{ height: 40, objectFit: 'contain', marginBottom: 24, alignSelf: 'flex-start' }} />
-              <p style={{ color: '#aaa', fontSize: 16, lineHeight: 1.6, flex: 1, marginBottom: 32 }}>
-                Especialistas em viagens e experiências corporativas de alto padrão. Do planejamento ao retorno, cuidamos de cada detalhe para que você viva momentos inesquecíveis com segurança e conforto.
+
+            {/* Card E-Mais */}
+            <div style={{ background: 'rgba(5,5,5,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 24, padding: '40px', display: 'flex', flexDirection: 'column', transition: 'border-color 0.3s, transform 0.3s', boxShadow: '0 20px 40px rgba(0,0,0,0.25)' }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              <img src="/logo_emais.png" alt="E-Mais" style={{ height: 40, objectFit: 'contain', marginBottom: 24, alignSelf: 'flex-start' }} />
+              <p style={{ color: '#ccc', fontSize: 16, lineHeight: 1.6, flex: 1, marginBottom: 32 }}>
+                A plataforma de experiências esportivas que conecta você aos maiores eventos do mundo com tecnologia, agilidade e personalização de ponta a ponta.
               </p>
-              <div style={{ alignSelf: 'flex-start', background: 'rgba(228,60,68,0.1)', border: '1px solid rgba(228,60,68,0.2)', color: '#e43c44', padding: '8px 16px', borderRadius: 100, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Turismo Corporativo
+              <div style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Experiências Esportivas
               </div>
             </div>
 
-            {/* Card E-Mais */}
-            <div style={{ background: '#050505', border: '1px solid #222', borderRadius: 24, padding: '40px', display: 'flex', flexDirection: 'column', transition: 'border-color 0.3s' }} onMouseOver={e => e.currentTarget.style.borderColor = '#e43c44'} onMouseOut={e => e.currentTarget.style.borderColor = '#222'}>
-              <img src="/logo_emais.png" alt="E-Mais" style={{ height: 40, objectFit: 'contain', marginBottom: 24, alignSelf: 'flex-start' }} />
-              <p style={{ color: '#aaa', fontSize: 16, lineHeight: 1.6, flex: 1, marginBottom: 32 }}>
-                A plataforma de experiências esportivas que conecta você aos maiores eventos do mundo com tecnologia, agilidade e personalização de ponta a ponta.
+            {/* Card GP — Grande Prêmio */}
+            <div style={{ background: 'rgba(5,5,5,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 24, padding: '40px', display: 'flex', flexDirection: 'column', transition: 'border-color 0.3s, transform 0.3s', boxShadow: '0 20px 40px rgba(0,0,0,0.25)' }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              <img src="/logo-gp.png" alt="Grande Prêmio" style={{ height: 40, objectFit: 'contain', marginBottom: 24, alignSelf: 'flex-start' }} />
+              <p style={{ color: '#ccc', fontSize: 16, lineHeight: 1.6, flex: 1, marginBottom: 32 }}>
+                O Grande Prêmio é o maior portal de automobilismo do Brasil, cobrindo F1, Indy, Stock Car e tudo que acelera o coração dos fãs — agora ao seu lado nas maiores experiências do esporte.
               </p>
-              <div style={{ alignSelf: 'flex-start', background: 'rgba(228,60,68,0.1)', border: '1px solid rgba(228,60,68,0.2)', color: '#e43c44', padding: '8px 16px', borderRadius: 100, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Experiências Esportivas
+              <div style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Mídia & Automobilismo
               </div>
             </div>
 
@@ -877,7 +881,7 @@ export default function PackageLP() {
         
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 80, alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: 32 }}>Garanta seu lugar na <span style={{ color: '#e43c44' }}>História.</span></h2>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, lineHeight: 1.1, marginBottom: 32 }}>Garanta seu lugar na <span style={{ color: '#e43c44' }}>História.</span></h2>
             <p style={{ fontSize: 20, color: '#888', lineHeight: 1.6, marginBottom: 48 }}>Preencha os dados ao lado e receba um atendimento personalizado de nossos especialistas em eventos esportivos.</p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -899,7 +903,7 @@ export default function PackageLP() {
           <div style={{ position: 'relative' }}>
             <div className="glass-form" style={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: 32, padding: '40px' }}>
               <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                <h3 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Cotação de Pacote</h3>
+                <h3 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Cotação de Pacote</h3>
                 <p style={{ fontSize: 14, color: '#666', marginTop: 8 }}>Mantenha seus dados atualizados para contato.</p>
               </div>
 
@@ -915,7 +919,7 @@ export default function PackageLP() {
               {submitting && !showSuccess && (
                 <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.85)', borderRadius: 32, zIndex: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ width: 44, height: 44, border: '4px solid rgba(255,255,255,0.1)', borderTopColor: '#e43c44', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  <p style={{ marginTop: 20, fontSize: 12, fontWeight: 800, color: '#e43c44' }}>Processando...</p>
+                  <p style={{ marginTop: 20, fontSize: 12, fontWeight: 700, color: '#e43c44' }}>Processando...</p>
                 </div>
               )}
             </div>
@@ -931,7 +935,7 @@ export default function PackageLP() {
       </footer>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         .animate-fade-in { animation: fadeIn 1.2s ease-out; }
         .gallery-thumb:hover img { transform: scale(1.06); }
@@ -968,7 +972,7 @@ function SuccessSection({ redirectUrl }: { redirectUrl?: string }) {
       <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'rgba(228,60,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 32 }}>
         <CheckCircle2 size={60} color="#e43c44" />
       </div>
-      <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 900, marginBottom: 16, color: '#fff' }}>SOLICITAÇÃO RECEBIDA</h1>
+      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, marginBottom: 16, color: '#fff' }}>SOLICITAÇÃO RECEBIDA</h1>
       <p style={{ fontSize: 20, color: '#888', maxWidth: 600, lineHeight: 1.6 }}>Obrigado pelo seu interesse. Um de nossos especialistas entrará em contato via WhatsApp ou E-mail em breve.</p>
       {redirectUrl && <p style={{ fontSize: 14, color: '#e43c44', marginTop: 32, fontWeight: 700 }}>Redirecionando você...</p>}
     </div>
