@@ -348,7 +348,7 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
           <p style={{ ...hint, padding: '8px 12px', background: '#0d0d0d', borderRadius: 8, border: '1px solid #1a1a1a' }}>
             💡 O <strong style={{ color: '#ccc' }}>título grande</strong> do Hero é o <strong style={{ color: '#ccc' }}>Nome do Pacote</strong> (campo "Título do Pacote" das informações básicas).
           </p>
-          <LPImageInput label="Logo da categoria na navbar (ex: Fórmula 1, Le Mans, Stock Car — PNG com fundo transparente)"
+          <LPImageInput label="Logo da categoria na navbar — opcional: se vazio, usa o logo cadastrado na categoria (aba Categorias do admin, botão 'Mídia LP')"
             value={pkg.categoryLogo || ''} onChange={url => onUpdate({ categoryLogo: url })} tokenKey={tokenKey} />
           <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 12 }}>
             <div style={fieldCol}>

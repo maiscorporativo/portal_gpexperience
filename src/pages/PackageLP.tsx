@@ -211,7 +211,7 @@ function PackageNavbar({ onBook, categoryLogo }: { onBook: () => void; categoryL
 export default function PackageLP() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { packages, loading } = useContentConfig();
+  const { packages, categoryAssets, loading } = useContentConfig();
   const [pkg, setPkg] = useState<TrendingPackage | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -442,9 +442,14 @@ export default function PackageLP() {
   // Fundo animado da bandeira por seção (configurável no admin — padrão: só na Programação)
   const videoBg = { programacao: true, pacotes: false, experiencia: false, galeria: false, ...parseJSON(pkg.videoBgSections, {}) };
 
+  // Assets da categoria do pacote (logo da navbar + fundo da Parceria), cadastrados na aba Categorias do admin
+  const catAssets = (pkg.category && categoryAssets?.[pkg.category]) || {};
+  const navCategoryLogo = pkg.categoryLogo || catAssets.logo; // logo do pacote sobrepõe o da categoria
+  const parceriaBg = catAssets.parceriaBg ? fixImgPath(catAssets.parceriaBg) : '';
+
   return (
     <div style={{ background: '#050505', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', minHeight: '100vh', overflowX: 'hidden' }}>
-      <PackageNavbar categoryLogo={pkg.categoryLogo} onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
+      <PackageNavbar categoryLogo={navCategoryLogo} onBook={() => document.getElementById('conversion-section')?.scrollIntoView({ behavior: 'smooth' })} />
       <Speedometer />
 
       {/* --- HERO SECTION --- */}
@@ -846,9 +851,9 @@ export default function PackageLP() {
 
       {/* --- PARCERIA (fundo com imagem + cards pretos glassmórficos) --- */}
       {vis.parceria && (
-      <section style={{ padding: '100px 20px', textAlign: 'center', position: 'relative', overflow: 'hidden', backgroundImage: 'url(/f1_parceria.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        {/* Overlay para legibilidade do texto sobre a foto */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.35) 100%)', pointerEvents: 'none' }} />
+      <section style={{ padding: '100px 20px', textAlign: 'center', position: 'relative', overflow: 'hidden', ...(parceriaBg ? { backgroundImage: `url(${parceriaBg})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: '#f97316' }) }}>
+        {/* Overlay para legibilidade do texto sobre a foto (só quando há imagem de fundo da categoria) */}
+        {parceriaBg && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.35) 100%)', pointerEvents: 'none' }} />}
         <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: 16, textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>Realizado por</p>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, color: '#fff', margin: '0 0 16px', textShadow: '0 3px 16px rgba(0,0,0,0.9)' }}>Uma Parceria de Referência</h2>

@@ -121,6 +121,16 @@ async function autoMigrate() {
       console.log('✅ Coluna category_icons criada');
     }
 
+    // Criar category_assets se não existir (logo da navbar + fundo da Parceria por categoria)
+    const [checkAssets] = await pool.query(
+      `SELECT COUNT(*) as c FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'site_content' AND COLUMN_NAME = 'category_assets'`
+    );
+    if (checkAssets[0].c === 0) {
+      await pool.query(`ALTER TABLE site_content ADD COLUMN category_assets LONGTEXT`);
+      console.log('✅ Coluna category_assets criada');
+    }
+
     // Migrar colunas existentes para LONGTEXT
     const [rows] = await pool.query(
       `SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.COLUMNS

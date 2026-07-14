@@ -1125,18 +1125,21 @@ function EmojiPicker({ currentEmoji, onChange }: {
 }
 
 
-function SortableCategoryItem({ cat, i, categoryIcons, updateCategoryIcon, reorderCategory, editIdx, editVal, setEditVal, confirmEdit, setEditIdx, startEdit, removeCategory, categoriesCount, toast, showConfirm }: any) {
+function SortableCategoryItem({ cat, i, categoryIcons, categoryAssets, updateCategoryIcon, updateCategoryAsset, reorderCategory, editIdx, editVal, setEditVal, confirmEdit, setEditIdx, startEdit, removeCategory, categoriesCount, toast, showConfirm }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, setActivatorNodeRef, isDragging } = useSortable({ id: cat });
+  const [showAssets, setShowAssets] = useState(false);
+  const assets = (categoryAssets && categoryAssets[cat]) || {};
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 10 : 1,
     position: 'relative',
-    display: 'flex', alignItems: 'center', gap: 8, background: '#111111', border: '1px solid #333333', borderRadius: 8, padding: '10px 12px'
+    display: 'flex', flexDirection: 'column', gap: 8, background: '#111111', border: '1px solid #333333', borderRadius: 8, padding: '10px 12px'
   };
 
   return (
     <div ref={setNodeRef} style={style}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <button ref={setActivatorNodeRef} {...attributes} {...listeners} style={{ background: 'none', border: 'none', color: '#737373', cursor: 'grab', padding: 0 }} title="Arrastar">
         <GripVertical size={14} />
       </button>
@@ -1167,14 +1170,32 @@ function SortableCategoryItem({ cat, i, categoryIcons, updateCategoryIcon, reord
       ) : (
         <button onClick={() => startEdit(i)} style={{ background: '#1f1f1f', border: '1px solid #333333', borderRadius: 6, color: '#e43c44', fontSize: 11, padding: '5px 10px', cursor: 'pointer' }}>Editar</button>
       )}
+      <button onClick={() => setShowAssets(v => !v)} title="Logo da categoria e fundo da seção Parceria (LPs)"
+        style={{ background: showAssets ? '#1a2030' : '#1f1f1f', border: `1px solid ${(assets.logo || assets.parceriaBg) ? '#3b82f6' : '#333333'}`, borderRadius: 6, color: '#3b82f6', fontSize: 11, padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <ImgIcon size={12} /> Mídia LP {showAssets ? '▴' : '▾'}
+      </button>
       <button onClick={async () => { if (await showConfirm(`Remover a categoria "${cat}"?`, { type: 'danger', confirmText: 'Remover', title: 'Remover Categoria' })) { removeCategory(i); toast(`Categoria "${cat}" removida.`, 'warning'); } }} style={{ background: '#2a0a0a', border: '1px solid #3a1a1a', borderRadius: 6, color: '#ff6b6b', fontSize: 11, padding: '5px 8px', cursor: 'pointer' }}><Trash2 size={12} /></button>
+      </div>
+
+      {showAssets && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, padding: '12px', background: '#0a0a0a', borderRadius: 8, border: '1px solid #1a1a1a' }}>
+          <div>
+            <ImageUploadField label="Logo da categoria (navbar das LPs)" value={assets.logo ?? ''} onChange={(v: string) => updateCategoryAsset(cat, { logo: v })} />
+            <p style={{ fontSize: 10, color: '#555', margin: '6px 0 0' }}>Aparece na navbar de todos os pacotes desta categoria (PNG com fundo transparente).</p>
+          </div>
+          <div>
+            <ImageUploadField label="Fundo da seção Parceria (LPs)" value={assets.parceriaBg ?? ''} onChange={(v: string) => updateCategoryAsset(cat, { parceriaBg: v })} />
+            <p style={{ fontSize: 10, color: '#555', margin: '6px 0 0' }}>Imagem de fundo da seção "Uma Parceria de Referência". Sem imagem, o fundo fica laranja.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 /* ── Categories Tab ───────────────────────────────────────────── */
 function CategoriesTab() {
-  const { categories, categoryIcons, addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon } = useContentConfig();
+  const { categories, categoryIcons, categoryAssets, addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon, updateCategoryAsset } = useContentConfig();
   const { toast } = useToast();
   const { showConfirm } = useDialog();
   const [newName, setNewName] = useState('');
@@ -1255,7 +1276,9 @@ function CategoriesTab() {
                 i={i}
                 categoriesCount={categories.length}
                 categoryIcons={categoryIcons}
+                categoryAssets={categoryAssets}
                 updateCategoryIcon={updateCategoryIcon}
+                updateCategoryAsset={updateCategoryAsset}
                 reorderCategory={reorderCategory}
                 editIdx={editIdx}
                 editVal={editVal}

@@ -96,6 +96,7 @@ router.get('/', async (req, res) => {
       heroImages:     parseField(row.hero_images,     DEFAULT_HERO_IMAGES),
       categories:     parseField(row.categories,      DEFAULT_CATEGORIES),
       categoryIcons:  parseField(row.category_icons,  {}),
+      categoryAssets: parseField(row.category_assets, {}),
     });
   } catch (err) {
     console.error('[GET /api/content]', err.message);
@@ -105,18 +106,19 @@ router.get('/', async (req, res) => {
 
 /* ── PUT /api/content ─────────────────────────────────────────── */
 router.put('/', requireAuth, async (req, res) => {
-  const { events, packages, testimonials, heroImages, categories, categoryIcons } = req.body;
+  const { events, packages, testimonials, heroImages, categories, categoryIcons, categoryAssets } = req.body;
   try {
     await pool.query(
-      `INSERT INTO site_content (id, events, packages, testimonials, hero_images, categories, category_icons)
-       VALUES (1, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO site_content (id, events, packages, testimonials, hero_images, categories, category_icons, category_assets)
+       VALUES (1, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          events          = VALUES(events),
          packages        = VALUES(packages),
          testimonials    = VALUES(testimonials),
          hero_images     = VALUES(hero_images),
          categories      = VALUES(categories),
-         category_icons  = VALUES(category_icons)`,
+         category_icons  = VALUES(category_icons),
+         category_assets = VALUES(category_assets)`,
       [
         JSON.stringify(events       ?? DEFAULT_EVENTS),
         JSON.stringify(packages     ?? DEFAULT_PACKAGES),
@@ -124,6 +126,7 @@ router.put('/', requireAuth, async (req, res) => {
         JSON.stringify(heroImages   ?? DEFAULT_HERO_IMAGES),
         JSON.stringify(categories   ?? DEFAULT_CATEGORIES),
         JSON.stringify(categoryIcons ?? {}),
+        JSON.stringify(categoryAssets ?? {}),
       ]
     );
     broadcastUpdate();

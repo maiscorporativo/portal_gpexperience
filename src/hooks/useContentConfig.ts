@@ -51,11 +51,14 @@ function getMarketingUser(): string {
   return (v && v !== '1') ? v : 'marketing';
 }
 
+export interface CategoryAssets { logo?: string; parceriaBg?: string }
+
 interface ContentStore {
   events: EventHighlight[];
   packages: TrendingPackage[];
   categories: string[];
   categoryIcons: Record<string, string>;
+  categoryAssets: Record<string, CategoryAssets>;
 }
 
 function loadCache(): ContentStore | null {
@@ -80,6 +83,9 @@ function loadCache(): ContentStore | null {
     if (!parsed.categoryIcons || typeof parsed.categoryIcons !== 'object') {
       parsed.categoryIcons = {};
     }
+    if (!parsed.categoryAssets || typeof parsed.categoryAssets !== 'object') {
+      parsed.categoryAssets = {};
+    }
     return parsed as ContentStore;
   } catch { return null; }
 }
@@ -97,6 +103,7 @@ async function fetchContent(): Promise<ContentStore> {
     packages:       json.packages       ?? DEFAULT_PACKAGES,
     categories:     json.categories     ?? DEFAULT_CATEGORIES,
     categoryIcons:  json.categoryIcons  ?? {},
+    categoryAssets: json.categoryAssets ?? {},
   };
 }
 
@@ -125,6 +132,7 @@ export function useContentConfig() {
     packages: DEFAULT_PACKAGES,
     categories: DEFAULT_CATEGORIES,
     categoryIcons: {},
+    categoryAssets: {},
   });
   const [loading, setLoading] = useState(!cached);
   const [saving, setSaving] = useState(false);
@@ -148,6 +156,7 @@ export function useContentConfig() {
         packages:       json.packages       ?? DEFAULT_PACKAGES,
         categories:     json.categories     ?? DEFAULT_CATEGORIES,
         categoryIcons:  json.categoryIcons  ?? {},
+        categoryAssets: json.categoryAssets ?? {},
       };
       setContent(data);
       saveCache(data);
@@ -368,9 +377,13 @@ export function useContentConfig() {
   const updateCategoryIcon = useCallback((name: string, icon: string) =>
     persist({ ...content, categoryIcons: { ...content.categoryIcons, [name]: icon } }), [content, persist]);
 
+  /* ── Category Assets (logo navbar + fundo Parceria por categoria) ── */
+  const updateCategoryAsset = useCallback((name: string, patch: Partial<CategoryAssets>) =>
+    persist({ ...content, categoryAssets: { ...content.categoryAssets, [name]: { ...content.categoryAssets[name], ...patch } } }), [content, persist]);
+
   /* ── Global ── */
   const resetAll = useCallback(async () => {
-    const defaults = { events: DEFAULT_EVENTS, packages: DEFAULT_PACKAGES, categories: DEFAULT_CATEGORIES, categoryIcons: {} };
+    const defaults = { events: DEFAULT_EVENTS, packages: DEFAULT_PACKAGES, categories: DEFAULT_CATEGORIES, categoryIcons: {}, categoryAssets: {} };
     await persist(defaults);
   }, [persist]);
 
@@ -389,12 +402,13 @@ export function useContentConfig() {
     packages: content.packages,
     categories: content.categories,
     categoryIcons: content.categoryIcons,
+    categoryAssets: content.categoryAssets,
     loading, saving, saveError,
     updateEvent, addEvent, removeEvent, reorderEvent,
     approveEvent, rejectEvent, masterUpdateEvent,
     updatePackage, addPackage, duplicatePackage, removePackage, restorePackage, permanentRemovePackage, reorderPackage,
     approvePackage, rejectPackage, masterUpdatePackage, marketingUpdatePackage, setPackageTrending,
-    addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon,
+    addCategory, removeCategory, updateCategory, reorderCategory, updateCategoryIcon, updateCategoryAsset,
     resetAll, exportConfig, importConfig,
   };
 }
