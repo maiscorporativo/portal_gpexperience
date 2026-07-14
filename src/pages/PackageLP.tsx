@@ -518,7 +518,7 @@ export default function PackageLP() {
                 </div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{c.titulo}</h3>
               </div>
-              <p style={{ color: '#888', lineHeight: 1.5, margin: 0, fontSize: 13 }}>{c.descricao}</p>
+              <p style={{ color: '#999', lineHeight: 1.5, margin: 0, fontSize: 16 }}>{c.descricao}</p>
             </div>
           ))}
         </div>
