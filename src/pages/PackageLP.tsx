@@ -273,6 +273,11 @@ export default function PackageLP() {
 
   // --- MAUTIC LOGIC (Preserved) ---
   useEffect(() => {
+    // Sem código do Mautic: limpa o container para não sobrar um formulário
+    // injetado por uma versão anterior do pacote junto com o aviso de indisponível
+    if (!pkg?.mauticFormCode && mauticContainerRef.current) {
+      mauticContainerRef.current.innerHTML = '';
+    }
     if (pkg?.mauticFormCode && mauticContainerRef.current) {
       mauticContainerRef.current.innerHTML = pkg.mauticFormCode;
       const form = mauticContainerRef.current.querySelector('form');
@@ -325,7 +330,7 @@ export default function PackageLP() {
 
           fetch(pkg.webhookClint, { 
             method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: clintData.toString() 
-          }).catch(e => console.error('Erro Clint:', e));
+          }).catch(e => console.error('Erro Webhook CRM:', e));
         }
         setShowSuccess(true);
         if (pkg.redirectUrl) {

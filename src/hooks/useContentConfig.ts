@@ -189,8 +189,10 @@ export function useContentConfig() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetch]);
 
-  /* ── Save helper ── */
-  const persist = useCallback(async (next: ContentStore) => {
+  /* ── Save helper ──
+   * Retorna true se o servidor gravou; false se só o cache local foi atualizado
+   * (ex.: sessão expirada) — os painéis usam isso para avisar o usuário. */
+  const persist = useCallback(async (next: ContentStore): Promise<boolean> => {
     // Merge imagens do localStorage para não perder dados salvos por outras instâncias do hook
     // (ex: ImageAdmin salva imagem, MasterAdmin aprova sem ter carregado a imagem na sua instância)
     const localCache = loadCache();
@@ -230,9 +232,11 @@ export function useContentConfig() {
       hasLocalUnsaved.current = false;
       setSaveError(null);
       bc?.postMessage('update');
+      return true;
     } catch (err: any) {
       console.warn('[useContentConfig] API save failed:', err);
       setSaveError(err.message || 'Erro desconhecido ao salvar');
+      return false;
     } finally {
       isSaving.current = false;
       setSaving(false);

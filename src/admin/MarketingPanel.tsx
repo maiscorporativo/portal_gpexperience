@@ -108,8 +108,8 @@ function Section({ title, icon: Icon, children, color = '#3b82f6' }: { title: st
 }
 
 function MarketingEditor({ pkg, onUpdate, onCancel }: {
-  pkg: TrendingPackage; 
-  onUpdate: (d: Partial<TrendingPackage>) => void;
+  pkg: TrendingPackage;
+  onUpdate: (d: Partial<TrendingPackage>) => Promise<boolean | void> | void;
   onCancel: () => void;
 }) {
   const [local, setLocal] = useState<TrendingPackage>({ ...pkg });
@@ -119,7 +119,11 @@ function MarketingEditor({ pkg, onUpdate, onCancel }: {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onUpdate(local);
+      const ok = await onUpdate(local);
+      if (ok === false) {
+        toast('Falha ao gravar no servidor — as alterações ficaram só neste navegador. Faça login novamente e salve de novo.', 'error');
+        return;
+      }
       toast('Configurações salvas!', 'success');
       onCancel();
     } catch {
@@ -128,6 +132,20 @@ function MarketingEditor({ pkg, onUpdate, onCancel }: {
       setSaving(false);
     }
   };
+
+  // Campos extraídos do snippet do Mautic — são as chaves que o webhook CRM
+  // recebe no payload (mesma regra de extração usada na LP em PackageLP.tsx)
+  const camposPayload = React.useMemo(() => {
+    const nomes: string[] = [];
+    const re = /mauticform\[([^\]]+)\]/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(local.mauticFormCode || ''))) {
+      const campo = m[1];
+      if (['formId', 'return', 'formName'].includes(campo)) continue;
+      if (!nomes.includes(campo)) nomes.push(campo);
+    }
+    return nomes;
+  }, [local.mauticFormCode]);
 
   const fieldStyle = { display: 'flex', flexDirection: 'column' as const, gap: 8 };
   const labelStyle = { fontSize: 11, color: '#737373', fontWeight: 700, textTransform: 'uppercase' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
@@ -214,8 +232,32 @@ function MarketingEditor({ pkg, onUpdate, onCancel }: {
               </div>
 
               <div style={fieldStyle}>
-                <label style={labelStyle}><Database size={14} color="#8b5cf6" /> Webhook Clint Digital</label>
+                <label style={labelStyle}><Database size={14} color="#8b5cf6" /> Webhook CRM</label>
                 <input value={local.webhookClint || ''} onChange={e => setLocal({...local, webhookClint: e.target.value})} placeholder="https://..." style={IS} className="admin-input" />
+              </div>
+
+              {/* Campos do payload enviados ao Webhook CRM (detectados do snippet Mautic) */}
+              <div style={fieldStyle}>
+                <label style={labelStyle}><Database size={14} color="#8b5cf6" /> Campos do payload (mapeie no seu CRM)</label>
+                {camposPayload.length === 0 ? (
+                  <div style={{ fontSize: 12, color: '#666', background: '#050505', border: '1px dashed #333', borderRadius: 8, padding: '14px 16px' }}>
+                    Cole o Snippet Form Mautic acima para detectar automaticamente os campos que o webhook enviará.
+                  </div>
+                ) : (
+                  <div style={{ background: '#050505', border: '1px solid #333', borderRadius: 8, padding: '14px 16px' }}>
+                    <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>
+                      Ao converter, o webhook recebe um POST (x-www-form-urlencoded) com as chaves abaixo — configure o mapeamento no seu CRM com estes nomes:
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {camposPayload.map(campo => (
+                        <span key={campo} style={{ fontSize: 12, fontFamily: 'monospace', background: '#8b5cf615', color: '#c4b5fd', border: '1px solid #8b5cf633', borderRadius: 6, padding: '4px 10px' }}>{campo}</span>
+                      ))}
+                      {['pacote_lp', 'origem_lead', 'url_conversao'].map(campo => (
+                        <span key={campo} title="Adicionado automaticamente pela LP" style={{ fontSize: 12, fontFamily: 'monospace', background: '#0d3320', color: '#4ade80', border: '1px solid #14532d', borderRadius: 6, padding: '4px 10px' }}>{campo} · automático</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Section>
