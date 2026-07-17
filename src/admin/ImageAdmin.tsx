@@ -25,7 +25,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 import { DEFAULT_IMAGES, type ImageKey } from '../imageConfig';
-import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments, hasPrice, PRICE_ON_REQUEST } from '../utils/currency';
 import { slugify, sanitizeSlugInput, uniqueSlug } from '../utils/slug';
 import { useImageConfig } from '../hooks/useImageConfig';
 import { useContentConfig } from '../hooks/useContentConfig';
@@ -844,7 +844,9 @@ function PackageCard({ pkg, index, total, trendingCount, categories, otherSlugs 
                     style={{ background: '#050505', border: '1px solid #333333', borderRadius: 7, color: '#e8edf2', fontSize: 13, padding: '9px 12px', outline: 'none' }}
                   />
                   <span style={{ fontSize: 10, color: '#4ade80' }}>
-                    Card exibirá: {parseInstallments(pkg.installments) > 1
+                    Card exibirá: {!hasPrice(pkg.price)
+                      ? PRICE_ON_REQUEST + ` (preço vazio ou zero)`
+                      : parseInstallments(pkg.installments) > 1
                       ? `${parseInstallments(pkg.installments)}x de ${getCurrencySymbol(pkg.currency || 'BRL')} ${formatInstallmentValue(pkg.price, pkg.currency || 'BRL', parseInstallments(pkg.installments))}`
                       : `${getCurrencySymbol(pkg.currency || 'BRL')} ${formatDisplayPrice(pkg.price, pkg.currency || 'BRL')} (à vista)`}
                   </span>

@@ -218,7 +218,7 @@ export function useContentConfig() {
     isSaving.current = true;
     hasLocalUnsaved.current = true;
     setSaving(true);
-    setSaveError(false);
+    setSaveError(null);
     setContent(merged);
     saveCache(merged);
     lastUpdated.current = JSON.stringify(merged).slice(0, 40);

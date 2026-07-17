@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { MapPin, Calendar, ArrowRight } from 'lucide-react';
 import type { TrendingPackage } from '../types';
-import { useState } from 'react';
 import { useContentConfig } from '../hooks/useContentConfig';
 import Reveal from './Reveal';
-import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments, hasPrice, PRICE_ON_REQUEST } from '../utils/currency';
 import { appendCurrentQuery } from '../utils/slug';
 
 /* ── Category icons/emojis ── */
@@ -51,11 +50,13 @@ function PackageCard({ pkg, onClick }: { pkg: TrendingPackage & { originalIndex:
         </div>
         <div className="flex items-center justify-between mt-3">
           <div>
-            <p className="text-[10px] text-neutral-500 uppercase tracking-wider">a partir de</p>
+            <p className="text-[10px] text-neutral-500 uppercase tracking-wider">{hasPrice(pkg.price) ? 'a partir de' : 'fale com um consultor'}</p>
             <p className="text-gold font-bold text-lg">
-              {parseInstallments(pkg.installments) > 1
-                ? `${parseInstallments(pkg.installments)}x de ${getCurrencySymbol(curr)} ${formatInstallmentValue(pkg.price, curr, parseInstallments(pkg.installments))}`
-                : `${getCurrencySymbol(curr)} ${formatDisplayPrice(pkg.price, curr)}`}
+              {!hasPrice(pkg.price)
+                ? PRICE_ON_REQUEST
+                : parseInstallments(pkg.installments) > 1
+                  ? `${parseInstallments(pkg.installments)}x de ${getCurrencySymbol(curr)} ${formatInstallmentValue(pkg.price, curr, parseInstallments(pkg.installments))}`
+                  : `${getCurrencySymbol(curr)} ${formatDisplayPrice(pkg.price, curr)}`}
             </p>
           </div>
           <div className="w-8 h-8 rounded-full bg-gold/10 group-hover:bg-gold flex items-center justify-center transition-all duration-300">

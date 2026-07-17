@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  CheckCircle2, Plane, BedDouble, Ticket,
-  MapPin, Calendar, ChevronDown, Users,
+import {
+  CheckCircle2, Calendar, Users,
   MessageCircle, AlertTriangle, Zap, Trophy, Headset, ChevronRight, ChevronLeft, X
 } from 'lucide-react';
 import { useContentConfig } from '../hooks/useContentConfig';
 import { appendCurrentQuery } from '../utils/slug';
+import { hasPrice, PRICE_ON_REQUEST } from '../utils/currency';
 import type { TrendingPackage } from '../types';
 
 // Helper to convert YouTube URL to Embed URL
@@ -217,7 +217,6 @@ export default function PackageLP() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState(0); // Para a seção de Programação
-  const [activePkgTab, setActivePkgTab] = useState(0); // Para a seção de Pacotes
   const [pricingMode, setPricingMode] = useState<'individual' | 'duplo'>('duplo');
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null); // Galeria ampliada
 
@@ -586,7 +585,11 @@ export default function PackageLP() {
             <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 16px' }}>Pacotes de <span style={{ color: '#e43c44' }}>Viagem Completos</span></h2>
             <p style={{ fontSize: 20, color: '#aaa', maxWidth: 672, margin: '0 auto' }}>Voe com tudo incluído. Hospedagem, transporte e ingressos em um único pacote.</p>
             
-            {/* Pricing Toggle */}
+            {/* Pricing Toggle — oculto quando nenhuma opção tem preço (Valor sob consulta) */}
+            {(() => {
+              const opts = pacotes && !Array.isArray(pacotes) ? (pacotes.opcoes_hospedagem || []) : (Array.isArray(pacotes) ? pacotes : []);
+              return opts.some((op: any) => hasPrice(op.valor_individual) || hasPrice(op.valor_duplo) || hasPrice(op.valor_parcela) || hasPrice(op.preço));
+            })() && (
             <div style={{ marginTop: 40, display: 'inline-flex', background: '#111', padding: 6, borderRadius: 100, border: '1px solid #222' }}>
               <button 
                 onClick={() => setPricingMode('individual')}
@@ -609,6 +612,7 @@ export default function PackageLP() {
                 Quarto Duplo
               </button>
             </div>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32, maxWidth: 1024, margin: '0 auto' }}>
@@ -645,12 +649,21 @@ export default function PackageLP() {
                     <p style={{ color: '#999', fontSize: 16, lineHeight: 1.5, marginBottom: 24 }}>{op.descricao_card || 'Experiência completa com todo o conforto e exclusividade.'}</p>
 
                     <div style={{ borderTop: '1px solid #222', borderBottom: '1px solid #222', margin: '0 0 32px', padding: '24px 0' }}>
-                      <div style={{ fontSize: 16, color: '#888', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>{parcelas}x de</div>
-                      <div style={{ fontSize: 36, fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24', display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                        <span style={{ fontSize: 22 }}>{op.moeda || 'USD'}</span>
-                        <span style={{ fontSize: 36 }}>{price || op.valor_parcela || op.preço || '---'}</span>
-                      </div>
-                      <div style={{ fontSize: 16, color: '#888', marginTop: 8 }}>por pessoa em quarto {pricingMode}</div>
+                      {hasPrice(price || op.valor_parcela || op.preço) ? (
+                        <>
+                          <div style={{ fontSize: 16, color: '#888', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>{parcelas}x de</div>
+                          <div style={{ fontSize: 36, fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                            <span style={{ fontSize: 22 }}>{op.moeda || 'USD'}</span>
+                            <span style={{ fontSize: 36 }}>{price || op.valor_parcela || op.preço || '---'}</span>
+                          </div>
+                          <div style={{ fontSize: 16, color: '#888', marginTop: 8 }}>por pessoa em quarto {pricingMode}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div style={{ fontSize: 28, fontWeight: 700, color: i === 0 ? '#e43c44' : '#fbbf24' }}>{PRICE_ON_REQUEST}</div>
+                          <div style={{ fontSize: 16, color: '#888', marginTop: 8 }}>fale com um consultor para condições e valores</div>
+                        </>
+                      )}
                     </div>
 
                     <div style={{ flex: 1, marginBottom: 32 }}>

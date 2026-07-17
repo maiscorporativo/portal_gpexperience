@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import type { TrendingPackage } from '../types';
 import Reveal from './Reveal';
-import PackageModal from './PackageModal';
 import { useContentConfig } from '../hooks/useContentConfig';
-import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments, hasPrice, PRICE_ON_REQUEST } from '../utils/currency';
 import { appendCurrentQuery } from '../utils/slug';
 
 
@@ -89,12 +87,14 @@ export default function TrendingPackages() {
                     <div>{pkg.date} | {pkg.loc}</div>
                   </div>
                   <div className="border-t border-neutral-100 pt-4 flex flex-col">
-                    <span className="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">Pacotes a partir de</span>
+                    <span className="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">{hasPrice(pkg.price) ? 'Pacotes a partir de' : 'Fale com um consultor'}</span>
                     <div className="flex items-center justify-between mt-1">
                       <span className="font-semibold text-lg">
-                        {parseInstallments(pkg.installments) > 1
-                          ? `${parseInstallments(pkg.installments)}x de ${getCurrencySymbol(pkg.currency || 'BRL')} ${formatInstallmentValue(pkg.price, pkg.currency || 'BRL', parseInstallments(pkg.installments))}`
-                          : `${getCurrencySymbol(pkg.currency || 'BRL')} ${formatDisplayPrice(pkg.price, pkg.currency || 'BRL')}`}
+                        {!hasPrice(pkg.price)
+                          ? PRICE_ON_REQUEST
+                          : parseInstallments(pkg.installments) > 1
+                            ? `${parseInstallments(pkg.installments)}x de ${getCurrencySymbol(pkg.currency || 'BRL')} ${formatInstallmentValue(pkg.price, pkg.currency || 'BRL', parseInstallments(pkg.installments))}`
+                            : `${getCurrencySymbol(pkg.currency || 'BRL')} ${formatDisplayPrice(pkg.price, pkg.currency || 'BRL')}`}
                       </span>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleNavigate(pkg.originalIndex, pkg.externalUrl, pkg.slug); }}

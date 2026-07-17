@@ -4,7 +4,6 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import PartnersMarquee from './components/PartnersMarquee';
 import TrendingPackages from './components/TrendingPackages';
-import PlatinumAccess from './components/PlatinumAccess';
 import ContactForm from './components/ContactForm';
 
 import Footer from './components/Footer';

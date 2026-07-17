@@ -6,7 +6,7 @@ import type { TrendingPackage } from '../types';
 import { useToast } from '../components/ui/ToastProvider';
 import { useDialog } from '../components/ui/DialogProvider';
 import LPContentEditor from './LPEditor';
-import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments } from '../utils/currency';
+import { getCurrencySymbol, formatDisplayPrice, formatInstallmentValue, parseInstallments, hasPrice, PRICE_ON_REQUEST } from '../utils/currency';
 import { sanitizeSlugInput } from '../utils/slug';
 
 const MASTER_AUTH_KEY = 'emais_master_auth';
@@ -274,7 +274,9 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
                 placeholder="Ex: 10 (vazio = à vista)" inputMode="numeric" style={IS}
                 onFocus={e => e.target.style.borderColor = '#e43c44'} onBlur={e => e.target.style.borderColor = '#333333'} />
               <span style={{ fontSize: 10, color: '#4ade80' }}>
-                Card exibirá: {parseInstallments(local.installments) > 1
+                Card exibirá: {!hasPrice(local.price)
+                      ? PRICE_ON_REQUEST + ` (preço vazio ou zero)`
+                      : parseInstallments(local.installments) > 1
                   ? `${parseInstallments(local.installments)}x de ${getCurrencySymbol(local.currency || 'BRL')} ${formatInstallmentValue(local.price, local.currency || 'BRL', parseInstallments(local.installments))}`
                   : `${getCurrencySymbol(local.currency || 'BRL')} ${formatDisplayPrice(local.price, local.currency || 'BRL')} (à vista)`}
               </span>

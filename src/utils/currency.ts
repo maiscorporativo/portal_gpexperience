@@ -49,3 +49,13 @@ export function parseInstallments(raw?: string): number {
   const n = parseInt((raw || '').replace(/\D/g, ''), 10);
   return Number.isFinite(n) && n >= 2 ? n : 1;
 }
+
+/** Frase exibida quando o pacote não tem preço definido. */
+export const PRICE_ON_REQUEST = 'Valor sob consulta';
+
+/** Um pacote tem preço quando o campo contém dígitos e o valor não é zero.
+ *  Preço vazio ou zero → o site exibe PRICE_ON_REQUEST no lugar do valor. */
+export function hasPrice(rawPrice?: string): boolean {
+  const digits = (rawPrice || '').replace(/\D/g, '');
+  return !!digits && parseInt(digits, 10) > 0;
+}
