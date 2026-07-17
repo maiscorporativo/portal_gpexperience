@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DEFAULT_IMAGES, STORAGE_KEY, type ImageKey } from '../imageConfig';
+import { encodeB64, unwrapContentResponse } from './useContentConfig';
 
 type ImageOverrides = Partial<Record<ImageKey, string>>;
 
@@ -23,14 +24,20 @@ async function pushHeroToApi(overrides: ImageOverrides) {
     // Read current content from cache and attach updated hero images
     const contentRaw = localStorage.getItem('emais_content_cache');
     const content = contentRaw ? JSON.parse(contentRaw) : {};
-    await fetch('/api/content', {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getSessionToken()}`,
+    };
+    const payload = { ...content, heroImages: overrides };
+    // Rota Base64 (imune ao firewall da hospedagem); 404 = servidor antigo → rota legada
+    const res = await fetch('/api/content/b64', {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getSessionToken()}`,
-      },
-      body: JSON.stringify({ ...content, heroImages: overrides }),
+      headers,
+      body: JSON.stringify({ b64: encodeB64(payload) }),
     });
+    if (res.status === 404) {
+      await fetch('/api/content', { method: 'PUT', headers, body: JSON.stringify(payload) });
+    }
   } catch { /* silent — localStorage already updated */ }
 }
 
@@ -39,9 +46,10 @@ export function useImageConfig() {
 
   // Fetch hero images from API on mount
   useEffect(() => {
-    fetch('/api/content')
+    fetch('/api/content?b64=1')
       .then(r => r.json())
-      .then(data => {
+      .then(raw => {
+        const data = unwrapContentResponse(raw);
         if (data.heroImages && Object.keys(data.heroImages).length > 0) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data.heroImages));
           setOverrides(data.heroImages);
