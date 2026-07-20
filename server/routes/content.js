@@ -7,6 +7,7 @@ import {
   DEFAULT_HERO_IMAGES,
   DEFAULT_CATEGORIES,
 } from '../defaults.js';
+import { listSharedPackages, saveSharedPackages, sharedDbEnabled, PORTAL } from '../shared-packages.js';
 
 const router = express.Router();
 
@@ -99,6 +100,19 @@ router.get('/', async (req, res) => {
           categoryIcons:  parseField(rows[0].category_icons,  {}),
           categoryAssets: parseField(rows[0].category_assets, {}),
         };
+
+    /* Pacotes: com a integração ativa, a fonte da verdade é a tabela
+       compartilhada (GP vê apenas automobilismo). Enquanto ela estiver
+       vazia, mantém os pacotes legados do site_content. */
+    if (rows.length && sharedDbEnabled()) {
+      try {
+        const shared = await listSharedPackages();
+        if (shared.length > 0) payload.packages = shared;
+      } catch (err) {
+        console.error('[GET /api/content] banco compartilhado indisponível, usando legado:', err.message);
+      }
+    }
+
     if (req.query.b64) {
       return res.json({ b64: Buffer.from(JSON.stringify(payload), 'utf8').toString('base64') });
     }
@@ -113,6 +127,16 @@ router.get('/', async (req, res) => {
 async function saveContent(body, res) {
   const { events, packages, testimonials, heroImages, categories, categoryIcons, categoryAssets } = body;
   try {
+    /* Integração ativa: sincroniza os pacotes com a tabela compartilhada
+       (conteúdo só é gravado para pacotes de origem própria; para os demais,
+       apenas os controles locais). O site_content guarda como backup somente
+       os pacotes deste portal. */
+    let backupPackages = packages;
+    if (sharedDbEnabled() && packages !== undefined) {
+      await saveSharedPackages(packages);
+      backupPackages = packages.filter(p => !p.origem || p.origem === PORTAL);
+    }
+
     await pool.query(
       `INSERT INTO site_content (id, events, packages, testimonials, hero_images, categories, category_icons, category_assets)
        VALUES (1, ?, ?, ?, ?, ?, ?, ?)
@@ -126,7 +150,7 @@ async function saveContent(body, res) {
          category_assets = VALUES(category_assets)`,
       [
         JSON.stringify(events       ?? DEFAULT_EVENTS),
-        JSON.stringify(packages     ?? DEFAULT_PACKAGES),
+        JSON.stringify(backupPackages ?? DEFAULT_PACKAGES),
         JSON.stringify(testimonials ?? DEFAULT_TESTIMONIALS),
         JSON.stringify(heroImages   ?? DEFAULT_HERO_IMAGES),
         JSON.stringify(categories   ?? DEFAULT_CATEGORIES),

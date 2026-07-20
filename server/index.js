@@ -10,6 +10,7 @@ import authRouter from './routes/auth.js';
 import contactRouter from './routes/contact.js';
 import pool from './db.js';
 import { migrateSharedDb } from './shared-db.js';
+import { migrateGpPackagesIfEmpty } from './shared-packages.js';
 
 dotenv.config();
 
@@ -156,6 +157,7 @@ app.listen(PORT, async () => {
   await autoMigrate();
   try {
     await migrateSharedDb();
+    await migrateGpPackagesIfEmpty(pool);
   } catch (e) {
     console.warn('⚠️ Migração do banco compartilhado falhou (não crítico):', e.message);
   }
