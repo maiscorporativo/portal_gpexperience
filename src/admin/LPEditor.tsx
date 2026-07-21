@@ -18,7 +18,7 @@
 import React, { useState } from 'react';
 import {
   Image as ImageIcon, Plus, Trash2, X, Video, LayoutGrid, CalendarDays,
-  BedDouble, Star, Sparkles, Images, Loader2, Check, Tag, DollarSign,
+  BedDouble, Star, Sparkles, Images, Loader2, Check, Tag, DollarSign, MapPin,
 } from 'lucide-react';
 import type { TrendingPackage } from '../types';
 
@@ -255,6 +255,26 @@ function BankPicker({ bank, selected, multiple, onChange }: {
   );
 }
 
+/* ── Editor de lista simples (um texto por item — ex: "experiências exclusivas") ── */
+function SimpleListEditor({ items, onChange, placeholder, addLabel }: {
+  items: string[]; onChange: (items: string[]) => void; placeholder: string; addLabel: string;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
+          <input placeholder={placeholder} value={item} onChange={e => { const n = [...items]; n[i] = e.target.value; onChange(n); }} style={{ ...IS, fontSize: 12, padding: '7px 10px' }} />
+          <button onClick={() => { const n = [...items]; n.splice(i, 1); onChange(n); }} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: 4 }}><X size={13} /></button>
+        </div>
+      ))}
+      <button onClick={() => onChange([...items, ''])}
+        style={{ alignSelf: 'flex-start', background: '#141414', border: '1px solid #2a2a2a', color: '#aaa', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5 }}>
+        <Plus size={11} /> {addLabel}
+      </button>
+    </div>
+  );
+}
+
 /* ── Tipos auxiliares do JSON de pacotes ── */
 type Incluso = { titulo?: string; descricao?: string };
 type OpcaoHospedagem = {
@@ -268,6 +288,7 @@ type PacotesObj = {
   inclusos: Incluso[];
 };
 type Destaque = { titulo?: string; titulo_destaque?: string; texto?: string; imagem?: string; invertido?: boolean };
+type DestinoLifestyle = { titulo?: string; descricao?: string; items?: string[]; imagens?: string[]; invertido?: boolean };
 
 function parsePacotes(raw?: string): PacotesObj {
   const base: PacotesObj = { opcoes_hospedagem: [], datas: { partida: '', retorno: '', duracao: '' }, inclusos: [] };
@@ -314,9 +335,12 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
   const setCards = (c: any[]) => onUpdate({ cardsData: JSON.stringify(c) });
   const destaque = parseJSONSafe<Destaque>(pkg.destaqueSection, {});
   const setDestaque = (d: Destaque) => onUpdate({ destaqueSection: JSON.stringify(d) });
+  const experienciaItems = splitList(pkg.experienciaItems);
+  const destino = parseJSONSafe<DestinoLifestyle>(pkg.destinoLifestyleData, {});
+  const setDestino = (d: DestinoLifestyle) => onUpdate({ destinoLifestyleData: JSON.stringify(d) });
 
   // Visibilidade das seções na LP (todas visíveis por padrão)
-  const vis: Record<string, boolean> = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSONSafe<Record<string, boolean>>(pkg.lpSections, {}) };
+  const vis: Record<string, boolean> = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, destino: true, parceria: true, ...parseJSONSafe<Record<string, boolean>>(pkg.lpSections, {}) };
   const setVis = (key: string, value: boolean) => onUpdate({ lpSections: JSON.stringify({ ...vis, [key]: value }) });
 
   // Fundo animado da bandeira quadriculada por seção (padrão: só na Programação)
@@ -551,22 +575,58 @@ export default function LPContentEditor({ pkg, onUpdate, tokenKey }: {
         </div>
       </LPSection>
 
-      {/* ══ SEÇÃO 5 — EXPERIÊNCIA ══ */}
-      <LPSection badge="Seção 5 da LP" title="Experiência" icon={Star} color="#8b5cf6"
+      {/* ══ SEÇÃO 5 — EXPERIÊNCIAS ══ */}
+      <LPSection badge="Seção 5 da LP" title="Experiências" icon={Star} color="#8b5cf6"
         toggle={{ on: vis.experiencia, onChange: v => setVis('experiencia', v) }}
-        subtitle='Bloco "Uma Experiência Inesquecível": texto à esquerda e imagens à direita. Escolha as imagens a partir do Banco de Imagens.'>
+        subtitle='Bloco "Uma Experiência Inesquecível": subtítulo + lista de experiências exclusivas à esquerda, imagens à direita. Escolha as imagens a partir do Banco de Imagens.'>
         <div style={{ display: 'grid', gap: 12 }}>
           {videoBgRow('experiencia')}
           <div style={fieldCol}>
-            <label style={lbl}>Texto da seção</label>
-            <textarea rows={4} value={pkg.experienciaSection || ''} onChange={e => onUpdate({ experienciaSection: e.target.value })}
+            <label style={lbl}>Subtítulo da seção</label>
+            <textarea rows={3} value={pkg.experienciaSection || ''} onChange={e => onUpdate({ experienciaSection: e.target.value })}
               placeholder="Nossos pacotes garantem que você vivencie cada momento memorável com conforto, segurança e acesso a áreas exclusivas..." style={{ ...IS, resize: 'vertical' }} />
+          </div>
+          <div style={fieldCol}>
+            <label style={lbl}>Experiências exclusivas (lista de itens)</label>
+            <SimpleListEditor items={experienciaItems} placeholder="Ex: Acesso aos boxes e paddock"
+              addLabel="Adicionar experiência" onChange={items => onUpdate({ experienciaItems: joinList(items) })} />
           </div>
           <div style={fieldCol}>
             <label style={lbl}>Imagens da seção (clique para selecionar do banco)</label>
             <BankPicker bank={bank} multiple selected={splitList(pkg.experienciaImages)}
               onChange={urls => onUpdate({ experienciaImages: joinList(urls) })} />
           </div>
+        </div>
+      </LPSection>
+
+      {/* ══ SEÇÃO DESTINO & LIFESTYLE (opcional) ══ */}
+      <LPSection badge="Seção da LP · opcional" title="Destino & Lifestyle" icon={MapPin} color="#06b6d4"
+        toggle={{ on: vis.destino, onChange: v => setVis('destino', v) }}
+        subtitle="Apresenta a cidade/destino do evento: título, breve descrição, atrativos locais e imagens escolhidas do Banco de Imagens. Fica oculta automaticamente se título e descrição estiverem vazios.">
+        <div style={{ display: 'grid', gap: 12 }}>
+          <div style={fieldCol}>
+            <label style={lbl}>Título</label>
+            <input placeholder="Ex: Indianapolis te espera" value={destino.titulo || ''} onChange={e => setDestino({ ...destino, titulo: e.target.value })} style={IS} />
+          </div>
+          <div style={fieldCol}>
+            <label style={lbl}>Descrição breve da cidade</label>
+            <textarea rows={3} value={destino.descricao || ''} onChange={e => setDestino({ ...destino, descricao: e.target.value })}
+              placeholder="Capital do automobilismo americano, Indianapolis combina tradição centenária com um estilo de vida vibrante..." style={{ ...IS, resize: 'vertical' }} />
+          </div>
+          <div style={fieldCol}>
+            <label style={lbl}>Atrativos da cidade (lista de itens)</label>
+            <SimpleListEditor items={destino.items || []} placeholder="Ex: Indianapolis Motor Speedway Museum"
+              addLabel="Adicionar atrativo" onChange={items => setDestino({ ...destino, items })} />
+          </div>
+          <div style={fieldCol}>
+            <label style={lbl}>Imagens desta seção (clique para selecionar do banco)</label>
+            <BankPicker bank={bank} multiple selected={destino.imagens || []}
+              onChange={urls => setDestino({ ...destino, imagens: urls })} />
+          </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#aaa', cursor: 'pointer' }}>
+            <input type="checkbox" checked={!!destino.invertido} onChange={e => setDestino({ ...destino, invertido: e.target.checked })} />
+            Texto à esquerda / imagens à direita (padrão é imagens à esquerda / texto à direita)
+          </label>
         </div>
       </LPSection>
 

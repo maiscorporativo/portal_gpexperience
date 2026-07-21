@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  CheckCircle2, Calendar, Users,
+  CheckCircle2, Calendar, Users, MapPin,
   MessageCircle, AlertTriangle, Zap, Trophy, Headset, ChevronRight, ChevronLeft, X
 } from 'lucide-react';
 import { useContentConfig } from '../hooks/useContentConfig';
@@ -443,7 +443,7 @@ export default function PackageLP() {
   ]);
 
   // Visibilidade das seções da LP (configurável no admin — todas visíveis por padrão)
-  const vis = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, parceria: true, ...parseJSON(pkg.lpSections, {}) };
+  const vis = { cards: true, programacao: true, pacotes: true, experiencia: true, galeria: true, destaque: true, destino: true, parceria: true, ...parseJSON(pkg.lpSections, {}) };
 
   // Fundo animado da bandeira por seção (configurável no admin — padrão: só na Programação)
   const videoBg = { programacao: true, pacotes: false, experiencia: false, galeria: false, ...parseJSON(pkg.videoBgSections, {}) };
@@ -755,6 +755,18 @@ export default function PackageLP() {
           <div>
             <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 24px', lineHeight: 1.1 }}>Uma Experiência <span style={{ color: '#e43c44' }}>Inesquecível</span></h2>
             <div style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: pkg.experienciaSection || 'Nossos pacotes garantem que você vivencie cada momento memorável com conforto, segurança e acesso a áreas exclusivas que a maioria dos visitantes nunca experimenta.' }} />
+            {(pkg.experienciaItems || '').split(';').map(s => s.trim()).filter(Boolean).length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 28 }}>
+                {(pkg.experienciaItems || '').split(';').map(s => s.trim()).filter(Boolean).map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 22, height: 22, background: '#e43c44', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <CheckCircle2 size={13} color="#fff" />
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#eee' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div style={{ display: 'grid', gap: 20 }}>
             {(() => {
@@ -776,6 +788,51 @@ export default function PackageLP() {
         </div>
       </section>
       )}
+
+      {/* --- DESTINO & LIFESTYLE --- */}
+      {(() => {
+        if (!vis.destino) return null;
+        const destino = parseJSON(pkg.destinoLifestyleData, null);
+        if (!destino || (!destino.titulo && !destino.descricao)) return null;
+        const imgs: string[] = (destino.imagens || []).filter((u: string) => galleryList.includes(u));
+        const items: string[] = (destino.items || []).filter(Boolean);
+        const fotos = (
+          <div style={{ display: 'grid', gridTemplateColumns: imgs.length > 1 ? '1fr 1fr' : '1fr', gap: 16 }}>
+            {imgs.length > 0 ? imgs.map((img, i) => (
+              <img key={i} src={fixImgPath(img)} alt={destino.titulo || 'Destino'} style={{ width: '100%', height: imgs.length > 1 ? 220 : 380, objectFit: 'cover', borderRadius: 24, border: '1px solid #222' }} />
+            )) : (
+              <div style={{ width: '100%', height: 380, background: '#111', borderRadius: 24, border: '1px solid #222' }} />
+            )}
+          </div>
+        );
+        const texto = (
+          <div>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, margin: '0 0 24px', lineHeight: 1.1 }}>
+              <span style={{ color: '#e43c44' }}>{destino.titulo}</span>
+            </h2>
+            {destino.descricao && <p style={{ fontSize: 16, color: '#aaa', lineHeight: 1.8, marginBottom: items.length > 0 ? 28 : 0 }}>{destino.descricao}</p>}
+            {items.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {items.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 22, height: 22, background: '#e43c44', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <MapPin size={12} color="#fff" />
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#eee' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+        return (
+          <section style={{ padding: '100px 20px', background: '#0a0a0b' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+              {destino.invertido ? <>{texto}{fotos}</> : <>{fotos}{texto}</>}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* --- GALERIA DE FOTOS (todas as imagens do Banco de Imagens) --- */}
       {(() => {

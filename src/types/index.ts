@@ -63,11 +63,13 @@ export interface TrendingPackage {
   categoryLogo?: string; // Logo da categoria (F1, Le Mans, Stock Car...) exibido na navbar da LP, enviado pelo admin
   galleryImages?: string; // Banco de Imagens — URLs separadas por ";" (alimenta a seção Galeria da LP)
   experienciaImages?: string; // Imagens escolhidas do banco para a seção Experiência (URLs separadas por ";")
+  experienciaItems?: string; // Lista de "experiências exclusivas" da seção Experiência (itens separados por ";")
   destaqueSection?: string; // JSON { titulo, titulo_destaque, texto, imagem, invertido } — seção destaque estilo "Troféu" da Indy 500
+  destinoLifestyleData?: string; // JSON { titulo, descricao, items: string[], imagens: string[], invertido } — seção Destino & Lifestyle
   programacaoTitulo?: string; // Título da seção Programação (parte branca — padrão: "Programação do")
   programacaoTituloDestaque?: string; // Título da seção Programação (parte vermelha — padrão: "Fim de Semana")
   programacaoSubtitulo?: string; // Subtítulo da seção Programação (padrão: "Dias de ação e emoção")
-  lpSections?: string; // JSON de visibilidade das seções da LP: { cards, programacao, pacotes, experiencia, galeria, destaque, parceria } — todas true por padrão
+  lpSections?: string; // JSON de visibilidade das seções da LP: { cards, programacao, pacotes, experiencia, galeria, destaque, destino, parceria } — todas true por padrão
   videoBgSections?: string; // JSON: seções com fundo animado da bandeira { programacao, pacotes, experiencia } — padrão: só programacao
   highlights?: string; // Semicolon separated features/highlights
   sectionBackground?: string;
