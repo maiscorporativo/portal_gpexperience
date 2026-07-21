@@ -125,7 +125,7 @@ router.get('/', async (req, res) => {
 
 /* ── Gravação compartilhada pelas duas rotas de PUT ───────────── */
 async function saveContent(body, res) {
-  const { events, packages, testimonials, heroImages, categories, categoryIcons, categoryAssets } = body;
+  const { events, packages, testimonials, heroImages, heroImagesReplace, categories, categoryIcons, categoryAssets } = body;
   try {
     /* Integração ativa: sincroniza os pacotes com a tabela compartilhada
        (conteúdo só é gravado para pacotes de origem própria; para os demais,
@@ -143,6 +143,20 @@ async function saveContent(body, res) {
       }
     }
 
+    /* heroImages é editado por várias linhas independentes do admin (uma por
+       imagem da galeria), cada uma só conhecendo seu próprio subconjunto.
+       Requisições concorrentes podem completar fora de ordem — se a última a
+       terminar carregasse um snapshot mais antigo/parcial, ela apagava as
+       imagens salvas pelas outras linhas. Por isso o padrão aqui é MERGE por
+       chave com o valor já salvo; só reset/import (heroImagesReplace: true)
+       substitui o objeto inteiro. */
+    let finalHeroImages = heroImages ?? DEFAULT_HERO_IMAGES;
+    if (heroImages !== undefined && !heroImagesReplace) {
+      const [current] = await pool.query('SELECT hero_images FROM site_content WHERE id = 1');
+      const existingHero = current.length ? parseField(current[0].hero_images, DEFAULT_HERO_IMAGES) : DEFAULT_HERO_IMAGES;
+      finalHeroImages = { ...existingHero, ...heroImages };
+    }
+
     await pool.query(
       `INSERT INTO site_content (id, events, packages, testimonials, hero_images, categories, category_icons, category_assets)
        VALUES (1, ?, ?, ?, ?, ?, ?, ?)
@@ -158,7 +172,7 @@ async function saveContent(body, res) {
         JSON.stringify(events       ?? DEFAULT_EVENTS),
         JSON.stringify(backupPackages ?? DEFAULT_PACKAGES),
         JSON.stringify(testimonials ?? DEFAULT_TESTIMONIALS),
-        JSON.stringify(heroImages   ?? DEFAULT_HERO_IMAGES),
+        JSON.stringify(finalHeroImages),
         JSON.stringify(categories   ?? DEFAULT_CATEGORIES),
         JSON.stringify(categoryIcons ?? {}),
         JSON.stringify(categoryAssets ?? {}),

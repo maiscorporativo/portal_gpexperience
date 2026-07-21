@@ -19,16 +19,23 @@ function loadOverrides(): ImageOverrides {
   } catch { return {}; }
 }
 
-async function pushHeroToApi(overrides: ImageOverrides) {
+async function pushHeroToApi(overrides: ImageOverrides, replace = false) {
   try {
-    // Read current content from cache and attach updated hero images
+    // Read current content from cache and attach updated hero images — os
+    // demais campos (events/packages/...) não têm fallback pro valor
+    // existente no servidor quando ausentes, então precisam vir aqui.
     const contentRaw = localStorage.getItem('emais_content_cache');
     const content = contentRaw ? JSON.parse(contentRaw) : {};
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${getSessionToken()}`,
     };
-    const payload = { ...content, heroImages: overrides };
+    // heroImages, por sua vez, é mesclado por chave no servidor (várias
+    // linhas do admin editam esse campo de forma independente e concorrente
+    // — mandar só a chave alterada evita apagar as demais). replace=true
+    // (reset geral / importar config) força substituição total.
+    const payload: Record<string, unknown> = { ...content, heroImages: overrides };
+    if (replace) payload.heroImagesReplace = true;
     // Rota Base64 (imune ao firewall da hospedagem); 404 = servidor antigo → rota legada
     const res = await fetch('/api/content/b64', {
       method: 'PUT',
@@ -79,7 +86,10 @@ export function useImageConfig() {
       const next = { ...prev, [key]: url };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       window.dispatchEvent(new Event(UPDATE_EVENT));
-      pushHeroToApi(next);
+      // Envia só a própria chave — o servidor faz o merge, então esta linha
+      // nunca depende do seu próprio snapshot local estar em dia com o que
+      // as outras linhas já salvaram.
+      pushHeroToApi({ [key]: url });
       return next;
     });
   }, []);
@@ -88,7 +98,7 @@ export function useImageConfig() {
     localStorage.removeItem(STORAGE_KEY);
     setOverrides({});
     window.dispatchEvent(new Event(UPDATE_EVENT));
-    pushHeroToApi({});
+    pushHeroToApi({}, true);
   }, []);
 
   const exportConfig = useCallback((): string => JSON.stringify(overrides, null, 2), [overrides]);
@@ -99,7 +109,7 @@ export function useImageConfig() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       setOverrides(parsed);
       window.dispatchEvent(new Event(UPDATE_EVENT));
-      pushHeroToApi(parsed);
+      pushHeroToApi(parsed, true);
       return true;
     } catch { return false; }
   }, []);
