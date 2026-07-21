@@ -8,6 +8,7 @@ import contentRouter from './routes/content.js';
 import uploadRouter, { uploadsDir } from './routes/upload.js';
 import authRouter from './routes/auth.js';
 import contactRouter from './routes/contact.js';
+import setupRouter from './routes/setup.js';
 import pool from './db.js';
 import { migrateSharedDb } from './shared-db.js';
 import { migrateGpPackagesIfEmpty } from './shared-packages.js';
@@ -65,6 +66,7 @@ app.use('/api/content', contentRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/setup', setupRouter);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
