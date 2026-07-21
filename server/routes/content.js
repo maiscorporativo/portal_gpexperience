@@ -150,8 +150,16 @@ async function saveContent(body, res) {
        imagens salvas pelas outras linhas. Por isso o padrão aqui é MERGE por
        chave com o valor já salvo; só reset/import (heroImagesReplace: true)
        substitui o objeto inteiro. */
-    let finalHeroImages = heroImages ?? DEFAULT_HERO_IMAGES;
-    if (heroImages !== undefined && !heroImagesReplace) {
+    let finalHeroImages;
+    if (heroImages === undefined) {
+      // Campo ausente (ex: save de pacotes/eventos, que não mexe na
+      // galeria Hero) — preserva o que já está gravado, não reseta pros
+      // padrões.
+      const [current] = await pool.query('SELECT hero_images FROM site_content WHERE id = 1');
+      finalHeroImages = current.length ? parseField(current[0].hero_images, DEFAULT_HERO_IMAGES) : DEFAULT_HERO_IMAGES;
+    } else if (heroImagesReplace) {
+      finalHeroImages = heroImages;
+    } else {
       const [current] = await pool.query('SELECT hero_images FROM site_content WHERE id = 1');
       const existingHero = current.length ? parseField(current[0].hero_images, DEFAULT_HERO_IMAGES) : DEFAULT_HERO_IMAGES;
       finalHeroImages = { ...existingHero, ...heroImages };
