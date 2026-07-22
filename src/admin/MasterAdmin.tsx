@@ -191,18 +191,23 @@ function PackageReviewCard({ pkg, onApprove, onReject, onUpdate, onRemove, trend
 }) {
   const [open, setOpen] = useState(false);
   const [local, setLocal] = useState<TrendingPackage>(pkg);
-  const set = (d: Partial<TrendingPackage>) => setLocal(p => ({ ...p, ...d }));
+  const [hasEdited, setHasEdited] = useState(false);
+  const set = (d: Partial<TrendingPackage>) => { setLocal(p => ({ ...p, ...d })); setHasEdited(true); };
 
-  // Sincroniza local quando pkg muda (após salvar, o hook reconstrói o array)
-  useEffect(() => { setLocal(pkg); }, [pkg]);
+  // Sincroniza local quando pkg muda (após salvar, o hook reconstrói o
+  // array). SÓ faz isso sem edições pendentes: o polling de 5s recria o
+  // array (novas referências de objeto) mesmo sem mudança real no conteúdo
+  // — sincronizar sempre apagava qualquer campo editado e ainda não salvo
+  // (o formulário "desfazia" o que o usuário tinha acabado de digitar).
+  useEffect(() => { if (!hasEdited) setLocal(pkg); }, [pkg, hasEdited]);
 
   const masterUser = localStorage.getItem(MASTER_AUTH_KEY) ?? 'master';
   const now = () => new Date().toISOString();
   const { toast } = useToast();
   const { showAlert, showConfirm } = useDialog();
 
-  const handleSaveApprove = () => { onUpdate({ ...local, status: 'approved', updatedBy: masterUser, updatedAt: now() }); toast('Edições salvas com sucesso!', 'success'); };
-  const handleSaveOnly    = () => { onUpdate({ ...local, updatedBy: masterUser, updatedAt: now() }); toast('Salvo sem aprovar.', 'info'); };
+  const handleSaveApprove = () => { onUpdate({ ...local, status: 'approved', updatedBy: masterUser, updatedAt: now() }); setHasEdited(false); toast('Edições salvas com sucesso!', 'success'); };
+  const handleSaveOnly    = () => { onUpdate({ ...local, updatedBy: masterUser, updatedAt: now() }); setHasEdited(false); toast('Salvo sem aprovar.', 'info'); };
 
   const statusColor = pkg.status === 'approved' ? '#4ade80' : pkg.status === 'rejected' ? '#f87171' : '#fbbf24';
   const statusBg    = pkg.status === 'approved' ? '#0d3320' : pkg.status === 'rejected' ? '#3a0d0d' : '#1a1a1a';
