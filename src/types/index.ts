@@ -77,6 +77,8 @@ export interface TrendingPackage {
   cardsData?: string; // JSON string para Cards de Experiência
   programacaoData?: string; // JSON string para dias e programação
   pacotesOptionsData?: string; // JSON string para opções de pacotes
+  euTicketBannerTitle?: string; // Título do banner "Somente Ingresso" (seção Pacotes) — banner só aparece se preenchido
+  euTicketBannerText?: string; // Subtítulo/chamada do banner "Somente Ingresso" (exibido em itálico)
   experienciaSection?: string; // JSON string ou texto da seção Experiência
   partnershipSection?: string; // JSON string ou boolean para parceria
   /* ── Soft-delete ── */
